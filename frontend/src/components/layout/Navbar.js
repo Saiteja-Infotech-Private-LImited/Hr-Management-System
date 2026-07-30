@@ -260,8 +260,6 @@
 //     </div>
 //   );
 // }
-
-
 'use client';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -280,25 +278,25 @@ import {
   Briefcase,
   FolderOpen,
 } from 'lucide-react';
-
+ 
 export default function Navbar() {
   const { user } = useSelector((state) => state.auth);
-  const router   = useRouter();
+  const router = useRouter();
   const pathname = usePathname();
-
-  const [search, setSearch]           = useState('');
+ 
+  const [search, setSearch] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-
+ 
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'HR';
-
+ 
   useEffect(() => {
     let active = true;
     const fetchUnreadCount = async () => {
       try {
         const res = await getUnreadCount();
         if (active) setUnreadCount(res.data?.data || 0);
-      } catch {}
+      } catch { }
     };
     fetchUnreadCount();
     const interval = setInterval(fetchUnreadCount, 30000);
@@ -307,43 +305,46 @@ export default function Navbar() {
       clearInterval(interval);
     };
   }, []);
-
+ 
   const EMP_SEARCH_ITEMS = [
-    { label: 'Dashboard',       path: '/employee/dashboard',      icon: Home },
-    { label: 'Attendance',      path: '/employee/attendance',     icon: Calendar },
-    { label: 'Leave Management',path: '/employee/leave',          icon: ClipboardList },
-    { label: 'Payslips',        path: '/employee/payslips',       icon: Wallet },
-    { label: 'Performance',     path: '/employee/performance',    icon: TrendingUp },
-    { label: 'Notifications',   path: '/employee/notifications',  icon: Bell },
-    { label: 'Settings',        path: '/employee/settings',       icon: Settings },
+    { label: 'Dashboard', path: '/employee/dashboard', icon: Home },
+    { label: 'Attendance', path: '/employee/attendance', icon: Calendar },
+    { label: 'Leave Management', path: '/employee/leave', icon: ClipboardList },
+    { label: 'Payslips', path: '/employee/payslips', icon: Wallet },
+    { label: 'Performance', path: '/employee/performance', icon: TrendingUp },
+    { label: 'Notifications', path: '/employee/notifications', icon: Bell },
+    { label: 'Settings', path: '/employee/settings', icon: Settings },
   ];
-
+ 
   const ADMIN_SEARCH_ITEMS = [
-    { label: 'Dashboard',       path: '/admin/dashboard',         icon: Home },
-    { label: 'Employees',       path: '/admin/employees',         icon: Users },
-    { label: 'Leave Approvals', path: '/admin/leave',             icon: ClipboardList },
-    { label: 'Payroll',         path: '/admin/payroll',           icon: Wallet },
-    { label: 'Performance',     path: '/admin/performance',       icon: TrendingUp },
-    { label: 'Training',        path: '/admin/training',          icon: GraduationCap },
-    { label: 'Recruitment',     path: '/admin/recruitment',       icon: Briefcase },
-    { label: 'Onboarding',      path: '/admin/onboarding',        icon: FolderOpen },
-    { label: 'Notifications',   path: '/admin/notifications',     icon: Bell },
-    { label: 'Settings',        path: '/admin/settings',          icon: Settings },
+    { label: 'Dashboard', path: '/admin/dashboard', icon: Home },
+    { label: 'Employees', path: '/admin/employees', icon: Users },
+    { label: 'Leave Approvals', path: '/admin/leave', icon: ClipboardList },
+    { label: 'Payroll', path: '/admin/payroll', icon: Wallet },
+    { label: 'Performance', path: '/admin/performance', icon: TrendingUp },
+    { label: 'Training', path: '/admin/training', icon: GraduationCap },
+    { label: 'Recruitment', path: '/admin/recruitment', icon: Briefcase },
+    { label: 'Onboarding', path: '/admin/onboarding', icon: FolderOpen },
+    { label: 'Notifications', path: '/admin/notifications', icon: Bell },
+    { label: 'Settings', path: '/admin/settings', icon: Settings },
   ];
-
-  const allItems = isAdmin ? ADMIN_SEARCH_ITEMS : EMP_SEARCH_ITEMS;
-
+ 
+  // Sort alphabetically by label (string order, not insertion/numeric order)
+  const allItems = (isAdmin ? ADMIN_SEARCH_ITEMS : EMP_SEARCH_ITEMS)
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label));
+ 
   const filtered = search.trim()
     ? allItems.filter(item =>
-        item.label.toLowerCase().includes(search.toLowerCase()))
+      item.label.toLowerCase().includes(search.toLowerCase()))
     : [];
-
+ 
   const handleSearchSelect = (path) => {
     router.push(path);
     setSearch('');
     setShowResults(false);
   };
-
+ 
   const handleBellClick = () => {
     if (isAdmin) {
       router.push('/admin/notifications');
@@ -351,7 +352,7 @@ export default function Navbar() {
       router.push('/employee/notifications');
     }
   };
-
+ 
   return (
     <div className="app-navbar">
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -369,147 +370,158 @@ export default function Navbar() {
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-
+ 
         {/* Search Box */}
         <div className="nav-search-box" style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-          stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 1 }}>
-          <circle cx="11" cy="11" r="8"/>
-          <path d="M21 21l-4.35-4.35"/>
-        </svg>
-        <input
-          value={search}
-          onChange={e => { setSearch(e.target.value); setShowResults(true); }}
-          onFocus={() => setShowResults(true)}
-          onBlur={() => setTimeout(() => setShowResults(false), 200)}
-          placeholder="Search pages..."
-          style={{
-            width: '100%', paddingLeft: '36px', paddingRight: '12px',
-            height: '38px', border: '1.5px solid #e2e8f0',
-            borderRadius: '10px', fontSize: '13px', outline: 'none',
-            boxSizing: 'border-box', transition: 'border 0.2s',
-            background: '#f8fafc', color: '#1e293b',
-          }}
-          onFocusCapture={e => {
-            e.target.style.borderColor = '#3b82f6';
-            e.target.style.background = 'white';
-          }}
-          onBlurCapture={e => {
-            e.target.style.borderColor = '#e2e8f0';
-            e.target.style.background = '#f8fafc';
-          }}
-        />
-
-        {/* Search Results Dropdown */}
-        {showResults && search.trim() && (
-          <div style={{
-            position: 'absolute', top: '44px', left: 0, right: 0,
-            background: 'white', borderRadius: '12px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            overflow: 'hidden', zIndex: 100,
-          }}>
-            {filtered.length === 0 ? (
-              <div style={{ padding: '14px 16px', fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>
-                No results for &quot;{search}&quot;
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 1 }}>
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            value={search}
+            onChange={e => {
+              // Allow letters and spaces only — strip any numbers/symbols
+              const lettersOnly = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+              setSearch(lettersOnly);
+              setShowResults(true);
+            }}
+            onKeyPress={e => {
+              // Block numeric/symbol keys before they even get typed
+              if (!/[a-zA-Z\s]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            onFocus={() => setShowResults(true)}
+            onBlur={() => setTimeout(() => setShowResults(false), 200)}
+            placeholder="Search pages..."
+            style={{
+              width: '100%', paddingLeft: '36px', paddingRight: '12px',
+              height: '38px', border: '1.5px solid #e2e8f0',
+              borderRadius: '10px', fontSize: '13px', outline: 'none',
+              boxSizing: 'border-box', transition: 'border 0.2s',
+              background: '#f8fafc', color: '#1e293b',
+            }}
+            onFocusCapture={e => {
+              e.target.style.borderColor = '#3b82f6';
+              e.target.style.background = 'white';
+            }}
+            onBlurCapture={e => {
+              e.target.style.borderColor = '#e2e8f0';
+              e.target.style.background = '#f8fafc';
+            }}
+          />
+ 
+          {/* Search Results Dropdown */}
+          {showResults && search.trim() && (
+            <div style={{
+              position: 'absolute', top: '44px', left: 0, right: 0,
+              background: 'white', borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              overflow: 'hidden', zIndex: 100,
+            }}>
+              {filtered.length === 0 ? (
+                <div style={{ padding: '14px 16px', fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>
+                  No results for &quot;{search}&quot;
+                </div>
+              ) : (
+                filtered.map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i}
+                      onMouseDown={() => handleSearchSelect(item.path)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '10px 16px', cursor: 'pointer',
+                        borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none',
+                        background: pathname === item.path ? '#eff6ff' : 'white',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseLeave={e => e.currentTarget.style.background = pathname === item.path ? '#eff6ff' : 'white'}
+                    >
+                      <Icon size={18} color={pathname === item.path ? '#3b82f6' : '#64748b'} strokeWidth={2} />
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                          {item.label}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                          {item.path}
+                        </div>
+                      </div>
+                      {pathname === item.path && (
+                        <span style={{
+                          marginLeft: 'auto', fontSize: '10px',
+                          background: '#eff6ff', color: '#3b82f6',
+                          padding: '2px 8px', borderRadius: '20px', fontWeight: '700',
+                        }}>
+                          Current
+                        </span>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+ 
+          {/* Empty Search — Quick Navigation */}
+          {showResults && !search.trim() && (
+            <div style={{
+              position: 'absolute', top: '44px', left: 0, right: 0,
+              background: 'white', borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              padding: '12px 16px', zIndex: 100,
+            }}>
+              <div style={{
+                fontSize: '11px', color: '#94a3b8', fontWeight: '600',
+                marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px',
+              }}>
+                Quick Navigation
               </div>
-            ) : (
-              filtered.map((item, i) => {
+              {allItems.slice(0, 5).map((item, i) => {
                 const Icon = item.icon;
                 return (
                   <div key={i}
                     onMouseDown={() => handleSearchSelect(item.path)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '10px',
-                      padding: '10px 16px', cursor: 'pointer',
-                      borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none',
-                      background: pathname === item.path ? '#eff6ff' : 'white',
-                      transition: 'background 0.15s',
+                      padding: '8px 0', cursor: 'pointer',
+                      borderBottom: i < 4 ? '1px solid #f1f5f9' : 'none',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-                    onMouseLeave={e => e.currentTarget.style.background = pathname === item.path ? '#eff6ff' : 'white'}
+                    onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                    onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                   >
-                    <Icon size={18} color={pathname === item.path ? '#3b82f6' : '#64748b'} strokeWidth={2}/>
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
-                        {item.label}
-                      </div>
-                      <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                        {item.path}
-                      </div>
-                    </div>
-                    {pathname === item.path && (
-                      <span style={{
-                        marginLeft: 'auto', fontSize: '10px',
-                        background: '#eff6ff', color: '#3b82f6',
-                        padding: '2px 8px', borderRadius: '20px', fontWeight: '700',
-                      }}>
-                        Current
-                      </span>
-                    )}
+                    <Icon size={16} color="#374151" strokeWidth={2} />
+                    <span style={{ fontSize: '13px', color: '#374151', fontWeight: '500' }}>
+                      {item.label}
+                    </span>
                   </div>
                 );
-              })
-            )}
-          </div>
-        )}
-
-        {/* Empty Search — Quick Navigation */}
-        {showResults && !search.trim() && (
-          <div style={{
-            position: 'absolute', top: '44px', left: 0, right: 0,
-            background: 'white', borderRadius: '12px',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            padding: '12px 16px', zIndex: 100,
-          }}>
-            <div style={{
-              fontSize: '11px', color: '#94a3b8', fontWeight: '600',
-              marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px',
-            }}>
-              Quick Navigation
+              })}
             </div>
-            {allItems.slice(0, 5).map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div key={i}
-                  onMouseDown={() => handleSearchSelect(item.path)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '10px',
-                    padding: '8px 0', cursor: 'pointer',
-                    borderBottom: i < 4 ? '1px solid #f1f5f9' : 'none',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                >
-                  <Icon size={16} color="#374151" strokeWidth={2}/>
-                  <span style={{ fontSize: '13px', color: '#374151', fontWeight: '500' }}>
-                    {item.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      </div>
-
+ 
       {/* Right Side */}
       <div className="nav-right-side" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-
+ 
         {/* Notification Bell */}
         <div
           onClick={handleBellClick}
           style={{ position: 'relative', cursor: 'pointer', padding: '6px' }}
           title="Go to Notifications"
         >
-          <Bell size={20} color="#64748b" strokeWidth={2}/>
+          <Bell size={20} color="#64748b" strokeWidth={2} />
           {unreadCount > 0 && (
             <span style={{
               position: 'absolute', top: '2px', right: '2px',
@@ -522,10 +534,10 @@ export default function Navbar() {
             </span>
           )}
         </div>
-
+ 
         {/* Divider */}
-        <div className="nav-divider" style={{ width: '1px', height: '28px', background: '#e2e8f0' }}/>
-
+        <div className="nav-divider" style={{ width: '1px', height: '28px', background: '#e2e8f0' }} />
+ 
         {/* Role Badge */}
         <span className="nav-role-badge" style={{
           background: user?.role === 'ADMIN' ? '#dbeafe'
@@ -537,7 +549,7 @@ export default function Navbar() {
         }}>
           {user?.role}
         </span>
-
+ 
         {/* User Info */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{

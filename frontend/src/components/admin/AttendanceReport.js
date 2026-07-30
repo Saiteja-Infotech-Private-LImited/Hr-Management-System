@@ -4,14 +4,14 @@ import { getAttendanceSummaryByDate, exportAttendanceRange } from '@/lib/adminAp
 import { downloadBlob } from '@/lib/downloadFile';
 import EmployeeAttendanceModal from './EmployeeAttendanceModal';
 import toast from 'react-hot-toast';
-
+ 
 const STATUS_COLORS = {
     PRESENT: { bg: '#dcfce7', color: '#16a34a' },
     HALF_DAY: { bg: '#fff7ed', color: '#f59e0b' },
     ON_LEAVE: { bg: '#eff6ff', color: '#3b82f6' },
     ABSENT: { bg: '#fee2e2', color: '#dc2626' },
 };
-
+ 
 function StatusBadge({ status }) {
     const s = STATUS_COLORS[status] || { bg: '#f1f5f9', color: '#64748b' };
     return (
@@ -24,14 +24,23 @@ function StatusBadge({ status }) {
         </span>
     );
 }
-
+ 
+function formatDuration(mins) {
+    if (!mins) return '--';
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+ 
 function todayIST() {
     const now = new Date();
     const ist = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     return ist.toISOString().split('T')[0];
 }
-
+ 
 export default function AttendanceReport() {
+    const maxDate = useMemo(() => todayIST(), []);
+ 
     const [fromDate, setFromDate] = useState(todayIST());
     const [toDate, setToDate] = useState(todayIST());
     const [search, setSearch] = useState('');
@@ -42,9 +51,10 @@ export default function AttendanceReport() {
     const [totalPages, setTotalPages] = useState(1);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [exporting, setExporting] = useState(false);
-
+ 
     useEffect(() => {
         let active = true;
+        setLoading(true);
         getAttendanceSummaryByDate(toDate, page, 50)
             .then((res) => {
                 if (!active) return;
@@ -60,7 +70,7 @@ export default function AttendanceReport() {
             });
         return () => { active = false; };
     }, [toDate, page]);
-
+ 
     const filteredRows = useMemo(() => {
         return rows.filter((r) => {
             const matchesSearch = !search ||
@@ -70,7 +80,34 @@ export default function AttendanceReport() {
             return matchesSearch && matchesStatus;
         });
     }, [rows, search, statusFilter]);
-
+ 
+    const handleFromDateChange = (e) => {
+        const val = e.target.value;
+        if (val > maxDate) {
+            toast.error('Future dates are not allowed');
+            return;
+        }
+        if (val > toDate) {
+            toast.error('From date cannot be after To date');
+            return;
+        }
+        setFromDate(val);
+    };
+ 
+    const handleToDateChange = (e) => {
+        const val = e.target.value;
+        if (val > maxDate) {
+            toast.error('Future dates are not allowed');
+            return;
+        }
+        if (val < fromDate) {
+            toast.error('To date cannot be before From date');
+            return;
+        }
+        setToDate(val);
+        setPage(0);
+    };
+ 
     const handleExport = async () => {
         setExporting(true);
         try {
@@ -82,7 +119,7 @@ export default function AttendanceReport() {
             setExporting(false);
         }
     };
-
+ 
     return (
         <div>
             <div style={{ marginBottom: '20px' }}>
@@ -93,7 +130,7 @@ export default function AttendanceReport() {
                     View attendance for all employees by date range.
                 </p>
             </div>
-
+ 
             <div style={{
                 display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap',
                 background: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px 16px',
@@ -111,7 +148,8 @@ export default function AttendanceReport() {
                 <input
                     type="date"
                     value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
+                    max={maxDate}
+                    onChange={handleFromDateChange}
                     style={{
                         padding: '8px 12px', border: '1px solid #e2e8f0',
                         borderRadius: '8px', fontSize: '13px',
@@ -120,7 +158,8 @@ export default function AttendanceReport() {
                 <input
                     type="date"
                     value={toDate}
-                    onChange={(e) => { setLoading(true); setToDate(e.target.value); setPage(0); }}
+                    max={maxDate}
+                    onChange={handleToDateChange}
                     style={{
                         padding: '8px 12px', border: '1px solid #e2e8f0',
                         borderRadius: '8px', fontSize: '13px',
@@ -152,18 +191,18 @@ export default function AttendanceReport() {
                     {exporting ? 'Exporting...' : '⬇ Export'}
                 </button>
             </div>
-
+ 
             <div style={{
                 background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden',
             }}>
                 <div className="table-responsive">
-                    <div style={{ minWidth: '680px' }}>
+                    <div style={{ minWidth: '780px' }}>
                         <div style={{
-                            display: 'grid', gridTemplateColumns: '2fr 1.3fr 1fr 1fr 1fr 0.8fr',
+                            display: 'grid', gridTemplateColumns: '1.8fr 1.1fr 0.9fr 0.9fr 0.9fr 0.9fr 0.8fr',
                             padding: '10px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0',
                         }}>
-                            {['Name', 'Department', 'Status', 'Check in', 'Check out', ''].map((h) => (
+                            {['Name', 'Department', 'Status', 'Check in', 'Check out', 'Break', ''].map((h) => (
                                 <div key={h} style={{
                                     fontSize: '11px', fontWeight: '700', color: '#64748b',
                                     textTransform: 'uppercase', letterSpacing: '0.5px',
@@ -172,7 +211,7 @@ export default function AttendanceReport() {
                                 </div>
                             ))}
                         </div>
-
+ 
                         {loading ? (
                             <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>Loading...</div>
                         ) : filteredRows.length === 0 ? (
@@ -182,7 +221,7 @@ export default function AttendanceReport() {
                         ) : (
                             filteredRows.map((r) => (
                                 <div key={r.employeeId} style={{
-                                    display: 'grid', gridTemplateColumns: '2fr 1.3fr 1fr 1fr 1fr 0.8fr',
+                                    display: 'grid', gridTemplateColumns: '1.8fr 1.1fr 0.9fr 0.9fr 0.9fr 0.9fr 0.8fr',
                                     padding: '12px 20px', borderBottom: '1px solid #f1f5f9', alignItems: 'center',
                                 }}>
                                     <div>
@@ -198,6 +237,9 @@ export default function AttendanceReport() {
                                     </div>
                                     <div style={{ fontSize: '13px', color: '#64748b' }}>
                                         {r.checkOut ? String(r.checkOut).slice(0, 5) : '--'}
+                                    </div>
+                                    <div style={{ fontSize: '13px', color: r.onBreak ? '#f59e0b' : '#64748b', fontWeight: r.onBreak ? '700' : '400' }}>
+                                        {r.onBreak ? 'On break' : formatDuration(r.totalBreakMinutes)}
                                     </div>
                                     <div>
                                         <button
@@ -216,7 +258,7 @@ export default function AttendanceReport() {
                         )}
                     </div>
                 </div>
-
+ 
                 {totalPages > 1 && (
                     <div style={{
                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px',
@@ -224,7 +266,7 @@ export default function AttendanceReport() {
                     }}>
                         <button
                             disabled={page === 0}
-                            onClick={() => { setLoading(true); setPage((p) => Math.max(0, p - 1)); }}
+                            onClick={() => setPage((p) => Math.max(0, p - 1))}
                             style={{ padding: '6px 14px', fontSize: '12px', cursor: page === 0 ? 'not-allowed' : 'pointer' }}
                         >
                             ← Prev
@@ -234,7 +276,7 @@ export default function AttendanceReport() {
                         </span>
                         <button
                             disabled={page + 1 >= totalPages}
-                            onClick={() => { setLoading(true); setPage((p) => p + 1); }}
+                            onClick={() => setPage((p) => p + 1)}
                             style={{ padding: '6px 14px', fontSize: '12px', cursor: page + 1 >= totalPages ? 'not-allowed' : 'pointer' }}
                         >
                             Next →
@@ -242,10 +284,9 @@ export default function AttendanceReport() {
                     </div>
                 )}
             </div>
-
+ 
             {selectedEmployeeId && (
                 <EmployeeAttendanceModal
-                    key={`${selectedEmployeeId}-${toDate}`}
                     employeeId={selectedEmployeeId}
                     asOfDate={toDate}
                     onClose={() => setSelectedEmployeeId(null)}

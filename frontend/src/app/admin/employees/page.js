@@ -34,7 +34,9 @@ function InputField({
   placeholder,
   value,
   onChange,
-  max
+  max,
+  maxLength,
+  numericOnly,
 }) {
   return (
     <div>
@@ -44,10 +46,35 @@ function InputField({
       <input
         type={type}
         value={value || ''}
-        onChange={e => onChange(name, e.target.value)}
+        onChange={e => {
+          let val = e.target.value;
+          if (numericOnly) {
+            // Strip anything that isn't a digit — blocks letters and special characters
+            val = val.replace(/[^0-9]/g, '');
+          }
+          if (maxLength) {
+            val = val.slice(0, maxLength);
+          }
+          onChange(name, val);
+        }}
+        onKeyPress={e => {
+          if (numericOnly && !/[0-9]/.test(e.key)) {
+            e.preventDefault();
+          }
+        }}
+        onPaste={e => {
+          if (numericOnly) {
+            const pasted = e.clipboardData.getData('text');
+            if (/[^0-9]/.test(pasted)) {
+              e.preventDefault();
+            }
+          }
+        }}
         placeholder={placeholder}
         required={required}
-        max={max}   // <-- Add this line
+        max={max}
+        maxLength={maxLength}
+        inputMode={numericOnly ? 'numeric' : undefined}
         style={{
           width: '100%',
           padding: '9px 12px',
@@ -160,6 +187,12 @@ export default function EmployeeManagementPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (form.phone && form.phone.length !== 10) {
+      toast.error('Phone number must be exactly 10 digits');
+      return;
+    }
+
     setSubmitting(true);
     try {
       const payload = {
@@ -427,7 +460,17 @@ export default function EmployeeManagementPage() {
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
-                </div>                <InputField label="Phone" name="phone" placeholder="9876543210" value={form.phone} onChange={handleFieldChange} />
+                </div>
+                <InputField
+                  label="Phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="9876543210"
+                  value={form.phone}
+                  onChange={handleFieldChange}
+                  numericOnly
+                  maxLength={10}
+                />
                 <InputField label="Department" name="department" placeholder="Engineering" value={form.department} onChange={handleFieldChange} />
                 <InputField label="Designation" name="designation" placeholder="Software Engineer" value={form.designation} onChange={handleFieldChange} />
                 <InputField label="Basic Salary" name="basicSalary" type="number" placeholder="50000" value={form.basicSalary} onChange={handleFieldChange} />
