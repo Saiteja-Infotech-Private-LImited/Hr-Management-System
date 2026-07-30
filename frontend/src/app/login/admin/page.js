@@ -15,7 +15,7 @@ const EyeIcon = ({ show, toggle }) => (
       cursor: 'pointer', padding: '0',
       display: 'flex', alignItems: 'center',
     }}>
-    {show ? (
+    {!show ? (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
         stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
