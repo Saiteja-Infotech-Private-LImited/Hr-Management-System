@@ -1,12 +1,12 @@
 'use client';
- 
+
 import { useState } from 'react';
 import { useInterview } from '@/lib/InterviewForm';
 import { Mail, Loader } from 'lucide-react';
- 
+
 export default function SendInterviewForm() {
   const { sendOnlineInterview, sendOfflineInterview } = useInterview();
- 
+
   // ONLINE INTERVIEW STATE
   const [onlineData, setOnlineData] = useState({
     candidateName: '',
@@ -23,7 +23,7 @@ export default function SendInterviewForm() {
   const [onlineError, setOnlineError] = useState(null);
   const [onlineSuccess, setOnlineSuccess] = useState(null);
   const [showOnlineSuccess, setShowOnlineSuccess] = useState(false);
- 
+
   // OFFLINE INTERVIEW STATE
   const [offlineData, setOfflineData] = useState({
     candidateName: '',
@@ -38,17 +38,17 @@ export default function SendInterviewForm() {
   const [offlineError, setOfflineError] = useState(null);
   const [offlineSuccess, setOfflineSuccess] = useState(null);
   const [showOfflineSuccess, setShowOfflineSuccess] = useState(false);
- 
+
   const handleOnlineChange = (e) => {
     const { name, value } = e.target;
     setOnlineData(prev => ({ ...prev, [name]: value }));
   };
- 
+
   const handleOfflineChange = (e) => {
     const { name, value } = e.target;
     setOfflineData(prev => ({ ...prev, [name]: value }));
   };
- 
+
   // Field labels used for validation error messages
   const ONLINE_FIELD_LABELS = {
     candidateName: 'Candidate Name',
@@ -61,7 +61,7 @@ export default function SendInterviewForm() {
     meetingId: 'Meeting ID',
     passcode: 'Passcode',
   };
- 
+
   const OFFLINE_FIELD_LABELS = {
     candidateName: 'Candidate Name',
     recipientEmail: 'Email Address',
@@ -71,22 +71,22 @@ export default function SendInterviewForm() {
     venueAddress: 'Venue Address',
     cityLocation: 'City / Location',
   };
- 
+
   const getMissingFields = (data, labels) =>
     Object.keys(labels).filter((key) => !String(data[key] ?? '').trim());
- 
+
   const handleSendOnlineInterview = async (e) => {
     e.preventDefault();
     setShowOnlineSuccess(false);
     setOnlineError(null);
- 
+
     const missing = getMissingFields(onlineData, ONLINE_FIELD_LABELS);
     if (missing.length > 0) {
       const missingLabels = missing.map((key) => ONLINE_FIELD_LABELS[key]);
       setOnlineError(`Please fill in all fields. Missing: ${missingLabels.join(', ')}`);
       return;
     }
- 
+
     setOnlineLoading(true);
     try {
       const response = await sendOnlineInterview(onlineData);
@@ -112,19 +112,19 @@ export default function SendInterviewForm() {
       setOnlineLoading(false);
     }
   };
- 
+
   const handleSendOfflineInterview = async (e) => {
     e.preventDefault();
     setShowOfflineSuccess(false);
     setOfflineError(null);
- 
+
     const missing = getMissingFields(offlineData, OFFLINE_FIELD_LABELS);
     if (missing.length > 0) {
       const missingLabels = missing.map((key) => OFFLINE_FIELD_LABELS[key]);
       setOfflineError(`Please fill in all fields. Missing: ${missingLabels.join(', ')}`);
       return;
     }
- 
+
     setOfflineLoading(true);
     try {
       const response = await sendOfflineInterview(offlineData);
@@ -148,7 +148,7 @@ export default function SendInterviewForm() {
       setOfflineLoading(false);
     }
   };
- 
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* ONLINE INTERVIEW */}
@@ -160,7 +160,7 @@ export default function SendInterviewForm() {
           </div>
           <p className="text-sm text-gray-600">Send online interview invitation via email</p>
         </div>
- 
+
         <form onSubmit={handleSendOnlineInterview} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Candidate Name</label>
@@ -175,7 +175,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Email Address</label>
             <input
@@ -189,7 +189,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Job Title</label>
             <input
@@ -203,7 +203,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Interview Date</label>
             <input
@@ -216,7 +216,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Interview Time</label>
             <input
@@ -229,7 +229,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Platform</label>
             <input
@@ -243,7 +243,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Meeting Link</label>
             <input
@@ -257,7 +257,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Meeting ID</label>
             <input
@@ -271,7 +271,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Passcode</label>
             <input
@@ -285,17 +285,17 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           {onlineError && <div className="p-3 bg-red-100 border border-red-300 rounded-lg"><p className="text-sm text-red-800">❌ {onlineError}</p></div>}
           {showOnlineSuccess && onlineSuccess && <div className="p-3 bg-green-100 border border-green-300 rounded-lg"><p className="text-sm text-green-800">✓ {onlineSuccess}</p></div>}
- 
+
           <div className="flex gap-3 justify-end pt-4 border-t border-gray-300">
             <button type="button" onClick={() => setOnlineData({ candidateName: '', recipientEmail: '', jobTitle: '', interviewDate: '', interviewTime: '', platform: '', meetingLink: '', meetingId: '', passcode: '' })} disabled={onlineLoading} className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">CANCEL</button>
             <button type="submit" disabled={onlineLoading} className="px-5 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 disabled:opacity-70 flex items-center gap-2">{onlineLoading ? (<><Loader size={14} className="animate-spin" />Sending...</>) : (<><Mail size={14} />SEND ONLINE</>)}</button>
           </div>
         </form>
       </div>
- 
+
       {/* OFFLINE INTERVIEW */}
       <div className="bg-white border border-gray-300 rounded-lg p-6">
         <div className="mb-6">
@@ -305,7 +305,7 @@ export default function SendInterviewForm() {
           </div>
           <p className="text-sm text-gray-600">Send offline interview invitation via email</p>
         </div>
- 
+
         <form onSubmit={handleSendOfflineInterview} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Candidate Name</label>
@@ -320,7 +320,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Email Address</label>
             <input
@@ -334,7 +334,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Job Title</label>
             <input
@@ -348,7 +348,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Interview Date</label>
             <input
@@ -361,7 +361,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Interview Time</label>
             <input
@@ -374,7 +374,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Venue Address</label>
             <textarea
@@ -387,7 +387,7 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 min-h-20"
             />
           </div>
- 
+
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">City / Location</label>
             <input
@@ -401,10 +401,10 @@ export default function SendInterviewForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
             />
           </div>
- 
+
           {offlineError && <div className="p-3 bg-red-100 border border-red-300 rounded-lg"><p className="text-sm text-red-800">❌ {offlineError}</p></div>}
           {showOfflineSuccess && offlineSuccess && <div className="p-3 bg-green-100 border border-green-300 rounded-lg"><p className="text-sm text-green-800">✓ {offlineSuccess}</p></div>}
- 
+
           <div className="flex gap-3 justify-end pt-4 border-t border-gray-300">
             <button type="button" onClick={() => setOfflineData({ candidateName: '', recipientEmail: '', jobTitle: '', interviewDate: '', interviewTime: '', venueAddress: '', cityLocation: '' })} disabled={offlineLoading} className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">CANCEL</button>
             <button type="submit" disabled={offlineLoading} className="px-5 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 disabled:opacity-70 flex items-center gap-2">{offlineLoading ? (<><Loader size={14} className="animate-spin" />Sending...</>) : (<><Mail size={14} />SEND OFFLINE</>)}</button>
