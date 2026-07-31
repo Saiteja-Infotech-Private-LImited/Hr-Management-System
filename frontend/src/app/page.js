@@ -6,58 +6,112 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-[#0f1523] to-[#090b14]">
-      <div className="w-full max-w-md bg-[#1e2333] p-10 rounded-[32px] shadow-2xl flex flex-col items-center">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '20px',
+    }}>
+      <div style={{
+        background: 'white', borderRadius: '20px',
+        padding: '48px 40px', width: '100%', maxWidth: '440px',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}>
         {/* Header */}
-        <div className="w-[72px] h-[72px] rounded-2xl bg-gradient-to-b from-[#6b8fff] to-[#5174ff] flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(81,116,255,0.3)]">
-          <span className="text-white text-3xl font-black">H</span>
+        <div style={{
+          width: '64px', height: '64px',
+          background: 'linear-gradient(135deg, #1e3a5f, #2563eb)',
+          borderRadius: '16px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginBottom: '16px',
+        }}>
+          <span style={{ color: 'white', fontSize: '28px', fontWeight: '800' }}>H</span>
         </div>
-        <h1 className="text-[26px] font-extrabold text-white mb-1 tracking-tight">HRMS</h1>
-        <p className="text-[10px] font-bold text-[#5174ff] uppercase tracking-[0.2em] mb-3">Management System</p>
-        <p className="text-[13px] text-slate-300 mb-10 font-medium">Streamline · Manage · Empower</p>
-        
-        <p className="text-[11px] font-bold text-slate-400 mb-4 w-full text-left uppercase tracking-wider">Select Portal</p>
+        <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>HRMS</h1>
+        <p style={{ fontSize: '13px', fontWeight: '600', color: '#3b82f6', letterSpacing: '2px', marginBottom: '4px' }}>HR MANAGEMENT SYSTEM</p>
+        <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px' }}>Streamline · Manage · Empower</p>
+        <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '32px' }}>Choose how you want to sign in</p>
 
         {/* Employee Card */}
         <Link
           href="/login/employee"
-          className="group w-full flex items-center gap-4 p-5 mb-4 rounded-xl bg-[#343a4a] hover:bg-[#3d4456] transition-colors cursor-pointer"
+          style={{
+            width: '100%', border: '2px solid #3b82f6',
+            borderRadius: '14px', padding: '16px 20px',
+            display: 'flex', alignItems: 'center', gap: '14px',
+            marginBottom: '14px', cursor: 'pointer',
+            background: '#eff6ff', transition: 'all 0.2s',
+            textDecoration: 'none',
+          }}
+          onMouseOver={e => e.currentTarget.style.background = '#dbeafe'}
+          onMouseOut={e => e.currentTarget.style.background = '#eff6ff'}
         >
-          <div className="w-11 h-11 rounded-full bg-[#273961] flex items-center justify-center shrink-0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#5174ff] stroke-[2] stroke-linecap-round stroke-linejoin-round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
+          <div style={{
+            width: '48px', height: '48px', background: '#dbeafe',
+            borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#3b82f6">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
             </svg>
           </div>
-          <div className="flex-1 text-left">
-            <div className="text-[15px] font-bold text-white mb-1">Employee Portal</div>
-            <div className="text-[12px] font-medium text-slate-400">Access your personal dashboard</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b', marginBottom: '3px' }}>Employee Login</div>
+            <div style={{ fontSize: '12px', color: '#64748b' }}>Access your personal dashboard and services</div>
           </div>
-          <div className="w-6 h-6 rounded-full bg-[#464d60] flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-slate-300 stroke-[2.5] stroke-linecap-round stroke-linejoin-round"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#3b82f6"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
         </Link>
 
         {/* Admin Card */}
         <Link
           href="/login/admin"
-          className="group w-full flex items-center gap-4 p-5 mb-8 rounded-xl bg-[#343a4a] hover:bg-[#3d4456] transition-colors cursor-pointer"
+          style={{
+            width: '100%', border: '2px solid #16a34a',
+            borderRadius: '14px', padding: '16px 20px',
+            display: 'flex', alignItems: 'center', gap: '14px',
+            marginBottom: '32px', cursor: 'pointer',
+            background: '#f0fdf4', transition: 'all 0.2s',
+            textDecoration: 'none',
+          }}
+          onMouseOver={e => e.currentTarget.style.background = '#dcfce7'}
+          onMouseOut={e => e.currentTarget.style.background = '#f0fdf4'}
         >
-          <div className="w-11 h-11 rounded-full bg-[#1b433a] flex items-center justify-center shrink-0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#10b981] stroke-[2] stroke-linecap-round stroke-linejoin-round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <div style={{
+            width: '48px', height: '48px', background: '#dcfce7',
+            borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#16a34a">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
             </svg>
           </div>
-          <div className="flex-1 text-left">
-            <div className="text-[15px] font-bold text-white mb-1">HR / Admin Portal</div>
-            <div className="text-[12px] font-medium text-slate-400">Manage system and personnel</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b', marginBottom: '3px' }}>HR / Admin Login</div>
+            <div style={{ fontSize: '12px', color: '#64748b' }}>Access admin panel and manage the system</div>
           </div>
-          <div className="w-6 h-6 rounded-full bg-[#464d60] flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-slate-300 stroke-[2.5] stroke-linecap-round stroke-linejoin-round"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#16a34a"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
         </Link>
 
-        <p className="text-[10px] font-semibold text-[#5a6275] uppercase tracking-wider">© 2025 HRMS. All rights reserved.</p>
+        {/* Illustration */}
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', alignItems: 'flex-end' }}>
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <rect x="10" y="30" width="60" height="40" rx="4" fill="#dbeafe"/>
+            <rect x="20" y="40" width="40" height="4" rx="2" fill="#93c5fd"/>
+            <rect x="20" y="48" width="30" height="4" rx="2" fill="#bfdbfe"/>
+            <rect x="20" y="56" width="35" height="4" rx="2" fill="#bfdbfe"/>
+            <circle cx="40" cy="18" r="10" fill="#3b82f6"/>
+            <path d="M36 18l3 3 5-5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          </svg>
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <rect x="10" y="30" width="60" height="40" rx="4" fill="#dcfce7"/>
+            <rect x="20" y="40" width="40" height="4" rx="2" fill="#86efac"/>
+            <rect x="20" y="48" width="30" height="4" rx="2" fill="#bbf7d0"/>
+            <rect x="20" y="56" width="35" height="4" rx="2" fill="#bbf7d0"/>
+            <circle cx="40" cy="18" r="10" fill="#16a34a"/>
+            <path d="M36 18l3 3 5-5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          </svg>
+        </div>
+
+        <p style={{ fontSize: '11px', color: '#cbd5e1' }}>© 2025 HRMS. All rights reserved.</p>
       </div>
     </div>
   );
