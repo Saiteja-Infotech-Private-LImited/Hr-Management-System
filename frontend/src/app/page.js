@@ -7,16 +7,16 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#f8fafc] dark:bg-slate-900 transition-colors duration-500">
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#f8fafc] dark:bg-[#0b1120] transition-colors duration-500">
       {/* Dynamic Background Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-100/50 dark:bg-[#DBFF00]/10 blur-[100px] sm:blur-[120px] animate-pulse"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-100/50 dark:bg-[#DBFF00]/10 blur-[100px] sm:blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-100/50 dark:bg-[#DBFF00]/5 blur-[100px] sm:blur-[120px] animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-100/50 dark:bg-[#DBFF00]/5 blur-[100px] sm:blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
 
-      <div className="w-full max-w-md relative z-10 backdrop-blur-xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 p-10 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl flex flex-col items-center transform transition-all duration-500 hover:scale-[1.01]">
+      <div className="w-full max-w-md relative z-10 backdrop-blur-xl bg-white dark:bg-[#111827] border border-slate-100 dark:border-white/5 p-10 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] flex flex-col items-center transform transition-all duration-500">
         {/* Header */}
-        <div className="w-16 h-16 rounded-[16px] bg-[#10b981] dark:from-[#DBFF00] dark:to-[#a3cc00] flex items-center justify-center shadow-lg shadow-emerald-500/20 dark:shadow-[#DBFF00]/20 mb-6 relative group">
-          <div className="absolute inset-0 bg-white/20 dark:bg-black/10 rounded-[16px] blur-md group-hover:blur-lg transition-all"></div>
-          <span className="text-white dark:text-slate-900 text-3xl font-black tracking-tight relative z-10">H</span>
+        <div className="w-16 h-16 rounded-[16px] bg-[#10b981] dark:bg-[#DBFF00] flex items-center justify-center shadow-lg shadow-emerald-500/20 dark:shadow-[#DBFF00]/20 mb-6 relative group">
+          <div className="absolute inset-0 bg-white/20 dark:bg-[#DBFF00]/20 rounded-[16px] blur-md group-hover:blur-lg transition-all"></div>
+          <span className="text-white dark:text-black text-3xl font-black tracking-tight relative z-10">H</span>
         </div>
         <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1 tracking-tight">HRMS</h1>
         <h2 className="text-[13px] font-semibold text-slate-500 dark:text-slate-400 mb-5 tracking-wide text-center uppercase">
@@ -26,56 +26,56 @@ export default function Home() {
         <div className="w-6 h-[2px] rounded-full bg-slate-200 dark:bg-white/10 mb-5"></div>
         
         <div className="flex flex-col items-center mb-8">
-          <p className="text-[11px] font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 dark:from-[#DBFF00] dark:to-emerald-400 uppercase tracking-[0.35em] mb-2">
+          <p className="text-[11px] font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 dark:text-white dark:bg-none uppercase tracking-[0.35em] mb-2">
             Workspace
           </p>
-          <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-400 font-medium tracking-widest">
             <span>Streamline</span>
-            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-500"></span>
             <span>Manage</span>
-            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-500"></span>
             <span>Empower</span>
           </div>
         </div>
 
-        <p className="text-xs font-semibold text-slate-400 dark:text-slate-400 mb-4 w-full text-left uppercase tracking-wider">Select Portal</p>
+        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-4 w-full text-left uppercase tracking-wider">SELECT PORTAL</p>
 
         {/* Employee Card */}
         <Link
           href="/login/employee"
-          className="group w-full flex items-center gap-5 p-4 mb-4 rounded-[16px] border border-slate-100 dark:border-white/10 bg-white dark:bg-white/5 hover:border-emerald-500/30 dark:hover:border-[#DBFF00]/50 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md dark:shadow-lg dark:hover:shadow-[#DBFF00]/20"
+          className="group w-full flex items-center gap-5 p-4 mb-4 rounded-[16px] border border-slate-100 dark:border-white/5 bg-white dark:bg-[#111827] hover:border-emerald-500/30 dark:hover:border-white/10 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none"
         >
-          <div className="w-12 h-12 rounded-[12px] bg-emerald-50 dark:bg-[#DBFF00]/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-[#DBFF00]/20 transition-colors">
+          <div className="w-12 h-12 rounded-[12px] bg-emerald-50 dark:bg-[#0b1120] border border-transparent dark:border-white/5 flex items-center justify-center shrink-0">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#10b981] dark:text-[#DBFF00] stroke-[2] stroke-linecap-round stroke-linejoin-round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </div>
           <div className="flex-1 text-left">
-            <div className="text-sm font-bold text-slate-800 dark:text-white mb-0.5 group-hover:text-[#10b981] dark:group-hover:text-[#DBFF00] transition-colors">Employee Portal</div>
-            <div className="text-[11px] font-medium text-slate-400 dark:text-slate-400">Access your personal dashboard</div>
+            <div className="text-sm font-bold text-slate-800 dark:text-white mb-0.5">Employee Portal</div>
+            <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500">Access your personal dashboard</div>
           </div>
-          <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-[#DBFF00]/10 group-hover:translate-x-1 transition-all">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500 group-hover:text-[#10b981] dark:group-hover:text-[#DBFF00] stroke-[2.5] stroke-linecap-round stroke-linejoin-round"><path d="m9 18 6-6-6-6" /></svg>
+          <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-transparent flex items-center justify-center group-hover:translate-x-1 transition-all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500 stroke-[2.5] stroke-linecap-round stroke-linejoin-round"><path d="m9 18 6-6-6-6" /></svg>
           </div>
         </Link>
 
         {/* Admin Card */}
         <Link
           href="/login/admin"
-          className="group w-full flex items-center gap-5 p-4 mb-8 rounded-[16px] border border-slate-100 dark:border-white/10 bg-white dark:bg-white/5 hover:border-emerald-500/30 dark:hover:border-[#DBFF00]/50 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md dark:shadow-lg dark:hover:shadow-[#DBFF00]/20"
+          className="group w-full flex items-center gap-5 p-4 mb-8 rounded-[16px] border border-slate-100 dark:border-white/5 bg-white dark:bg-[#111827] hover:border-emerald-500/30 dark:hover:border-white/10 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none"
         >
-          <div className="w-12 h-12 rounded-[12px] bg-emerald-50 dark:bg-[#DBFF00]/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-[#DBFF00]/20 transition-colors">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#10b981] dark:text-[#DBFF00] stroke-[2] stroke-linecap-round stroke-linejoin-round">
+          <div className="w-12 h-12 rounded-[12px] bg-emerald-50 dark:bg-[#0b1120] border border-transparent dark:border-white/5 flex items-center justify-center shrink-0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-[#10b981] dark:text-[#a855f7] stroke-[2] stroke-linecap-round stroke-linejoin-round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
           </div>
           <div className="flex-1 text-left">
-            <div className="text-sm font-bold text-slate-800 dark:text-white mb-0.5 group-hover:text-[#10b981] dark:group-hover:text-[#DBFF00] transition-colors">HR / Admin Portal</div>
-            <div className="text-[11px] font-medium text-slate-400 dark:text-slate-400">Manage system and personnel</div>
+            <div className="text-sm font-bold text-slate-800 dark:text-white mb-0.5">HR / Admin Portal</div>
+            <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500">Manage system and personnel</div>
           </div>
-          <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-[#DBFF00]/10 group-hover:translate-x-1 transition-all">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500 group-hover:text-[#10b981] dark:group-hover:text-[#DBFF00] stroke-[2.5] stroke-linecap-round stroke-linejoin-round"><path d="m9 18 6-6-6-6" /></svg>
+          <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-transparent flex items-center justify-center group-hover:translate-x-1 transition-all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-slate-400 dark:text-slate-500 stroke-[2.5] stroke-linecap-round stroke-linejoin-round"><path d="m9 18 6-6-6-6" /></svg>
           </div>
         </Link>
 

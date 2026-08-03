@@ -134,17 +134,17 @@ export default function PayrollPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
             Payroll Management
           </h1>
-          <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             Generate and manage employee payroll
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           style={{
-            padding: '10px 20px', background: '#1e3a5f',
+            padding: '10px 20px', background: 'var(--primary-color)',
             color: 'white', border: 'none', borderRadius: '10px',
             fontSize: '13px', fontWeight: '700', cursor: 'pointer',
           }}
@@ -155,19 +155,19 @@ export default function PayrollPage() {
 
       {/* Month/Year Filter */}
       <div style={{
-        background: 'white', borderRadius: '12px', padding: '16px 20px',
-        border: '1px solid #e2e8f0', marginBottom: '20px',
+        background: 'var(--panel-bg)', borderRadius: '12px', padding: '16px 20px',
+        border: '1px solid var(--border-color)', marginBottom: '20px',
         display: 'flex', alignItems: 'center', gap: '16px',
         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       }}>
-        <span style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Filter by:</span>
+        <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>Filter by:</span>
         <select
           value={month}
           onChange={e => setMonth(parseInt(e.target.value))}
           style={{
-            padding: '8px 14px', border: '1.5px solid #e2e8f0',
+            padding: '8px 14px', border: '1.5px solid var(--border-color)',
             borderRadius: '8px', fontSize: '13px', outline: 'none',
-            background: 'white', fontWeight: '500',
+            background: 'var(--panel-bg)', fontWeight: '500',
           }}
         >
           {MONTHS.map((m, i) => (
@@ -179,9 +179,9 @@ export default function PayrollPage() {
           value={year}
           onChange={e => setYear(parseInt(e.target.value))}
           style={{
-            padding: '8px 14px', border: '1.5px solid #e2e8f0',
+            padding: '8px 14px', border: '1.5px solid var(--border-color)',
             borderRadius: '8px', fontSize: '13px', outline: 'none',
-            background: 'white', fontWeight: '500',
+            background: 'var(--panel-bg)', fontWeight: '500',
           }}
         >
           {[2024, 2025, 2026, 2027].map(y => (
@@ -192,7 +192,7 @@ export default function PayrollPage() {
         <button
           onClick={fetchPayroll}
           style={{
-            padding: '8px 20px', background: '#1e3a5f',
+            padding: '8px 20px', background: 'var(--primary-color)',
             color: 'white', border: 'none', borderRadius: '8px',
             fontSize: '13px', fontWeight: '700', cursor: 'pointer',
           }}
@@ -205,19 +205,19 @@ export default function PayrollPage() {
       {payrolls.length > 0 && (
         <div style={{ display: 'flex', gap: '14px', marginBottom: '20px' }}>
           {[
-            { label: 'Total Employees', value: payrolls.length, color: '#1e3a5f', bg: '#eff6ff', icon: '👥' },
+            { label: 'Total Employees', value: payrolls.length, color: 'var(--text-primary)', bg: '#eff6ff', icon: '👥' },
             { label: 'Total Gross', value: formatCurrency(totalGross), color: '#16a34a', bg: '#dcfce7', icon: '💵' },
             { label: 'Total Deductions', value: formatCurrency(totalDed), color: '#dc2626', bg: '#fee2e2', icon: '➖' },
             { label: 'Total Net Pay', value: formatCurrency(totalNet), color: '#f59e0b', bg: '#fff7ed', icon: '💰' },
             { label: 'Paid', value: `${paidCount}/${payrolls.length}`, color: '#8b5cf6', bg: '#fdf4ff', icon: '✅' },
           ].map((s, i) => (
             <div key={i} style={{
-              flex: 1, background: 'white', borderRadius: '12px',
-              padding: '16px', border: '1px solid #e2e8f0',
+              flex: 1, background: 'var(--panel-bg)', borderRadius: '12px',
+              padding: '16px', border: '1px solid var(--border-color)',
               boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600' }}>{s.label}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600' }}>{s.label}</span>
                 <div style={{ width: '28px', height: '28px', background: s.bg, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{s.icon}</div>
               </div>
               <div style={{ fontSize: '18px', fontWeight: '800', color: s.color }}>{s.value}</div>
@@ -228,12 +228,12 @@ export default function PayrollPage() {
 
       {/* Payroll Table */}
       <div className="table-responsive" style={{
-        background: 'white', borderRadius: '12px',
-        border: '1px solid #e2e8f0',
+        background: 'var(--panel-bg)', borderRadius: '12px',
+        border: '1px solid var(--border-color)',
         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #e2e8f0' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
             {MONTHS[month - 1]} {year} — Payroll Records
           </h3>
         </div>
@@ -242,30 +242,30 @@ export default function PayrollPage() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: '2fr 1.2fr 1.2fr 1.2fr 1.2fr 1fr 2fr',
-          padding: '10px 20px', background: '#f8fafc',
-          borderBottom: '1px solid #e2e8f0',
+          padding: '10px 20px', background: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
         }}>
           {['Employee', 'Gross', 'Deductions', 'Net Salary', 'Present Days', 'Status', 'Actions'].map(h => (
-            <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               {h}
             </div>
           ))}
         </div>
 
         {loading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
         ) : payrolls.length === 0 ? (
           <div style={{ padding: '80px', textAlign: 'center' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>💰</div>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
               No payroll for {MONTHS[month - 1]} {year}
             </div>
-            <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
               Generate payroll for employees using the button above
             </div>
             <button
               onClick={() => setShowForm(true)}
-              style={{ padding: '10px 20px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
+              style={{ padding: '10px 20px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
             >
               + Generate Payroll
             </button>
@@ -275,24 +275,24 @@ export default function PayrollPage() {
             <div key={p.id} style={{
               display: 'grid',
               gridTemplateColumns: '2fr 1.2fr 1.2fr 1.2fr 1.2fr 1fr 2fr',
-              padding: '13px 20px', borderBottom: '1px solid #f1f5f9',
+              padding: '13px 20px', borderBottom: '1px solid var(--border-light)',
               alignItems: 'center',
             }}>
               {/* Employee */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{
                   width: '34px', height: '34px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #1e3a5f, #3b82f6)',
+                  background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '11px', fontWeight: '700', color: 'white', flexShrink: 0,
                 }}>
                   {p.employeeName?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 </div>
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                     {p.employeeName}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>{p.employeeCode}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{p.employeeCode}</div>
                 </div>
               </div>
 
@@ -302,10 +302,10 @@ export default function PayrollPage() {
               <div style={{ fontSize: '13px', fontWeight: '600', color: '#dc2626' }}>
                 {formatCurrency(p.totalDeductions)}
               </div>
-              <div style={{ fontSize: '14px', fontWeight: '800', color: '#1e3a5f' }}>
+              <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)' }}>
                 {formatCurrency(p.netSalary)}
               </div>
-              <div style={{ fontSize: '13px', color: '#64748b' }}>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                 {p.presentDays} days
               </div>
 
@@ -361,29 +361,29 @@ export default function PayrollPage() {
           zIndex: 100, padding: '20px',
         }}>
           <div style={{
-            background: 'white', borderRadius: '16px', padding: '28px',
+            background: 'var(--panel-bg)', borderRadius: '16px', padding: '28px',
             width: '100%', maxWidth: '440px',
             boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)' }}>
                 Generate Payroll
               </h2>
               <button onClick={() => setShowForm(false)}
-                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-secondary)' }}>✕</button>
             </div>
 
             <form onSubmit={handleGenerate}>
               {/* Employee */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Employee <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <select
                   value={form.employeeId}
                   onChange={e => setForm({ ...form, employeeId: e.target.value })}
                   required
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', outline: 'none', background: 'white' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--border-color)', borderRadius: '10px', fontSize: '13px', outline: 'none', background: 'var(--panel-bg)' }}
                 >
                   <option value="">Select employee...</option>
                   {employees.map(emp => (
@@ -396,13 +396,13 @@ export default function PayrollPage() {
 
               {/* Month */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Month <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <select
                   value={form.month}
                   onChange={e => setForm({ ...form, month: e.target.value })}
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', outline: 'none', background: 'white' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--border-color)', borderRadius: '10px', fontSize: '13px', outline: 'none', background: 'var(--panel-bg)' }}
                 >
                   {MONTHS.map((m, i) => (
                     <option key={i} value={i + 1}>{m}</option>
@@ -412,13 +412,13 @@ export default function PayrollPage() {
 
               {/* Year */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Year <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <select
                   value={form.year}
                   onChange={e => setForm({ ...form, year: e.target.value })}
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', outline: 'none', background: 'white' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--border-color)', borderRadius: '10px', fontSize: '13px', outline: 'none', background: 'var(--panel-bg)' }}
                 >
                   {[2024, 2025, 2026, 2027].map(y => (
                     <option key={y} value={y}>{y}</option>
@@ -428,11 +428,11 @@ export default function PayrollPage() {
 
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button type="button" onClick={() => setShowForm(false)}
-                  style={{ flex: 1, padding: '12px', background: 'white', color: '#374151', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                  style={{ flex: 1, padding: '12px', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1.5px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
                   Cancel
                 </button>
                 <button type="submit" disabled={generating}
-                  style={{ flex: 1, padding: '12px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: generating ? 'not-allowed' : 'pointer', opacity: generating ? 0.7 : 1 }}>
+                  style={{ flex: 1, padding: '12px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: generating ? 'not-allowed' : 'pointer', opacity: generating ? 0.7 : 1 }}>
                   {generating ? '⏳ Generating...' : 'Generate'}
                 </button>
               </div>

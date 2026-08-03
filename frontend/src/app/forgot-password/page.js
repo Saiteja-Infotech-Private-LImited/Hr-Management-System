@@ -45,14 +45,14 @@ export default function ForgotPasswordPage() {
   const inputStyle = {
     width: '100%',
     padding: '12px 14px',
-    border: '1.5px solid #e2e8f0',
+    border: '1.5px solid var(--border-color)',
     borderRadius: '10px',
     fontSize: '14px',
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'inherit',
-    color: '#1e293b',
-    background: 'white',
+    color: 'var(--text-primary)',
+    background: 'var(--panel-bg)',
     transition: 'border 0.2s',
   };
 
@@ -121,7 +121,7 @@ export default function ForgotPasswordPage() {
       padding: '20px',
     }}>
       <div style={{
-        background: 'white', borderRadius: '28px',
+        background: 'var(--panel-bg)', borderRadius: '28px',
         padding: '40px 36px', width: '100%', maxWidth: '420px',
         boxShadow: '0 8px 40px rgba(59,130,246,0.12)',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -130,7 +130,7 @@ export default function ForgotPasswordPage() {
         {/* Lock Icon */}
         <div style={{
           width: '72px', height: '72px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, #1e3a5f, #3b82f6)',
+          background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           marginBottom: '16px',
           boxShadow: '0 4px 16px rgba(59,130,246,0.3)',
@@ -148,7 +148,7 @@ export default function ForgotPasswordPage() {
             <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <div style={{
                 width: '32px', height: '32px', borderRadius: '50%',
-                background: step >= s ? '#1e3a5f' : '#e2e8f0',
+                background: step >= s ? 'var(--primary-color)' : '#e2e8f0',
                 color: step >= s ? 'white' : '#94a3b8',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '13px', fontWeight: '700', transition: 'all 0.3s',
@@ -163,7 +163,7 @@ export default function ForgotPasswordPage() {
               {i < 2 && (
                 <div style={{
                   width: '40px', height: '2px',
-                  background: step > s ? '#1e3a5f' : '#e2e8f0',
+                  background: step > s ? 'var(--primary-color)' : '#e2e8f0',
                   transition: 'all 0.3s',
                 }} />
               )}
@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
             <span key={label} style={{
               fontSize: '11px',
               fontWeight: step === i + 1 ? '700' : '400',
-              color: step === i + 1 ? '#1e3a5f' : '#94a3b8',
+              color: step === i + 1 ? 'var(--primary-color)' : '#94a3b8',
               whiteSpace: 'nowrap',
             }}>
               {label}
@@ -188,16 +188,16 @@ export default function ForgotPasswordPage() {
         {/* ── STEP 1 — Enter Email ── */}
         {step === 1 && (
           <>
-            <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '6px' }}>
+            <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '6px' }}>
               Forgot Password?
             </h1>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '28px', textAlign: 'center', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '28px', textAlign: 'center', lineHeight: 1.6 }}>
               Enter your registered email and we&apos;ll send you an OTP to reset your password
             </p>
 
             <form onSubmit={handleSendOtp} style={{ width: '100%' }}>
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Email Address
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -214,8 +214,8 @@ export default function ForgotPasswordPage() {
                     placeholder="Enter your registered email"
                     required
                     style={{ ...inputStyle, paddingLeft: '38px' }}
-                    onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
                 </div>
               </div>
@@ -223,7 +223,7 @@ export default function ForgotPasswordPage() {
               <button type="submit" disabled={loading}
                 style={{
                   width: '100%', padding: '13px',
-                  background: '#1e3a5f', color: 'white',
+                  background: 'var(--primary-color)', color: 'white',
                   border: 'none', borderRadius: '10px',
                   fontSize: '14px', fontWeight: '700',
                   cursor: loading ? 'not-allowed' : 'pointer',
@@ -236,8 +236,8 @@ export default function ForgotPasswordPage() {
               <button type="button" onClick={() => router.back()}
                 style={{
                   width: '100%', padding: '12px',
-                  background: 'white', color: '#374151',
-                  border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                  background: 'var(--panel-bg)', color: 'var(--text-primary)',
+                  border: '1.5px solid var(--border-color)', borderRadius: '10px',
                   fontSize: '13px', fontWeight: '600', cursor: 'pointer',
                 }}>
                 ← Back to Login
@@ -249,13 +249,13 @@ export default function ForgotPasswordPage() {
         {/* ── STEP 2 — Enter OTP + New Password ── */}
         {step === 2 && (
           <>
-            <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '6px' }}>
+            <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '6px' }}>
               Reset Password
             </h1>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '4px', textAlign: 'center' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px', textAlign: 'center' }}>
               OTP sent to
             </p>
-            <p style={{ fontSize: '14px', fontWeight: '700', color: '#1e3a5f', marginBottom: '24px' }}>
+            <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '24px' }}>
               {email}
             </p>
 
@@ -263,7 +263,7 @@ export default function ForgotPasswordPage() {
 
               {/* OTP Input */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Enter OTP
                 </label>
                 <input
@@ -279,20 +279,20 @@ export default function ForgotPasswordPage() {
                     fontSize: '28px',
                     fontWeight: '800',
                     letterSpacing: '12px',
-                    color: '#1e3a5f',
+                    color: 'var(--text-primary)',
                     padding: '14px',
                   }}
-                  onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                  onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                 />
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px', textAlign: 'center' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '6px', textAlign: 'center' }}>
                   Check your email inbox or spam folder · Valid for 10 minutes
                 </div>
               </div>
 
               {/* New Password */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   New Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -303,8 +303,8 @@ export default function ForgotPasswordPage() {
                     placeholder="Enter new password"
                     required
                     style={{ ...inputStyle, paddingRight: '44px' }}
-                    onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
                   <EyeIcon show={showNew} toggle={() => setShowNew(!showNew)} />
                 </div>
@@ -312,7 +312,7 @@ export default function ForgotPasswordPage() {
 
               {/* Confirm Password */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Confirm New Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -323,8 +323,8 @@ export default function ForgotPasswordPage() {
                     placeholder="Confirm new password"
                     required
                     style={{ ...inputStyle, paddingRight: '44px' }}
-                    onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
                   <EyeIcon show={showConfirm} toggle={() => setShowConfirm(!showConfirm)} />
                 </div>
@@ -332,9 +332,9 @@ export default function ForgotPasswordPage() {
 
               {/* Password Rules */}
               <div style={{
-                background: '#f8fafc', borderRadius: '10px',
+                background: 'var(--bg-input)', borderRadius: '10px',
                 padding: '12px', marginBottom: '20px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--border-color)',
               }}>
                 {[
                   { rule: 'At least 6 characters', met: met6chars },
@@ -356,7 +356,7 @@ export default function ForgotPasswordPage() {
               <button type="submit" disabled={loading}
                 style={{
                   width: '100%', padding: '13px',
-                  background: '#1e3a5f', color: 'white',
+                  background: 'var(--primary-color)', color: 'white',
                   border: 'none', borderRadius: '10px',
                   fontSize: '14px', fontWeight: '700',
                   cursor: loading ? 'not-allowed' : 'pointer',
@@ -369,8 +369,8 @@ export default function ForgotPasswordPage() {
               <button type="button" onClick={() => setStep(1)}
                 style={{
                   width: '100%', padding: '12px',
-                  background: 'white', color: '#374151',
-                  border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                  background: 'var(--panel-bg)', color: 'var(--text-primary)',
+                  border: '1.5px solid var(--border-color)', borderRadius: '10px',
                   fontSize: '13px', fontWeight: '600', cursor: 'pointer',
                   marginBottom: '16px',
                 }}>
@@ -380,7 +380,7 @@ export default function ForgotPasswordPage() {
 
             {/* Resend OTP */}
             <div style={{ textAlign: 'center' }}>
-              <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 Didn&apos;t receive OTP?{' '}
               </span>
               <button
@@ -408,17 +408,17 @@ export default function ForgotPasswordPage() {
               </svg>
             </div>
 
-            <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
+            <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '8px' }}>
               Password Reset! 🎉
             </h1>
-            <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '32px', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '32px', lineHeight: 1.6 }}>
               Your password has been reset successfully. You can now login with your new password.
             </p>
 
             <button onClick={() => router.push('/')}
               style={{
                 width: '100%', padding: '13px',
-                background: '#1e3a5f', color: 'white',
+                background: 'var(--primary-color)', color: 'white',
                 border: 'none', borderRadius: '10px',
                 fontSize: '14px', fontWeight: '700', cursor: 'pointer',
               }}>

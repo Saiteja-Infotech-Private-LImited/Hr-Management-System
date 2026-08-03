@@ -66,35 +66,36 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen flex w-full bg-white dark:bg-slate-900 transition-colors duration-500">
       {/* Left Panel - Hidden on mobile */}
-      <div className="hidden lg:flex lg:w-[45%] flex-col bg-slate-900 relative">
-        <div className="flex-1 relative overflow-hidden">
-          {/* Unsplash Image - Admin/Analytics focus */}
+      <div className="hidden lg:flex lg:w-[45%] flex-col relative overflow-hidden">
+        {/* Custom AI Image */}
+        <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80" 
+            src="/images/login_bg.png" 
             alt="Business Analytics" 
-            className="absolute inset-0 w-full h-full object-cover opacity-90"
+            className="w-full h-full object-cover opacity-90 dark:opacity-80"
           />
-          {/* Green separator line */}
-          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#10b981] dark:bg-[#DBFF00] z-10 transition-colors"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/90 via-[#0f172a]/40 to-transparent"></div>
         </div>
-        <div className="h-auto p-12 lg:px-16 lg:py-14 flex flex-col justify-center bg-[#111827]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded bg-transparent border-2 border-[#10b981] dark:border-[#DBFF00] flex items-center justify-center transition-colors">
-              <span className="text-[#10b981] dark:text-[#DBFF00] font-bold text-lg leading-none">H</span>
+        <div className="relative z-10 flex flex-col justify-between h-full p-12 lg:px-16 lg:py-16">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-[#10b981] dark:bg-[#a855f7] flex items-center justify-center transition-colors shadow-lg shadow-[#10b981]/30">
+              <span className="text-white font-bold text-lg leading-none">H</span>
             </div>
-            <span className="text-white font-bold text-[17px] tracking-tight">Saiteja Infotech Private Limited - Admin</span>
+            <span className="text-white font-bold text-[17px] tracking-tight drop-shadow-md">HRMS Admin</span>
           </div>
-          <h1 className="text-white text-4xl xl:text-5xl font-bold leading-[1.1] mb-4 tracking-tight">
-            Manage your<br/>workforce effectively.
-          </h1>
-          <p className="text-slate-400 text-[13px] font-medium max-w-sm">
-            Control center to oversee operations and team performance
-          </p>
+          <div>
+            <h1 className="text-white text-4xl xl:text-5xl font-bold leading-[1.2] mb-4 tracking-tight drop-shadow-lg">
+              Manage your<br/><span className="text-[#10b981] dark:text-[#a855f7]">workforce</span><br/>effectively.
+            </h1>
+            <p className="text-slate-200 text-[14px] font-medium max-w-sm drop-shadow-md">
+              Control center to oversee operations and team performance
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Right Panel */}
-      <div className="w-full lg:w-[55%] flex flex-col items-center justify-center relative p-8">
+      <div className="w-full lg:w-[55%] flex flex-col items-center justify-center relative p-8 dark:bg-[#0b1120]">
         
         {/* Back Button */}
         <button 
@@ -115,8 +116,8 @@ export default function AdminLogin() {
              </svg>
            </div>
            
-           <h2 className="text-[22px] font-bold text-slate-900 dark:text-white mb-8 text-center">
-             Admin Secure Login
+           <h2 className="text-[18px] font-bold text-slate-900 dark:text-white mb-8 text-center">
+             Admin <span className="dark:text-[#a855f7]">Secure</span> Login
            </h2>
 
            {error && (
@@ -145,7 +146,7 @@ export default function AdminLogin() {
                  onChange={handleChange}
                  placeholder="Input your registered email" 
                  required 
-                 className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] dark:focus:border-[#DBFF00] dark:focus:ring-[#DBFF00] transition-all text-slate-800 dark:text-white placeholder-slate-400" 
+                 className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-white/5 bg-white dark:bg-[#111827] text-[13px] focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] dark:focus:border-[#a855f7] dark:focus:ring-1 dark:focus:ring-[#a855f7] transition-all text-slate-800 dark:text-white placeholder-slate-500" 
                />
              </div>
 
@@ -162,7 +163,7 @@ export default function AdminLogin() {
                    onChange={handleChange}
                    placeholder="Input your password account" 
                    required 
-                   className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 text-[13px] focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] dark:focus:border-[#DBFF00] dark:focus:ring-[#DBFF00] transition-all text-slate-800 dark:text-white placeholder-slate-400" 
+                   className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-white/5 bg-white dark:bg-[#111827] text-[13px] focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] dark:focus:border-[#a855f7] dark:focus:ring-1 dark:focus:ring-[#a855f7] transition-all text-slate-800 dark:text-white placeholder-slate-500" 
                  />
                  <EyeIcon show={showPassword} toggle={() => setShowPassword(!showPassword)} />
                </div>
@@ -183,8 +184,8 @@ export default function AdminLogin() {
                disabled={loading || !isFormFilled} 
                className={`w-full py-3 rounded-lg text-[13px] font-bold transition-all flex items-center justify-center gap-2
                  ${isFormFilled 
-                   ? 'bg-[#10b981] dark:bg-[#DBFF00] text-white dark:text-slate-900 hover:bg-emerald-600 dark:hover:bg-[#a3cc00] shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] dark:shadow-[0_4px_14px_0_rgba(219,255,0,0.39)]' 
-                   : 'bg-[#f1f5f9] dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                   ? 'bg-[#10b981] dark:bg-[#a855f7] text-white hover:bg-emerald-600 dark:hover:bg-[#9333ea] shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] dark:shadow-none' 
+                   : 'bg-[#f1f5f9] dark:bg-[#111827] dark:border dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed'
                  }`}
              >
                {loading ? (

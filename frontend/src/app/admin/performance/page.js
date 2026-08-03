@@ -10,19 +10,19 @@ function StarRating({ value }) {
       {[1,2,3,4,5].map(s => (
         <span key={s} style={{ fontSize: '14px', color: s <= Math.round(value) ? '#f59e0b' : '#e2e8f0' }}>★</span>
       ))}
-      <span style={{ fontSize: '12px', color: '#64748b', marginLeft: '4px' }}>{value}/5</span>
+      <span style={{ fontSize: '12px', color: 'var(--text-secondary)', marginLeft: '4px' }}>{value}/5</span>
     </div>
   );
 }
 
 function Badge({ status }) {
   const map = {
-    DRAFT:        { bg: '#f1f5f9', color: '#64748b' },
+    DRAFT:        { bg: '#f1f5f9', color: 'var(--text-secondary)' },
     SUBMITTED:    { bg: '#eff6ff', color: '#3b82f6' },
     ACKNOWLEDGED: { bg: '#dcfce7', color: '#16a34a' },
     IN_PROGRESS:  { bg: '#fff7ed', color: '#f59e0b' },
   };
-  const s = map[status] || { bg: '#f1f5f9', color: '#64748b' };
+  const s = map[status] || { bg: '#f1f5f9', color: 'var(--text-secondary)' };
   return (
     <span style={{ background: s.bg, color: s.color, padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
       {status}
@@ -108,32 +108,32 @@ export default function PerformancePage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>Performance Reviews</h1>
-          <p style={{ fontSize: '13px', color: '#94a3b8' }}>Create and manage employee performance reviews</p>
+          <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>Performance Reviews</h1>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Create and manage employee performance reviews</p>
         </div>
         <button onClick={() => setShowForm(true)}
-          style={{ padding: '10px 20px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
+          style={{ padding: '10px 20px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
           + Create Review
         </button>
       </div>
 
       {/* Reviews Table */}
-      <div className="table-responsive" style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <div className="table-responsive" style={{ background: 'var(--panel-bg)', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         <div className="admin-data-table" style={{ minWidth: '760px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', padding: '10px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', padding: '10px 20px', background: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)' }}>
             {['Employee', 'Review Period', 'Overall Rating', 'Status', 'Review Date'].map(h => (
-              <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</div>
+              <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</div>
             ))}
           </div>
 
         {loading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
         ) : reviews.length === 0 ? (
           <div style={{ padding: '80px', textAlign: 'center' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>⭐</div>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>No reviews yet</div>
+            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>No reviews yet</div>
             <button onClick={() => setShowForm(true)}
-              style={{ padding: '10px 20px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
+              style={{ padding: '10px 20px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
               + Create First Review
             </button>
           </div>
@@ -144,30 +144,30 @@ export default function PerformancePage() {
               style={{ cursor: 'pointer' }}>
               <div style={{
                 display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
-                padding: '14px 20px', borderBottom: '1px solid #f1f5f9', alignItems: 'center',
+                padding: '14px 20px', borderBottom: '1px solid var(--border-light)', alignItems: 'center',
                 background: selected?.id === r.id ? '#eff6ff' : 'white',
               }}
-                onMouseEnter={e => { if (selected?.id !== r.id) e.currentTarget.style.background = '#f8fafc'; }}
-                onMouseLeave={e => { if (selected?.id !== r.id) e.currentTarget.style.background = 'white'; }}
+                onMouseEnter={e => { if (selected?.id !== r.id) e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                onMouseLeave={e => { if (selected?.id !== r.id) e.currentTarget.style.background = 'var(--panel-bg)'; }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #1e3a5f, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: 'white', flexShrink: 0 }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: 'white', flexShrink: 0 }}>
                     {r.employeeName?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </div>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>{r.employeeName}</div>
-                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>{r.employeeCode}</div>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>{r.employeeName}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{r.employeeCode}</div>
                   </div>
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>{r.reviewPeriod}</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{r.reviewPeriod}</div>
                 <StarRating value={r.overallRating}/>
                 <Badge status={r.status}/>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>{r.reviewDate}</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{r.reviewDate}</div>
               </div>
 
               {/* Expanded Detail */}
               {selected?.id === r.id && (
-                <div style={{ padding: '16px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ padding: '16px 20px', background: 'var(--bg-input)', borderBottom: '1px solid var(--border-color)' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', marginBottom: '16px' }}>
                     {[
                       { label: 'Technical', value: r.technicalSkills },
@@ -176,10 +176,10 @@ export default function PerformancePage() {
                       { label: 'Productivity', value: r.productivity },
                       { label: 'Leadership', value: r.leadership },
                     ].map(s => (
-                      <div key={s.label} style={{ background: 'white', borderRadius: '8px', padding: '10px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                        <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px' }}>{s.label}</div>
-                        <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e3a5f' }}>{s.value}</div>
-                        <div style={{ fontSize: '10px', color: '#94a3b8' }}>/ 5</div>
+                      <div key={s.label} style={{ background: 'var(--panel-bg)', borderRadius: '8px', padding: '10px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>{s.label}</div>
+                        <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>{s.value}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>/ 5</div>
                       </div>
                     ))}
                   </div>
@@ -190,9 +190,9 @@ export default function PerformancePage() {
                       { label: '📈 Improvements', value: r.improvements },
                       { label: '🎯 Goals', value: r.goals },
                     ].map(d => d.value && (
-                      <div key={d.label} style={{ background: 'white', borderRadius: '8px', padding: '12px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', marginBottom: '6px' }}>{d.label}</div>
-                        <div style={{ fontSize: '13px', color: '#374151', lineHeight: 1.5 }}>{d.value}</div>
+                      <div key={d.label} style={{ background: 'var(--panel-bg)', borderRadius: '8px', padding: '12px', border: '1px solid var(--border-color)' }}>
+                        <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', marginBottom: '6px' }}>{d.label}</div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: 1.5 }}>{d.value}</div>
                       </div>
                     ))}
                   </div>
@@ -200,7 +200,7 @@ export default function PerformancePage() {
                   {r.employeeComments && (
                     <div style={{ marginTop: '12px', background: '#eff6ff', borderRadius: '8px', padding: '12px', border: '1px solid #bfdbfe' }}>
                       <div style={{ fontSize: '11px', fontWeight: '700', color: '#3b82f6', marginBottom: '4px' }}>💬 Employee Comments</div>
-                      <div style={{ fontSize: '13px', color: '#374151' }}>{r.employeeComments}</div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{r.employeeComments}</div>
                     </div>
                   )}
                 </div>
@@ -214,21 +214,21 @@ export default function PerformancePage() {
       {/* Create Review Modal */}
       {showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '20px' }}>
-          <div style={{ background: 'white', borderRadius: '16px', padding: '28px', width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+          <div style={{ background: 'var(--panel-bg)', borderRadius: '16px', padding: '28px', width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b' }}>Create Performance Review</h2>
-              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+              <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)' }}>Create Performance Review</h2>
+              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-secondary)' }}>✕</button>
             </div>
 
             <form onSubmit={handleCreate}>
               {/* Employee + Period */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '5px' }}>
                     Employee <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <select value={form.employeeId} onChange={e => setForm({ ...form, employeeId: e.target.value })} required
-                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', outline: 'none', background: 'white' }}>
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid var(--border-color)', borderRadius: '8px', fontSize: '13px', outline: 'none', background: 'var(--panel-bg)' }}>
                     <option value="">Select employee...</option>
                     {employees.map(e => (
                       <option key={e.id} value={e.id}>{e.firstName} {e.lastName} — {e.employeeCode}</option>
@@ -236,17 +236,17 @@ export default function PerformancePage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>Review Period</label>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '5px' }}>Review Period</label>
                   <input value={form.reviewPeriod} onChange={e => setForm({ ...form, reviewPeriod: e.target.value })}
                     placeholder="e.g. Q2 2026"
-                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid var(--border-color)', borderRadius: '8px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               {/* Ratings */}
-              <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '16px', marginBottom: '16px' }}>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b', marginBottom: '14px' }}>Ratings (1–5)</div>
+              <div style={{ background: 'var(--bg-input)', borderRadius: '10px', padding: '16px', marginBottom: '16px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '14px' }}>Ratings (1–5)</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <RatingInput label="Technical Skills"   name="technicalSkills" value={form.technicalSkills} onChange={handleRatingChange}/>
                   <RatingInput label="Communication"      name="communication" value={form.communication} onChange={handleRatingChange}/>
@@ -263,21 +263,21 @@ export default function PerformancePage() {
                 { label: 'Goals', name: 'goals', placeholder: 'Goals for next period...' },
               ].map(f => (
                 <div key={f.name} style={{ marginBottom: '14px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>{f.label}</label>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '5px' }}>{f.label}</label>
                   <textarea value={form[f.name]} onChange={e => setForm({ ...form, [f.name]: e.target.value })}
                     placeholder={f.placeholder} rows={2}
-                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '13px', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid var(--border-color)', borderRadius: '8px', fontSize: '13px', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }}
                   />
                 </div>
               ))}
 
               <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                 <button type="button" onClick={() => setShowForm(false)}
-                  style={{ flex: 1, padding: '12px', background: 'white', color: '#374151', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                  style={{ flex: 1, padding: '12px', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1.5px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
                   Cancel
                 </button>
                 <button type="submit" disabled={submitting}
-                  style={{ flex: 1, padding: '12px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
+                  style={{ flex: 1, padding: '12px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '700', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
                   {submitting ? '⏳ Creating...' : 'Create Review'}
                 </button>
               </div>
@@ -292,7 +292,7 @@ export default function PerformancePage() {
 function RatingInput({ label, name, value, onChange }) {
   return (
     <div>
-      <label style={{ fontSize: '12px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '5px' }}>
+      <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '5px' }}>
         {label} ({value}/5)
       </label>
       <input
@@ -300,7 +300,7 @@ function RatingInput({ label, name, value, onChange }) {
         onChange={e => onChange(name, e.target.value)}
         style={{ width: '100%' }}
       />
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#94a3b8' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-secondary)' }}>
         <span>Poor</span><span>Average</span><span>Excellent</span>
       </div>
     </div>

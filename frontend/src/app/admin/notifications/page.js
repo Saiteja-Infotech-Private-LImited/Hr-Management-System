@@ -117,7 +117,7 @@ export default function AdminNotificationsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
           <h1 style={{
-            fontSize: '22px', fontWeight: '800', color: '#1e293b',
+            fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)',
             marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px',
           }}>
             Notifications
@@ -131,7 +131,7 @@ export default function AdminNotificationsPage() {
               </span>
             )}
           </h1>
-          <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             System alerts and activity updates
           </p>
         </div>
@@ -174,28 +174,28 @@ export default function AdminNotificationsPage() {
 
       {/* Notifications List */}
       <div style={{
-        background: 'white', borderRadius: '12px',
-        border: '1px solid #e2e8f0',
+        background: 'var(--panel-bg)', borderRadius: '12px',
+        border: '1px solid var(--border-color)',
         boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden',
       }}>
         {loading ? (
-          <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             Loading notifications...
           </div>
         ) : notifications.length === 0 ? (
           <div style={{ padding: '80px', textAlign: 'center' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔔</div>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+            <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
               {filter === 'UNREAD' ? 'All caught up!' : 'No notifications yet'}
             </div>
-            <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
               {filter === 'UNREAD'
                 ? 'No unread notifications'
                 : 'System notifications will appear here'}
             </div>
             {filter === 'UNREAD' && (
               <button onClick={() => setFilter('ALL')}
-                style={{ marginTop: '16px', padding: '8px 20px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+                style={{ marginTop: '16px', padding: '8px 20px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
                 View All
               </button>
             )}
@@ -210,7 +210,7 @@ export default function AdminNotificationsPage() {
                 background: n.isRead ? 'white' : '#f8fbff',
                 transition: 'background 0.2s',
               }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                 onMouseLeave={e => e.currentTarget.style.background = n.isRead ? 'white' : '#f8fbff'}
               >
                 {/* Unread dot */}
@@ -236,17 +236,17 @@ export default function AdminNotificationsPage() {
                   <div style={{
                     fontSize: '14px',
                     fontWeight: n.isRead ? '500' : '700',
-                    color: '#1e293b', marginBottom: '4px',
+                    color: 'var(--text-primary)', marginBottom: '4px',
                   }}>
                     {n.title}
                   </div>
                   <div style={{
-                    fontSize: '13px', color: '#64748b',
+                    fontSize: '13px', color: 'var(--text-secondary)',
                     lineHeight: '1.5', marginBottom: '6px',
                   }}>
                     {n.message}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {formatTimeAgo(n.createdAt, now)}
                   </div>
                 </div>
@@ -272,21 +272,21 @@ export default function AdminNotificationsPage() {
               <div style={{
                 padding: '14px 20px', display: 'flex',
                 justifyContent: 'center', gap: '8px',
-                borderTop: '1px solid #e2e8f0',
+                borderTop: '1px solid var(--border-color)',
               }}>
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  style={{ padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page === 0 ? '#cbd5e1' : '#374151', background: 'white', cursor: page === 0 ? 'not-allowed' : 'pointer' }}>
+                  style={{ padding: '6px 14px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page === 0 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page === 0 ? 'not-allowed' : 'pointer' }}>
                   ← Prev
                 </button>
-                <span style={{ padding: '6px 14px', fontSize: '12px', color: '#64748b' }}>
+                <span style={{ padding: '6px 14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
                   {page + 1} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  style={{ padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'white', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}>
+                  style={{ padding: '6px 14px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}>
                   Next →
                 </button>
               </div>

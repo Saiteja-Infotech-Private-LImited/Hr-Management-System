@@ -28,7 +28,7 @@ html.dark, html.dark body {
 .app-container {
   display: flex;
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--bg-main, #f8fafc);
   position: relative;
   overflow-x: hidden !important;
   width: 100%;
@@ -37,7 +37,7 @@ html.dark, html.dark body {
 .app-sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: #1e3a5f;
+  background: var(--nav-bg, #1e3a5f);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -45,8 +45,9 @@ html.dark, html.dark body {
   top: 0;
   bottom: 0;
   z-index: 50;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .app-navbar {
@@ -56,8 +57,8 @@ html.dark, html.dark body {
   right: 0;
   z-index: 30;
   height: 60px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--nav-bg, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -74,6 +75,17 @@ html.dark, html.dark body {
   min-height: 100vh;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
+}
+
+body.sidebar-collapsed .app-sidebar {
+  width: 80px;
+}
+body.sidebar-collapsed .app-navbar {
+  left: 80px;
+}
+body.sidebar-collapsed .app-main-content {
+  margin-left: 80px;
+  width: calc(100% - 80px);
 }
 
 .app-main-padding {
@@ -307,6 +319,15 @@ html.dark, html.dark body {
   }
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -327,8 +348,8 @@ html.dark, html.dark body {
   -webkit-overflow-scrolling: touch !important;
   border-radius: 12px;
   display: block !important;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg);
   box-sizing: border-box !important;
 }
 
@@ -385,4 +406,104 @@ div[style*="1.5fr 1fr"]>div {
   h2 {
     font-size: 1.15rem !important;
   }
+}
+
+/* --- DYNAMIC INLINE STYLE VARIABLES --- */
+:root {
+  --primary-color: #10b981;
+  --primary-hover: #059669;
+  --panel-bg: white;
+  --nav-bg: white;
+  --bg-main: #f8fafc;
+  --border-color: #f1f5f9;
+  --border-light: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
+  --bg-input: #f8fafc;
+  --bg-hover: #f1f5f9;
+}
+
+.dark {
+  --panel-bg: #1A2033;
+  --nav-bg: #1A2033;
+  --bg-main: #0F172A;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.02);
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #94a3b8;
+  --bg-input: rgba(255,255,255,0.05);
+  --bg-hover: rgba(255,255,255,0.05);
+}
+
+/* Org Chart Tree Layout */
+.org-tree * {
+  margin: 0;
+  padding: 0;
+}
+
+.org-tree ul {
+  padding-top: 20px;
+  position: relative;
+  transition: all 0.5s;
+  display: flex;
+  justify-content: center;
+}
+
+.org-tree li {
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 10px 0 10px;
+  transition: all 0.5s;
+}
+
+.org-tree li::before, .org-tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  border-top: 2px solid var(--border-color);
+  width: 50%;
+  height: 20px;
+  z-index: 1;
+}
+
+.org-tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid var(--border-color);
+}
+
+.org-tree li:first-child::before, .org-tree li:last-child::after {
+  border: 0 none;
+}
+
+.org-tree li:first-child::after {
+  border-radius: 8px 0 0 0;
+}
+
+.org-tree li:last-child::before {
+  border-right: 2px solid var(--border-color);
+  border-radius: 0 8px 0 0;
+}
+
+.org-tree li:only-child::after, .org-tree li:only-child::before {
+  display: none;
+}
+
+.org-tree li:only-child {
+  padding-top: 0;
+}
+
+.org-tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 2px solid var(--border-color);
+  width: 0;
+  height: 20px;
+  z-index: 1;
 }

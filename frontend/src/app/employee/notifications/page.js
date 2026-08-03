@@ -8,7 +8,7 @@ const TYPE_META = {
   LEAVE_APPLIED: { icon: '🌴', bg: '#f0fdf4', color: '#16a34a' },
   LEAVE_APPROVED: { icon: '🌴', bg: '#dcfce7', color: '#16a34a' },
   LEAVE_REJECTED: { icon: '🌴', bg: '#fee2e2', color: '#dc2626' },
-  LEAVE_CANCELLED: { icon: '🌴', bg: '#f1f5f9', color: '#64748b' },
+  LEAVE_CANCELLED: { icon: '🌴', bg: '#f1f5f9', color: 'var(--text-secondary)' },
   ATTENDANCE_REMINDER: { icon: '📅', bg: '#eff6ff', color: '#3b82f6' },
   PAYROLL_GENERATED: { icon: '💰', bg: '#fef9c3', color: '#ca8a04' },
   PERFORMANCE_REVIEWED: { icon: '⭐', bg: '#eef2ff', color: '#4f46e5' },
@@ -20,7 +20,7 @@ const TYPE_META = {
   DOCUMENT_REJECTED: { icon: '⚠️', bg: '#fee2e2', color: '#dc2626' },
   CHECKLIST_COMPLETED: { icon: '🎉', bg: '#dcfce7', color: '#16a34a' },
   JOB_APPLICATION: { icon: '💼', bg: '#eef2ff', color: '#4f46e5' },
-  GENERAL: { icon: '🔔', bg: '#f1f5f9', color: '#64748b' },
+  GENERAL: { icon: '🔔', bg: '#f1f5f9', color: 'var(--text-secondary)' },
 };
 
 function getMeta(n) {
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', margin: 0 }}>
+            <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>
               Notifications
             </h1>
             {unreadCount > 0 && (
@@ -127,7 +127,7 @@ export default function NotificationsPage() {
               </span>
             )}
           </div>
-          <p style={{ fontSize: '14px', color: '#94a3b8' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
             Stay updated with your latest alerts and activities.
           </p>
         </div>
@@ -138,8 +138,8 @@ export default function NotificationsPage() {
             disabled={markingAll}
             style={{
               padding: '11px 20px',
-              background: 'white', color: '#374151',
-              border: '1.5px solid #e2e8f0',
+              background: 'var(--panel-bg)', color: 'var(--text-primary)',
+              border: '1.5px solid var(--border-color)',
               borderRadius: '10px', fontSize: '13px',
               fontWeight: '700', cursor: markingAll ? 'not-allowed' : 'pointer',
               whiteSpace: 'nowrap',
@@ -152,7 +152,7 @@ export default function NotificationsPage() {
 
       <div style={{
         display: 'flex', gap: '6px', marginBottom: '20px',
-        background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0',
+        background: 'var(--panel-bg)', borderRadius: '12px', border: '1px solid var(--border-color)',
         padding: '6px', width: 'fit-content', boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       }}>
         {['ALL', 'UNREAD'].map(f => (
@@ -172,18 +172,18 @@ export default function NotificationsPage() {
         ))}
       </div>
 
-      <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--panel-bg)', borderRadius: '14px', border: '1px solid var(--border-color)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: '70px', textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>
+          <div style={{ padding: '70px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '14px' }}>
             Loading notifications...
           </div>
         ) : notifications.length === 0 ? (
           <div style={{ padding: '80px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: '44px', marginBottom: '14px' }}>🔔</div>
-            <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b', marginBottom: '6px' }}>
+            <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '6px' }}>
               {filter === 'UNREAD' ? "You're all caught up!" : 'No notifications yet'}
             </div>
-            <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
               {filter === 'UNREAD'
                 ? 'No unread notifications right now.'
                 : 'Updates and alerts will appear here.'}
@@ -191,7 +191,7 @@ export default function NotificationsPage() {
             {filter === 'UNREAD' && (
               <button
                 onClick={() => setFilter('ALL')}
-                style={{ marginTop: '18px', padding: '10px 22px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
+                style={{ marginTop: '18px', padding: '10px 22px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
               >
                 View all notifications
               </button>
@@ -225,17 +225,17 @@ export default function NotificationsPage() {
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '15px', fontWeight: n.read ? '600' : '800', color: '#1e293b' }}>
+                      <span style={{ fontSize: '15px', fontWeight: n.read ? '600' : '800', color: 'var(--text-primary)' }}>
                         {n.title}
                       </span>
                       {!n.read && (
                         <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4f46e5', flexShrink: 0 }} />
                       )}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#64748b', lineHeight: '1.5', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '6px' }}>
                       {n.message}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                       {formatTimeAgo(n.createdAt, now)}
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export default function NotificationsPage() {
                       onClick={e => { e.stopPropagation(); handleMarkRead(n.id); }}
                       style={{
                         flexShrink: 0, padding: '7px 16px',
-                        background: 'white', color: '#4f46e5',
+                        background: 'var(--panel-bg)', color: '#4f46e5',
                         border: '1.5px solid #e0e7ff',
                         borderRadius: '8px', fontSize: '12px',
                         fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap',
@@ -259,19 +259,19 @@ export default function NotificationsPage() {
             })}
 
             {totalPages > 1 && (
-              <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', borderTop: '1px solid var(--border-color)' }}>
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  style={{ padding: '7px 16px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '12px', fontWeight: '700', color: page === 0 ? '#cbd5e1' : '#374151', background: 'white', cursor: page === 0 ? 'not-allowed' : 'pointer' }}
+                  style={{ padding: '7px 16px', border: '1.5px solid var(--border-color)', borderRadius: '8px', fontSize: '12px', fontWeight: '700', color: page === 0 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page === 0 ? 'not-allowed' : 'pointer' }}
                 >← Prev</button>
-                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>
                   Page {page + 1} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  style={{ padding: '7px 16px', border: '1.5px solid #e2e8f0', borderRadius: '8px', fontSize: '12px', fontWeight: '700', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'white', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}
+                  style={{ padding: '7px 16px', border: '1.5px solid var(--border-color)', borderRadius: '8px', fontSize: '12px', fontWeight: '700', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}
                 >Next →</button>
               </div>
             )}

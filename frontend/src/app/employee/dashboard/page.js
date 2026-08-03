@@ -7,57 +7,55 @@ import {
   getUnreadCount, getMyNotifications
 } from '@/lib/employeeApi';
 import toast from 'react-hot-toast';
- 
-function StatCard({ label, value, sub, color, icon }) {
+import { Calendar, CheckCircle, Clock, Bell } from 'lucide-react';
+
+function StatCard({ label, value, sub, colorClass, icon }) {
   return (
-    <div style={{
-      background: 'white', borderRadius: '12px', padding: '20px',
-      border: '1px solid #e2e8f0', flex: 1,
-      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <span style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>{label}</span>
-        <div style={{ width: '36px', height: '36px', background: color + '20', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '18px' }}>{icon}</span>
+    <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">{label}</span>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorClass}`}>
+          {icon}
         </div>
       </div>
-      <div style={{ fontSize: '28px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>{value}</div>
-      <div style={{ fontSize: '12px', color: '#94a3b8' }}>{sub}</div>
+      <div>
+        <div className="text-[28px] font-extrabold text-slate-900 dark:text-white mb-1 leading-none">{value}</div>
+        <div className="text-[12px] font-medium text-slate-400 dark:text-slate-500">{sub}</div>
+      </div>
     </div>
   );
 }
- 
+
 function Badge({ status }) {
   const map = {
-    APPROVED: { bg: '#dcfce7', color: '#16a34a' },
-    PENDING: { bg: '#fef9c3', color: '#ca8a04' },
-    REJECTED: { bg: '#fee2e2', color: '#dc2626' },
-    CANCELLED: { bg: '#f1f5f9', color: '#64748b' },
-    CANCELLATION_PENDING: { bg: '#fdf4ff', color: '#9333ea' },
-    PRESENT: { bg: '#dcfce7', color: '#16a34a' },
-    ABSENT: { bg: '#fee2e2', color: '#dc2626' },
-    HALF_DAY: { bg: '#fff7ed', color: '#f59e0b' },
+    APPROVED: { bg: 'bg-emerald-100 dark:bg-emerald-500/10', color: 'text-emerald-600 dark:text-emerald-400' },
+    PENDING: { bg: 'bg-amber-100 dark:bg-amber-500/10', color: 'text-amber-600 dark:text-amber-400' },
+    REJECTED: { bg: 'bg-rose-100 dark:bg-rose-500/10', color: 'text-rose-600 dark:text-rose-400' },
+    CANCELLED: { bg: 'bg-slate-100 dark:bg-slate-800', color: 'text-slate-500 dark:text-slate-400' },
+    CANCELLATION_PENDING: { bg: 'bg-fuchsia-100 dark:bg-fuchsia-500/10', color: 'text-fuchsia-600 dark:text-fuchsia-400' },
+    PRESENT: { bg: 'bg-emerald-100 dark:bg-emerald-500/10', color: 'text-emerald-600 dark:text-emerald-400' },
+    ABSENT: { bg: 'bg-rose-100 dark:bg-rose-500/10', color: 'text-rose-600 dark:text-rose-400' },
+    HALF_DAY: { bg: 'bg-amber-100 dark:bg-amber-500/10', color: 'text-amber-600 dark:text-amber-400' },
   };
-  const s = map[status] || { bg: '#f1f5f9', color: '#64748b' };
+  const s = map[status] || { bg: 'bg-slate-100 dark:bg-slate-800', color: 'text-slate-500 dark:text-slate-400' };
   return (
-    <span style={{ background: s.bg, color: s.color, padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
+    <span className={`${s.bg} ${s.color} px-3 py-1 rounded-full text-[11px] font-bold tracking-wider w-fit inline-flex`}>
       {status?.replace(/_/g, ' ')}
     </span>
   );
 }
- 
+
 function Loader() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-      <div style={{ width: '32px', height: '32px', border: '3px solid #e2e8f0', borderTopColor: '#3b82f6', borderRadius: '50', animation: 'spin 0.8s linear infinite' }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    <div className="flex items-center justify-center py-10">
+      <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-800 border-t-emerald-500 rounded-full animate-spin"></div>
     </div>
   );
 }
- 
+
 export default function EmployeeDashboard() {
   const { user } = useSelector((state) => state.auth);
- 
+
   const [attendance, setAttendance] = useState(null);
   const [todayAtt, setTodayAtt] = useState(null);
   const [leaves, setLeaves] = useState([]);
@@ -67,18 +65,18 @@ export default function EmployeeDashboard() {
   const [loading, setLoading] = useState(true);
   const [checkingIn, setCheckingIn] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
- 
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
       const [attRes, leaveRes, balRes, notifRes, unreadRes] = await Promise.allSettled([
-        getMyAttendance(0, 35), // fetch enough records to cover a full 30-day attendance window
+        getMyAttendance(0, 35),
         getMyLeaves(0, 5),
         getLeaveBalance(),
         getMyNotifications(0, 5),
         getUnreadCount(),
       ]);
- 
+
       if (attRes.status === 'fulfilled') {
         const records = attRes.value.data?.data?.content || [];
         setAttendance(records);
@@ -105,12 +103,12 @@ export default function EmployeeDashboard() {
       setLoading(false);
     }
   }, []);
- 
+
   useEffect(() => {
     const timer = setTimeout(() => { fetchAll(); }, 0);
     return () => clearTimeout(timer);
   }, [fetchAll]);
- 
+
   const handleCheckIn = async () => {
     setCheckingIn(true);
     try {
@@ -123,7 +121,7 @@ export default function EmployeeDashboard() {
       setCheckingIn(false);
     }
   };
- 
+
   const handleCheckOut = async () => {
     setCheckingOut(true);
     try {
@@ -136,217 +134,221 @@ export default function EmployeeDashboard() {
       setCheckingOut(false);
     }
   };
- 
+
   const presentDays = attendance?.filter(a => a.status === 'PRESENT' || a.status === 'HALF_DAY').length || 0;
   const annualBalance = balance.find(b => b.leaveType === 'ANNUAL');
   const pendingLeaves = leaves.filter(l => l.status === 'PENDING').length;
- 
+
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+      <div className="mb-8">
+        <h1 className="text-[26px] font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
           Dashboard
         </h1>
-        <p style={{ fontSize: '13px', color: '#94a3b8' }}>
-          Welcome back, {user?.name}! Here&apos;s your overview for today.
+        <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
+          Welcome back, {user?.name?.split(' ')[0] || 'Employee'}! Here's your overview for today.
         </p>
       </div>
- 
+
       {loading ? <Loader /> : (
         <>
           {/* Stats Row */}
-          <div className="dashboard-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <StatCard
               label="Present Days"
               value={presentDays}
               sub="This month"
-              color="#3b82f6" icon="📅"
+              colorClass="bg-[#DBFF00]/10 text-[#DBFF00]"
+              icon={<Calendar className="w-5 h-5" />}
             />
             <StatCard
               label="Leave Balance"
               value={annualBalance ? `${annualBalance.remaining} days` : '—'}
               sub="Annual remaining"
-              color="#16a34a" icon="🌴"
+              colorClass="bg-[#a855f7]/10 text-[#a855f7]"
+              icon={<CheckCircle className="w-5 h-5" />}
             />
             <StatCard
               label="Pending Leaves"
               value={pendingLeaves}
               sub="Awaiting approval"
-              color="#f59e0b" icon="⏳"
+              colorClass="bg-[#0ea5e9]/10 text-[#0ea5e9]"
+              icon={<Clock className="w-5 h-5" />}
             />
             <StatCard
               label="Notifications"
               value={unreadCount}
               sub="Unread alerts"
-              color="#8b5cf6" icon="🔔"
+              colorClass="bg-[#f97316]/10 text-[#f97316]"
+              icon={<Bell className="w-5 h-5" />}
             />
           </div>
- 
+
           {/* Main Grid */}
-          <div className="dashboard-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
- 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
             {/* Today Attendance */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b', marginBottom: '16px' }}>
-                📅 Today&apos;s Attendance
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors">
+              <h3 className="text-[16px] font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[#10b981] dark:text-[#DBFF00]" /> Today's Attendance
               </h3>
-              <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>Check In</div>
-                  <div style={{ fontSize: '22px', fontWeight: '800', color: todayAtt?.checkIn ? '#16a34a' : '#cbd5e1' }}>
+              
+              <div className="flex justify-around mb-6 relative">
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-100 dark:bg-white/5 -translate-x-1/2"></div>
+                
+                <div className="text-center z-10 bg-white dark:bg-[#111827] px-4">
+                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Check In</div>
+                  <div className={`text-[24px] font-black ${todayAtt?.checkIn ? 'text-[#10b981] dark:text-[#DBFF00]' : 'text-slate-400 dark:text-slate-600'}`}>
                     {todayAtt?.checkIn ? todayAtt.checkIn.substring(0, 5) : '--:--'}
                   </div>
-                  <div style={{ fontSize: '10px', color: '#94a3b8' }}>
+                  <div className="text-[11px] font-semibold text-slate-500 mt-1">
                     {new Date().toLocaleDateString('en-IN')}
                   </div>
                 </div>
-                <div style={{ width: '1px', background: '#e2e8f0' }} />
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>Check Out</div>
-                  <div style={{ fontSize: '22px', fontWeight: '800', color: todayAtt?.checkOut ? '#f59e0b' : '#cbd5e1' }}>
+                
+                <div className="text-center z-10 bg-white dark:bg-[#111827] px-4">
+                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Check Out</div>
+                  <div className={`text-[24px] font-black ${todayAtt?.checkOut ? 'text-[#f97316]' : 'text-slate-400 dark:text-slate-600'}`}>
                     {todayAtt?.checkOut ? todayAtt.checkOut.substring(0, 5) : '--:--'}
                   </div>
-                  <div style={{ fontSize: '10px', color: '#94a3b8' }}>
+                  <div className="text-[11px] font-semibold text-slate-500 mt-1">
                     {todayAtt?.workHours ? `${todayAtt.workHours}h worked` : 'Not yet'}
                   </div>
                 </div>
               </div>
- 
+
               {/* Status badge */}
               {todayAtt && (
-                <div style={{ textAlign: 'center', marginBottom: '14px' }}>
+                <div className="text-center mb-6">
                   <Badge status={todayAtt.status} />
                 </div>
               )}
- 
+
               {/* Action buttons */}
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="flex gap-4">
                 <button
                   onClick={handleCheckIn}
                   disabled={!!todayAtt?.checkIn || checkingIn}
-                  style={{
-                    flex: 1, padding: '10px',
-                    background: todayAtt?.checkIn ? '#f1f5f9' : '#dcfce7',
-                    color: todayAtt?.checkIn ? '#94a3b8' : '#16a34a',
-                    border: `1px solid ${todayAtt?.checkIn ? '#e2e8f0' : '#bbf7d0'}`,
-                    borderRadius: '8px', fontSize: '13px', fontWeight: '700',
-                    cursor: todayAtt?.checkIn ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s',
-                  }}
+                  className={`flex-1 py-3 px-4 rounded-xl text-[13px] font-bold transition-all ${
+                    todayAtt?.checkIn 
+                      ? 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-white/5' 
+                      : 'bg-[#10b981]/10 dark:bg-[#DBFF00]/10 text-[#10b981] dark:text-[#DBFF00] hover:bg-[#10b981]/20 dark:hover:bg-[#DBFF00]/20 border border-[#10b981]/20 dark:border-[#DBFF00]/20 shadow-sm'
+                  }`}
                 >
-                  {checkingIn ? '⏳' : todayAtt?.checkIn ? '✓ Checked In' : 'Check In'}
+                  {checkingIn ? '⏳ Processing...' : todayAtt?.checkIn ? '✓ Checked In' : 'Check In'}
                 </button>
                 <button
                   onClick={handleCheckOut}
                   disabled={!todayAtt?.checkIn || !!todayAtt?.checkOut || checkingOut}
-                  style={{
-                    flex: 1, padding: '10px',
-                    background: todayAtt?.checkOut ? '#f1f5f9' : (!todayAtt?.checkIn ? '#f1f5f9' : '#fff7ed'),
-                    color: (todayAtt?.checkOut || !todayAtt?.checkIn) ? '#94a3b8' : '#f59e0b',
-                    border: `1px solid ${(todayAtt?.checkOut || !todayAtt?.checkIn) ? '#e2e8f0' : '#fed7aa'}`,
-                    borderRadius: '8px', fontSize: '13px', fontWeight: '700',
-                    cursor: (!todayAtt?.checkIn || todayAtt?.checkOut) ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s',
-                  }}
+                  className={`flex-1 py-3 px-4 rounded-xl text-[13px] font-bold transition-all ${
+                    (todayAtt?.checkOut || !todayAtt?.checkIn)
+                      ? 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-white/5' 
+                      : 'bg-[#f97316]/10 text-[#f97316] hover:bg-[#f97316]/20 border border-[#f97316]/20 shadow-sm'
+                  }`}
                 >
-                  {checkingOut ? '⏳' : todayAtt?.checkOut ? '✓ Checked Out' : 'Check Out'}
+                  {checkingOut ? '⏳ Processing...' : todayAtt?.checkOut ? '✓ Checked Out' : 'Check Out'}
                 </button>
               </div>
             </div>
- 
+
             {/* Leave Balance */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b', marginBottom: '16px' }}>
-                🌴 Leave Balance
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors">
+              <h3 className="text-[16px] font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-[#a855f7]" /> Leave Balance
               </h3>
+              
               {balance.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', padding: '20px' }}>
+                <div className="text-center text-slate-400 dark:text-slate-500 text-[13px] py-10 font-medium">
                   No leave balance data found
                 </div>
               ) : (
-                balance.map((b, i) => (
-                  <div key={i} style={{ marginBottom: '14px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '13px', color: '#374151', fontWeight: '500' }}>{b.leaveType}</span>
-                      <span style={{ fontSize: '12px', color: '#64748b' }}>{b.remaining} / {b.totalAllotted} days</span>
+                <div className="space-y-5">
+                  {balance.map((b, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-end mb-2">
+                        <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{b.leaveType}</span>
+                        <span className="text-[12px] font-semibold text-slate-500 dark:text-slate-400">{b.remaining} <span className="text-slate-400 dark:text-slate-500 font-medium">/ {b.totalAllotted} days</span></span>
+                      </div>
+                      <div className="h-2 bg-slate-100 dark:bg-[#1e293b] rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            b.leaveType === 'ANNUAL' ? 'bg-[#a855f7]' : 
+                            b.leaveType === 'SICK' ? 'bg-[#0ea5e9]' : 
+                            b.leaveType === 'CASUAL' ? 'bg-[#f97316]' : 'bg-[#10b981] dark:bg-[#DBFF00]'
+                          }`}
+                          style={{ width: `${(b.remaining / b.totalAllotted) * 100}%` }} 
+                        />
+                      </div>
                     </div>
-                    <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%', borderRadius: '4px',
-                        background: b.leaveType === 'ANNUAL' ? '#3b82f6' : b.leaveType === 'SICK' ? '#10b981' : b.leaveType === 'CASUAL' ? '#f59e0b' : '#8b5cf6',
-                        width: `${(b.remaining / b.totalAllotted) * 100}%`,
-                        transition: 'width 0.5s',
-                      }} />
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
           </div>
- 
+
           {/* Bottom Grid */}
-          <div className="dashboard-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
- 
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
             {/* Recent Leave Requests */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>📋 Recent Leave Requests</h3>
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-[16px] font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#0ea5e9]" /> Recent Leave Requests
+                </h3>
               </div>
+              
               {leaves.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', padding: '20px' }}>
+                <div className="text-center text-slate-400 dark:text-slate-500 text-[13px] py-10 font-medium">
                   No leave requests found
                 </div>
               ) : (
-                leaves.slice(0, 4).map((l, i) => (
-                  <div key={i} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '10px 0', borderBottom: i < leaves.length - 1 ? '1px solid #f1f5f9' : 'none',
-                  }}>
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>{l.leaveType} Leave</div>
-                      <div style={{ fontSize: '11px', color: '#94a3b8' }}>{l.startDate} – {l.endDate} · {l.totalDays} day(s)</div>
+                <div className="space-y-1">
+                  {leaves.slice(0, 4).map((l, i) => (
+                    <div key={i} className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-white/5 last:border-0">
+                      <div>
+                        <div className="text-[13px] font-bold text-slate-800 dark:text-slate-200">{l.leaveType} Leave</div>
+                        <div className="text-[11px] font-medium text-slate-500 mt-0.5">{l.startDate} – {l.endDate} &middot; {l.totalDays} day(s)</div>
+                      </div>
+                      <Badge status={l.status} />
                     </div>
-                    <Badge status={l.status} />
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
- 
+
             {/* Recent Notifications */}
-            <div style={{ background: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>🔔 Recent Notifications</h3>
+            <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-[16px] font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-[#f97316]" /> Recent Notifications
+                </h3>
                 {unreadCount > 0 && (
-                  <span style={{ background: '#eff6ff', color: '#3b82f6', padding: '2px 8px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
+                  <span className="bg-[#f97316]/10 text-[#f97316] px-3 py-1 rounded-full text-[11px] font-bold tracking-wide">
                     {unreadCount} unread
                   </span>
                 )}
               </div>
+              
               {notifications.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', padding: '20px' }}>
+                <div className="text-center text-slate-400 dark:text-slate-500 text-[13px] py-10 font-medium">
                   No notifications found
                 </div>
               ) : (
-                notifications.slice(0, 4).map((n, i) => (
-                  <div key={i} style={{
-                    display: 'flex', gap: '10px', alignItems: 'flex-start',
-                    padding: '10px 0', borderBottom: i < 3 ? '1px solid #f1f5f9' : 'none',
-                  }}>
-                    <div style={{
-                      width: '8px', height: '8px', borderRadius: '50%',
-                      background: n.isRead ? '#cbd5e1' : '#3b82f6',
-                      flexShrink: 0, marginTop: '5px',
-                    }} />
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b', marginBottom: '2px' }}>{n.title}</div>
-                      <div style={{ fontSize: '11px', color: '#64748b' }}>{n.message?.substring(0, 60)}...</div>
-                      <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '3px' }}>
-                        {new Date(n.createdAt).toLocaleDateString('en-IN')}
+                <div className="space-y-1">
+                  {notifications.slice(0, 4).map((n, i) => (
+                    <div key={i} className="flex gap-3 items-start py-3 border-b border-slate-100 dark:border-white/5 last:border-0">
+                      <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${n.isRead ? 'bg-slate-200 dark:bg-slate-700' : 'bg-[#f97316]'}`} />
+                      <div>
+                        <div className="text-[13px] font-bold text-slate-800 dark:text-slate-200 mb-0.5">{n.title}</div>
+                        <div className="text-[12px] font-medium text-slate-500 dark:text-slate-400 leading-snug">{n.message?.substring(0, 60)}...</div>
+                        <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1.5 uppercase tracking-wider">
+                          {new Date(n.createdAt).toLocaleDateString('en-IN')}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
           </div>

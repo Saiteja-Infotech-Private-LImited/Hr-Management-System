@@ -9,12 +9,12 @@ const STATUS_COLORS = {
     HALF_DAY: { bg: '#fff7ed', color: '#f59e0b' },
     ON_LEAVE: { bg: '#eff6ff', color: '#3b82f6' },
     ABSENT: { bg: '#fee2e2', color: '#dc2626' },
-    WEEKEND: { bg: '#f1f5f9', color: '#94a3b8' },
+    WEEKEND: { bg: '#f1f5f9', color: 'var(--text-secondary)' },
     HOLIDAY: { bg: '#fdf4ff', color: '#9333ea' },
 };
 
 function StatusBadge({ status }) {
-    const s = STATUS_COLORS[status] || { bg: '#f1f5f9', color: '#64748b' };
+    const s = STATUS_COLORS[status] || { bg: '#f1f5f9', color: 'var(--text-secondary)' };
     return (
         <span style={{
             background: s.bg, color: s.color,
@@ -27,7 +27,7 @@ function StatusBadge({ status }) {
 }
 
 function DayCell({ day }) {
-    const s = STATUS_COLORS[day.status] || { bg: '#f1f5f9', color: '#64748b' };
+    const s = STATUS_COLORS[day.status] || { bg: '#f1f5f9', color: 'var(--text-secondary)' };
     const shortLabel = day.status === 'PRESENT' ? 'P'
         : day.status === 'HALF_DAY' ? 'H'
             : day.status === 'ON_LEAVE' ? 'L'
@@ -36,7 +36,7 @@ function DayCell({ day }) {
                         : 'A';
     return (
         <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>{day.dayName}</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>{day.dayName}</div>
             <div style={{
                 width: '32px', height: '32px', borderRadius: '6px',
                 background: s.bg, color: s.color,
@@ -101,15 +101,15 @@ export default function EmployeeAttendanceModal({ employeeId, asOfDate, onClose 
             <div
                 onClick={(e) => e.stopPropagation()}
                 style={{
-                    background: 'white', borderRadius: '14px', width: '460px',
+                    background: 'var(--panel-bg)', borderRadius: '14px', width: '460px',
                     maxWidth: '100%', maxHeight: '85vh', overflowY: 'auto',
                     padding: '20px 24px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
                 }}
             >
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>Loading...</div>
+                    <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>Loading...</div>
                 ) : !report ? (
-                    <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+                    <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
                         No report available.
                         <div style={{ marginTop: '16px' }}>
                             <button onClick={onClose} style={closeBtnStyle}>Close</button>
@@ -119,16 +119,16 @@ export default function EmployeeAttendanceModal({ employeeId, asOfDate, onClose 
                     <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                             <div>
-                                <div style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b' }}>
-                                    {report.employeeName} <span style={{ color: '#94a3b8', fontWeight: '500' }}>({report.employeeCode})</span>
+                                <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-primary)' }}>
+                                    {report.employeeName} <span style={{ color: 'var(--text-secondary)', fontWeight: '500' }}>({report.employeeCode})</span>
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                                     {report.departmentName}
                                 </div>
                             </div>
                             <button onClick={onClose} aria-label="Close" style={{
                                 border: 'none', background: 'none', cursor: 'pointer',
-                                fontSize: '18px', color: '#94a3b8', lineHeight: 1,
+                                fontSize: '18px', color: 'var(--text-secondary)', lineHeight: 1,
                             }}>
                                 ✕
                             </button>
@@ -142,20 +142,20 @@ export default function EmployeeAttendanceModal({ employeeId, asOfDate, onClose 
                                 type="date"
                                 value={fromDate}
                                 onChange={(e) => setFromDate(e.target.value)}
-                                style={{ padding: '6px 10px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px' }}
+                                style={{ padding: '6px 10px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px' }}
                             />
-                            <span style={{ fontSize: '12px', color: '#94a3b8' }}>to</span>
+                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>to</span>
                             <input
                                 type="date"
                                 value={toDate}
                                 onChange={(e) => setToDate(e.target.value)}
-                                style={{ padding: '6px 10px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px' }}
+                                style={{ padding: '6px 10px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px' }}
                             />
                             <button
                                 onClick={handleExport}
                                 disabled={exporting}
                                 style={{
-                                    marginLeft: 'auto', padding: '6px 14px', background: '#1e3a5f', color: 'white',
+                                    marginLeft: 'auto', padding: '6px 14px', background: 'var(--primary-color)', color: 'white',
                                     border: 'none', borderRadius: '6px', fontSize: '12px', fontWeight: '700',
                                     cursor: exporting ? 'not-allowed' : 'pointer',
                                 }}
@@ -165,7 +165,7 @@ export default function EmployeeAttendanceModal({ employeeId, asOfDate, onClose 
                         </div>
 
                         <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', marginBottom: '6px' }}>
+                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '6px' }}>
                                 Yesterday ({report.yesterdayDate})
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#334155' }}>
@@ -176,20 +176,20 @@ export default function EmployeeAttendanceModal({ employeeId, asOfDate, onClose 
                                 )}
                             </div>
                             {report.yesterdayRemarks && (
-                                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px', fontStyle: 'italic' }}>
+                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px', fontStyle: 'italic' }}>
                                     &quot;{report.yesterdayRemarks}&quot;
                                 </div>
                             )}
                         </div>
 
                         <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', marginBottom: '10px' }}>
+                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '10px' }}>
                                 This week
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '4px' }}>
                                 {report.weeklyRecords?.map((d) => <DayCell key={d.date} day={d} />)}
                             </div>
-                            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '10px' }}>
+                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '10px' }}>
                                 P: {report.weeklyStats?.presentCount ?? 0} &nbsp;
                                 H: {report.weeklyStats?.halfDayCount ?? 0} &nbsp;
                                 A: {report.weeklyStats?.absentCount ?? 0} &nbsp;
@@ -199,24 +199,24 @@ export default function EmployeeAttendanceModal({ employeeId, asOfDate, onClose 
                         </div>
 
                         <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
-                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', marginBottom: '10px' }}>
+                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '700', textTransform: 'uppercase', marginBottom: '10px' }}>
                                 This month
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                                <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '10px 12px' }}>
-                                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Attendance</div>
-                                    <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e293b' }}>
+                                <div style={{ background: 'var(--bg-input)', borderRadius: '10px', padding: '10px 12px' }}>
+                                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Attendance</div>
+                                    <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
                                         {report.monthlyStats?.attendancePercent ?? 0}%
                                     </div>
                                 </div>
-                                <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '10px 12px' }}>
-                                    <div style={{ fontSize: '11px', color: '#94a3b8' }}>Total hours</div>
-                                    <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e293b' }}>
+                                <div style={{ background: 'var(--bg-input)', borderRadius: '10px', padding: '10px 12px' }}>
+                                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total hours</div>
+                                    <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>
                                         {report.monthlyStats?.totalWorkHours ?? 0}
                                     </div>
                                 </div>
                             </div>
-                            <div style={{ fontSize: '12px', color: '#64748b' }}>
+                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                                 Present: {report.monthlyStats?.presentCount ?? 0} &nbsp;
                                 Half: {report.monthlyStats?.halfDayCount ?? 0} &nbsp;
                                 Absent: {report.monthlyStats?.absentCount ?? 0} &nbsp;

@@ -10,7 +10,7 @@ const TYPE_META = {
     DOCUMENT_APPROVED: { icon: '✅', color: '#16a34a', bg: '#dcfce7' },
     CHECKLIST_COMPLETED: { icon: '🎉', color: '#16a34a', bg: '#dcfce7' },
     ONBOARDING_INITIATED: { icon: '👋', color: '#4f46e5', bg: '#eef2ff' },
-    DEFAULT: { icon: '🔔', color: '#64748b', bg: '#f1f5f9' },
+    DEFAULT: { icon: '🔔', color: 'var(--text-secondary)', bg: '#f1f5f9' },
 };
 
 function timeAgo(dateStr) {
@@ -92,8 +92,8 @@ export default function EmployeeOnboardingNotificationsPage() {
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div>
-                    <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e293b' }}>Notifications</div>
-                    <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '2px' }}>
+                    <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-primary)' }}>Notifications</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                         {unreadCount > 0 ? `${unreadCount} unread` : 'You\u2019re all caught up'}
                     </div>
                 </div>
@@ -101,8 +101,8 @@ export default function EmployeeOnboardingNotificationsPage() {
                     onClick={handleMarkAllRead}
                     disabled={unreadCount === 0 || markingAll}
                     style={{
-                        padding: '10px 16px', borderRadius: '10px', border: '1.5px solid #e2e8f0',
-                        background: 'white', color: '#374151', fontSize: '13px', fontWeight: '700',
+                        padding: '10px 16px', borderRadius: '10px', border: '1.5px solid var(--border-color)',
+                        background: 'var(--panel-bg)', color: 'var(--text-primary)', fontSize: '13px', fontWeight: '700',
                         cursor: unreadCount === 0 ? 'not-allowed' : 'pointer', opacity: unreadCount === 0 ? 0.5 : 1,
                     }}>
                     {markingAll ? 'Marking...' : 'Mark all as read'}
@@ -120,7 +120,7 @@ export default function EmployeeOnboardingNotificationsPage() {
                         style={{
                             padding: '8px 16px', borderRadius: '20px', border: 'none', cursor: 'pointer',
                             fontSize: '12px', fontWeight: '700',
-                            background: tab === t.key ? '#1e3a5f' : '#f1f5f9',
+                            background: tab === t.key ? 'var(--primary-color)' : '#f1f5f9',
                             color: tab === t.key ? 'white' : '#64748b',
                         }}>
                         {t.label}
@@ -128,16 +128,16 @@ export default function EmployeeOnboardingNotificationsPage() {
                 ))}
             </div>
 
-            <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--panel-bg)', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
                 {loading ? (
-                    <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>
+                    <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
                 ) : visible.length === 0 ? (
                     <div style={{ padding: '60px', textAlign: 'center' }}>
                         <div style={{ fontSize: '32px', marginBottom: '8px' }}>🔔</div>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>
                             {tab === 'UNREAD' ? 'No unread notifications' : 'No notifications yet'}
                         </div>
-                        <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                             Updates about your documents and checklist will show up here.
                         </div>
                     </div>
@@ -153,7 +153,7 @@ export default function EmployeeOnboardingNotificationsPage() {
                                     borderTop: i === 0 ? 'none' : '1px solid #f1f5f9', cursor: 'pointer',
                                     background: n.read ? 'white' : '#f8faff',
                                 }}
-                                onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                                 onMouseLeave={e => e.currentTarget.style.background = n.read ? 'white' : '#f8faff'}
                             >
                                 <div style={{
@@ -164,17 +164,17 @@ export default function EmployeeOnboardingNotificationsPage() {
                                     {meta.icon}
                                 </div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: '13px', fontWeight: n.read ? '600' : '800', color: '#1e293b' }}>
+                                    <div style={{ fontSize: '13px', fontWeight: n.read ? '600' : '800', color: 'var(--text-primary)' }}>
                                         {n.title}
                                     </div>
                                     {n.message && (
-                                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                                             {n.message}
                                         </div>
                                     )}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                                    <div style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                                         {timeAgo(n.createdAt)}
                                     </div>
                                     {!n.read && (

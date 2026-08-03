@@ -79,8 +79,8 @@
 //   return (
 //     <div style={{
 //       position: 'fixed', top: 0, left: '240px', right: 0, zIndex: 30,
-//       height: '60px', background: 'white',
-//       borderBottom: '1px solid #e2e8f0',
+//       height: '60px', background: 'var(--panel-bg)',
+//       borderBottom: '1px solid var(--border-color)',
 //       display: 'flex', alignItems: 'center',
 //       justifyContent: 'space-between', padding: '0 24px',
 //       boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
@@ -102,18 +102,18 @@
 //           placeholder="Search pages..."
 //           style={{
 //             width: '100%', paddingLeft: '36px', paddingRight: '12px',
-//             height: '38px', border: '1.5px solid #e2e8f0',
+//             height: '38px', border: '1.5px solid var(--border-color)',
 //             borderRadius: '10px', fontSize: '13px', outline: 'none',
 //             boxSizing: 'border-box', transition: 'border 0.2s',
-//             background: '#f8fafc', color: '#1e293b',
+//             background: 'var(--bg-input)', color: 'var(--text-primary)',
 //           }}
 //           onFocusCapture={e => {
 //             e.target.style.borderColor = '#3b82f6';
-//             e.target.style.background = 'white';
+//             e.target.style.background = 'var(--panel-bg)';
 //           }}
 //           onBlurCapture={e => {
-//             e.target.style.borderColor = '#e2e8f0';
-//             e.target.style.background = '#f8fafc';
+//             e.target.style.borderColor = 'var(--border-color)';
+//             e.target.style.background = 'var(--bg-input)';
 //           }}
 //         />
 
@@ -121,13 +121,13 @@
 //         {showResults && search.trim() && (
 //           <div style={{
 //             position: 'absolute', top: '44px', left: 0, right: 0,
-//             background: 'white', borderRadius: '12px',
-//             border: '1px solid #e2e8f0',
+//             background: 'var(--panel-bg)', borderRadius: '12px',
+//             border: '1px solid var(--border-color)',
 //             boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
 //             overflow: 'hidden', zIndex: 100,
 //           }}>
 //             {filtered.length === 0 ? (
-//               <div style={{ padding: '14px 16px', fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>
+//               <div style={{ padding: '14px 16px', fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
 //                 No results for "{search}"
 //               </div>
 //             ) : (
@@ -137,19 +137,19 @@
 //                   style={{
 //                     display: 'flex', alignItems: 'center', gap: '10px',
 //                     padding: '10px 16px', cursor: 'pointer',
-//                     borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none',
-//                     background: pathname === item.path ? '#eff6ff' : 'white',
+//                     borderBottom: i < filtered.length - 1 ? '1px solid var(--border-light)' : 'none',
+//                     background: pathname === item.path ? '#eff6ff' : 'var(--panel-bg)',
 //                     transition: 'background 0.15s',
 //                   }}
-//                   onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-//                   onMouseLeave={e => e.currentTarget.style.background = pathname === item.path ? '#eff6ff' : 'white'}
+//                   onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-input)'}
+//                   onMouseLeave={e => e.currentTarget.style.background = pathname === item.path ? '#eff6ff' : 'var(--panel-bg)'}
 //                 >
 //                   <span style={{ fontSize: '18px' }}>{item.icon}</span>
 //                   <div>
-//                     <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+//                     <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
 //                       {item.label}
 //                     </div>
-//                     <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+//                     <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
 //                       {item.path}
 //                     </div>
 //                   </div>
@@ -168,12 +168,12 @@
 //         {showResults && !search.trim() && (
 //           <div style={{
 //             position: 'absolute', top: '44px', left: 0, right: 0,
-//             background: 'white', borderRadius: '12px',
-//             border: '1px solid #e2e8f0',
+//             background: 'var(--panel-bg)', borderRadius: '12px',
+//             border: '1px solid var(--border-color)',
 //             boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
 //             padding: '12px 16px', zIndex: 100,
 //           }}>
-//             <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+//             <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
 //               Quick Navigation
 //             </div>
 //             {allItems.slice(0, 5).map((item, i) => (
@@ -182,13 +182,13 @@
 //                 style={{
 //                   display: 'flex', alignItems: 'center', gap: '10px',
 //                   padding: '8px 0', cursor: 'pointer',
-//                   borderBottom: i < 4 ? '1px solid #f1f5f9' : 'none',
+//                   borderBottom: i < 4 ? '1px solid var(--border-light)' : 'none',
 //                 }}
 //                 onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
 //                 onMouseLeave={e => e.currentTarget.style.opacity = '1'}
 //               >
 //                 <span style={{ fontSize: '16px' }}>{item.icon}</span>
-//                 <span style={{ fontSize: '13px', color: '#374151', fontWeight: '500' }}>{item.label}</span>
+//                 <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: '500' }}>{item.label}</span>
 //               </div>
 //             ))}
 //           </div>
@@ -211,7 +211,7 @@
 //           {unreadCount > 0 && (
 //             <span style={{
 //               position: 'absolute', top: '2px', right: '2px',
-//               background: '#ef4444', color: 'white',
+//               background: '#ef4444', color: 'var(--panel-bg)',
 //               borderRadius: '50%', minWidth: '16px', height: '16px',
 //               fontSize: '9px', display: 'flex', alignItems: 'center',
 //               justifyContent: 'center', fontWeight: '700', padding: '0 3px',
@@ -222,7 +222,7 @@
 //         </div>
 
 //         {/* Divider */}
-//         <div style={{ width: '1px', height: '28px', background: '#e2e8f0' }}/>
+//         <div style={{ width: '1px', height: '28px', background: 'var(--border-color)' }}/>
 
 //         {/* Role Badge */}
 //         <span style={{
@@ -240,18 +240,18 @@
 //         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
 //           <div style={{
 //             width: '36px', height: '36px',
-//             background: 'linear-gradient(135deg, #1e3a5f, #3b82f6)',
+//             background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))',
 //             borderRadius: '50%', display: 'flex',
 //             alignItems: 'center', justifyContent: 'center',
-//             color: 'white', fontSize: '13px', fontWeight: '700',
+//             color: 'var(--panel-bg)', fontSize: '13px', fontWeight: '700',
 //           }}>
 //             {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
 //           </div>
 //           <div>
-//             <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+//             <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
 //               {user?.name}
 //             </div>
-//             <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+//             <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
 //               {user?.employeeCode} · {user?.role === 'ADMIN' ? 'Super Admin' : user?.role}
 //             </div>
 //           </div>
@@ -362,8 +362,8 @@ export default function Navbar() {
           onClick={() => window.dispatchEvent(new CustomEvent('toggleMobileSidebar'))}
           style={{
             display: 'none',
-            background: '#f1f5f9', border: 'none', borderRadius: '8px',
-            padding: '8px', cursor: 'pointer', color: '#1e293b',
+            background: 'var(--border-light)', border: 'none', borderRadius: '8px',
+            padding: '8px', cursor: 'pointer', color: 'var(--text-primary)',
             alignItems: 'center', justifyContent: 'center',
           }}
           title="Toggle Menu"
@@ -403,18 +403,18 @@ export default function Navbar() {
             placeholder="Search pages..."
             style={{
               width: '100%', paddingLeft: '36px', paddingRight: '12px',
-              height: '38px', border: '1.5px solid #e2e8f0',
+              height: '38px', border: '1.5px solid var(--border-color)',
               borderRadius: '10px', fontSize: '13px', outline: 'none',
               boxSizing: 'border-box', transition: 'border 0.2s',
-              background: '#f8fafc', color: '#1e293b',
+              background: 'var(--bg-input)', color: 'var(--text-primary)',
             }}
             onFocusCapture={e => {
               e.target.style.borderColor = '#3b82f6';
-              e.target.style.background = 'white';
+              e.target.style.background = 'var(--panel-bg)';
             }}
             onBlurCapture={e => {
-              e.target.style.borderColor = '#e2e8f0';
-              e.target.style.background = '#f8fafc';
+              e.target.style.borderColor = 'var(--border-color)';
+              e.target.style.background = 'var(--bg-input)';
             }}
           />
  
@@ -422,13 +422,13 @@ export default function Navbar() {
           {showResults && search.trim() && (
             <div style={{
               position: 'absolute', top: '44px', left: 0, right: 0,
-              background: 'white', borderRadius: '12px',
-              border: '1px solid #e2e8f0',
+              background: 'var(--panel-bg)', borderRadius: '12px',
+              border: '1px solid var(--border-color)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
               overflow: 'hidden', zIndex: 100,
             }}>
               {filtered.length === 0 ? (
-                <div style={{ padding: '14px 16px', fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>
+                <div style={{ padding: '14px 16px', fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
                   No results for &quot;{search}&quot;
                 </div>
               ) : (
@@ -440,19 +440,19 @@ export default function Navbar() {
                       style={{
                         display: 'flex', alignItems: 'center', gap: '10px',
                         padding: '10px 16px', cursor: 'pointer',
-                        borderBottom: i < filtered.length - 1 ? '1px solid #f1f5f9' : 'none',
-                        background: pathname === item.path ? '#eff6ff' : 'white',
+                        borderBottom: i < filtered.length - 1 ? '1px solid var(--border-light)' : 'none',
+                        background: pathname === item.path ? '#eff6ff' : 'var(--panel-bg)',
                         transition: 'background 0.15s',
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
-                      onMouseLeave={e => e.currentTarget.style.background = pathname === item.path ? '#eff6ff' : 'white'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-input)'}
+                      onMouseLeave={e => e.currentTarget.style.background = pathname === item.path ? '#eff6ff' : 'var(--panel-bg)'}
                     >
-                      <Icon size={18} color={pathname === item.path ? '#3b82f6' : '#64748b'} strokeWidth={2} />
+                      <Icon size={18} color={pathname === item.path ? '#3b82f6' : 'var(--text-secondary)'} strokeWidth={2} />
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                        <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                           {item.label}
                         </div>
-                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                           {item.path}
                         </div>
                       </div>
@@ -476,13 +476,13 @@ export default function Navbar() {
           {showResults && !search.trim() && (
             <div style={{
               position: 'absolute', top: '44px', left: 0, right: 0,
-              background: 'white', borderRadius: '12px',
-              border: '1px solid #e2e8f0',
+              background: 'var(--panel-bg)', borderRadius: '12px',
+              border: '1px solid var(--border-color)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
               padding: '12px 16px', zIndex: 100,
             }}>
               <div style={{
-                fontSize: '11px', color: '#94a3b8', fontWeight: '600',
+                fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '600',
                 marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px',
               }}>
                 Quick Navigation
@@ -495,13 +495,13 @@ export default function Navbar() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: '10px',
                       padding: '8px 0', cursor: 'pointer',
-                      borderBottom: i < 4 ? '1px solid #f1f5f9' : 'none',
+                      borderBottom: i < 4 ? '1px solid var(--border-light)' : 'none',
                     }}
                     onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
                     onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                   >
                     <Icon size={16} color="#374151" strokeWidth={2} />
-                    <span style={{ fontSize: '13px', color: '#374151', fontWeight: '500' }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: '500' }}>
                       {item.label}
                     </span>
                   </div>
@@ -514,29 +514,6 @@ export default function Navbar() {
  
       {/* Right Side */}
       <div className="nav-right-side" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
- 
-        {/* Notification Bell */}
-        <div
-          onClick={handleBellClick}
-          style={{ position: 'relative', cursor: 'pointer', padding: '6px' }}
-          title="Go to Notifications"
-        >
-          <Bell size={20} color="#64748b" strokeWidth={2} />
-          {unreadCount > 0 && (
-            <span style={{
-              position: 'absolute', top: '2px', right: '2px',
-              background: '#ef4444', color: 'white',
-              borderRadius: '50%', minWidth: '16px', height: '16px',
-              fontSize: '9px', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', fontWeight: '700', padding: '0 3px',
-            }}>
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </div>
- 
-        {/* Divider */}
-        <div className="nav-divider" style={{ width: '1px', height: '28px', background: '#e2e8f0' }} />
  
         {/* Role Badge */}
         <span className="nav-role-badge" style={{
@@ -554,19 +531,19 @@ export default function Navbar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '36px', height: '36px',
-            background: 'linear-gradient(135deg, #1e3a5f, #3b82f6)',
+            background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))',
             borderRadius: '50%', display: 'flex',
             alignItems: 'center', justifyContent: 'center',
-            color: 'white', fontSize: '13px', fontWeight: '700',
+            color: 'var(--panel-bg)', fontSize: '13px', fontWeight: '700',
             flexShrink: 0,
           }}>
             {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
           </div>
           <div className="nav-user-info">
-            <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
               {user?.name}
             </div>
-            <div style={{ fontSize: '11px', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
               {user?.employeeCode} · {user?.role === 'ADMIN' ? 'Super Admin' : user?.role}
             </div>
           </div>

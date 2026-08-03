@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "leave_balance",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "leave_type", "year"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "leave_type", "leave_year"}))
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class LeaveBalance {
 
@@ -22,6 +22,7 @@ public class LeaveBalance {
     @Column(nullable = false)
     private String leaveType;    //annual,sick,casual,maternity,paternity
 
+    @Column(name = "leave_year")
     private int year;
 
     private double totalAllotted;  // example 18 days/year

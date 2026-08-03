@@ -21,31 +21,31 @@ function PayslipListItem({ p, selected, onSelect, formatCurrency }) {
         border: 'none',
         display: 'block',
         padding: '16px 20px',
-        borderBottom: '1px solid #f1f5f9',
+        borderBottom: '1px solid var(--border-light)',
         cursor: 'pointer',
         background: isSelected ? '#eff6ff' : 'white',
         borderLeft: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
         transition: 'all 0.15s',
       }}
       onMouseEnter={e => {
-        if (!isSelected) e.currentTarget.style.background = '#f8fafc';
+        if (!isSelected) e.currentTarget.style.background = 'var(--bg-hover)';
       }}
       onMouseLeave={e => {
-        if (!isSelected) e.currentTarget.style.background = 'white';
+        if (!isSelected) e.currentTarget.style.background = 'var(--panel-bg)';
       }}
       onFocus={e => {
-        if (!isSelected) e.currentTarget.style.background = '#f8fafc';
+        if (!isSelected) e.currentTarget.style.background = 'var(--bg-hover)';
       }}
       onBlur={e => {
-        if (!isSelected) e.currentTarget.style.background = 'white';
+        if (!isSelected) e.currentTarget.style.background = 'var(--panel-bg)';
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b', marginBottom: '4px' }}>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>
             {MONTHS[(p.month || 1) - 1]} {p.year}
           </div>
-          <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             {p.payslipNumber}
           </div>
         </div>
@@ -70,16 +70,16 @@ function PayslipListItem({ p, selected, onSelect, formatCurrency }) {
 function PayslipListView({ loading, payslips, selected, onSelect, page, totalPages, setPage, formatCurrency }) {
   const renderListContent = () => {
     if (loading) {
-      return <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>;
+      return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading...</div>;
     }
     if (payslips.length === 0) {
       return (
         <div style={{ padding: '60px', textAlign: 'center' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>💰</div>
-          <div style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', marginBottom: '4px' }}>
+          <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
             No payslips yet
           </div>
-          <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             Payslips will appear here once HR generates them
           </div>
         </div>
@@ -99,19 +99,19 @@ function PayslipListView({ loading, payslips, selected, onSelect, page, totalPag
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'center', gap: '8px', borderTop: '1px solid #e2e8f0' }}>
+          <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'center', gap: '8px', borderTop: '1px solid var(--border-color)' }}>
             <button
               onClick={() => setPage(prev => Math.max(0, prev - 1))}
               disabled={page === 0}
-              style={{ padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page === 0 ? '#cbd5e1' : '#374151', background: 'white', cursor: page === 0 ? 'not-allowed' : 'pointer' }}
+              style={{ padding: '6px 14px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page === 0 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page === 0 ? 'not-allowed' : 'pointer' }}
             >← Prev</button>
-            <span style={{ padding: '6px 14px', fontSize: '12px', color: '#64748b' }}>
+            <span style={{ padding: '6px 14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
               {page + 1} / {totalPages}
             </span>
             <button
               onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
               disabled={page >= totalPages - 1}
-              style={{ padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'white', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}
+              style={{ padding: '6px 14px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}
             >Next →</button>
           </div>
         )}
@@ -121,13 +121,13 @@ function PayslipListView({ loading, payslips, selected, onSelect, page, totalPag
 
   return (
     <div style={{
-      background: 'white', borderRadius: '12px',
-      border: '1px solid #e2e8f0',
+      background: 'var(--panel-bg)', borderRadius: '12px',
+      border: '1px solid var(--border-color)',
       boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       overflow: 'hidden',
     }}>
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid #e2e8f0' }}>
-        <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>Payslip History</h3>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+        <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>Payslip History</h3>
       </div>
       {renderListContent()}
     </div>
@@ -162,10 +162,10 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
   if (loadingDetail) {
     return (
       <div style={{
-        background: 'white', borderRadius: '12px',
-        border: '1px solid #e2e8f0',
+        background: 'var(--panel-bg)', borderRadius: '12px',
+        border: '1px solid var(--border-color)',
         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-        overflow: 'hidden', padding: '40px', textAlign: 'center', color: '#94a3b8'
+        overflow: 'hidden', padding: '40px', textAlign: 'center', color: 'var(--text-secondary)'
       }}>
         Loading details...
       </div>
@@ -188,14 +188,14 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
 
   return (
     <div style={{
-      background: 'white', borderRadius: '12px',
-      border: '1px solid #e2e8f0',
+      background: 'var(--panel-bg)', borderRadius: '12px',
+      border: '1px solid var(--border-color)',
       boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       overflow: 'hidden',
     }}>
       {/* Payslip Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e3a5f, #2563eb)',
+        background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))',
         padding: '20px 24px', color: 'white',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -253,23 +253,23 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
 
           {/* Earnings */}
           <div>
-            <div style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
               Earnings
             </div>
             {earningsList.map((item) => (
               <div key={item.label} style={{
                 display: 'flex', justifyContent: 'space-between',
-                padding: '8px 0', borderBottom: '1px solid #f1f5f9',
+                padding: '8px 0', borderBottom: '1px solid var(--border-light)',
                 fontSize: '13px',
               }}>
-                <span style={{ color: '#64748b' }}>{item.label}</span>
-                <span style={{ fontWeight: '600', color: '#1e293b' }}>{formatCurrency(item.value)}</span>
+                <span style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
+                <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{formatCurrency(item.value)}</span>
               </div>
             ))}
             <div style={{
               display: 'flex', justifyContent: 'space-between',
               padding: '10px 0', fontSize: '14px', fontWeight: '800',
-              color: '#1e293b', borderTop: '2px solid #e2e8f0', marginTop: '4px',
+              color: 'var(--text-primary)', borderTop: '2px solid #e2e8f0', marginTop: '4px',
             }}>
               <span>Gross Salary</span>
               <span style={{ color: '#16a34a' }}>{formatCurrency(selected.grossSalary)}</span>
@@ -278,23 +278,23 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
 
           {/* Deductions */}
           <div>
-            <div style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
               Deductions
             </div>
             {deductionsList.map((item) => (
               <div key={item.label} style={{
                 display: 'flex', justifyContent: 'space-between',
-                padding: '8px 0', borderBottom: '1px solid #f1f5f9',
+                padding: '8px 0', borderBottom: '1px solid var(--border-light)',
                 fontSize: '13px',
               }}>
-                <span style={{ color: '#64748b' }}>{item.label}</span>
+                <span style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
                 <span style={{ fontWeight: '600', color: '#dc2626' }}>{formatCurrency(item.value)}</span>
               </div>
             ))}
             <div style={{
               display: 'flex', justifyContent: 'space-between',
               padding: '10px 0', fontSize: '14px', fontWeight: '800',
-              color: '#1e293b', borderTop: '2px solid #e2e8f0', marginTop: '4px',
+              color: 'var(--text-primary)', borderTop: '2px solid #e2e8f0', marginTop: '4px',
             }}>
               <span>Total Deductions</span>
               <span style={{ color: '#dc2626' }}>{formatCurrency(selected.totalDeductions)}</span>
@@ -311,8 +311,8 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
           alignItems: 'center', marginBottom: '16px',
         }}>
           <div>
-            <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>NET SALARY</div>
-            <div style={{ fontSize: '11px', color: '#94a3b8' }}>Gross - Total Deductions</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>NET SALARY</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Gross - Total Deductions</div>
           </div>
           <div style={{ fontSize: '28px', fontWeight: '900', color: '#16a34a' }}>
             {formatCurrency(selected.netSalary)}
@@ -325,7 +325,7 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
           disabled={downloading}
           style={{
             width: '100%', padding: '12px',
-            background: '#1e3a5f', color: 'white',
+            background: 'var(--primary-color)', color: 'white',
             border: 'none', borderRadius: '10px',
             fontSize: '14px', fontWeight: '700',
             cursor: downloading ? 'not-allowed' : 'pointer',
@@ -398,10 +398,10 @@ export default function PayslipsPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
           My Payslips
         </h1>
-        <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           View and download your monthly payslips
         </p>
       </div>

@@ -9,12 +9,12 @@ function Badge({ status }) {
     APPROVED:             { bg: '#dcfce7', color: '#16a34a' },
     PENDING:              { bg: '#fef9c3', color: '#ca8a04' },
     REJECTED:             { bg: '#fee2e2', color: '#dc2626' },
-    CANCELLED:            { bg: '#f1f5f9', color: '#64748b' },
+    CANCELLED:            { bg: '#f1f5f9', color: 'var(--text-secondary)' },
     CANCELLATION_PENDING: { bg: '#fdf4ff', color: '#9333ea' },
     HR_PENDING:           { bg: '#fff7ed', color: '#f59e0b' },
     MANAGER_PENDING:      { bg: '#eff6ff', color: '#3b82f6' },
   };
-  const s = map[status] || { bg: '#f1f5f9', color: '#64748b' };
+  const s = map[status] || { bg: '#f1f5f9', color: 'var(--text-secondary)' };
   return (
     <span style={{
       background: s.bg, color: s.color,
@@ -46,6 +46,7 @@ export default function LeavePage() {
     reason:     '',
     managerId:  '',
   });
+  const [attachmentFile, setAttachmentFile] = useState(null);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -124,12 +125,26 @@ export default function LeavePage() {
     }
     setSubmitting(true);
     try {
+      let attachmentUrl = null;
+      let attachmentFileName = null;
+      
+      if (attachmentFile) {
+        const formData = new FormData();
+        formData.append('file', attachmentFile);
+        const uploadRes = await api.post('/api/files/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        attachmentUrl = uploadRes.data?.data?.url;
+        attachmentFileName = uploadRes.data?.data?.fileName;
+      }
+
       await api.post('/api/leaves/apply', {
         leaveType:  form.leaveType,
         startDate:  form.startDate,
         endDate:    form.endDate,
         reason:     form.reason,
         managerId:  parseInt(form.managerId),
+        ...(attachmentUrl && { attachmentUrl, attachmentFileName })
       });
       toast.success('Leave applied successfully!');
       setShowForm(false);
@@ -140,6 +155,7 @@ export default function LeavePage() {
         reason: '',
         managerId: managers.length > 0 ? managers[0].id : '',
       });
+      setAttachmentFile(null);
       fetchAll();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to apply leave');
@@ -167,7 +183,7 @@ export default function LeavePage() {
     CASUAL:    { color: '#f59e0b', bg: '#fff7ed', icon: '☀️' },
     PATERNITY: { color: '#8b5cf6', bg: '#fdf4ff', icon: '👶' },
     MATERNITY: { color: '#ec4899', bg: '#fdf2f8', icon: '🤱' },
-    UNPAID:    { color: '#64748b', bg: '#f1f5f9', icon: '📋' },
+    UNPAID:    { color: 'var(--text-secondary)', bg: '#f1f5f9', icon: '📋' },
   };
 
   return (
@@ -175,10 +191,10 @@ export default function LeavePage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
             Leave Management
           </h1>
-          <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             Apply for leave, track status and check your balance
           </p>
         </div>
@@ -186,7 +202,7 @@ export default function LeavePage() {
           onClick={() => setShowForm(true)}
           style={{
             padding: '10px 20px',
-            background: '#1e3a5f', color: 'white',
+            background: 'var(--primary-color)', color: 'white',
             border: 'none', borderRadius: '10px',
             fontSize: '13px', fontWeight: '700',
             cursor: 'pointer', display: 'flex',
@@ -203,13 +219,13 @@ export default function LeavePage() {
           ['ANNUAL', 'SICK', 'CASUAL', 'PATERNITY'].map(type => {
             const c = balanceColors[type];
             return (
-              <div key={type} style={{ background: 'white', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0' }}>
+              <div key={type} style={{ background: 'var(--panel-bg)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                   <span style={{ fontSize: '20px' }}>{c.icon}</span>
-                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>{type}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>{type}</span>
                 </div>
                 <div style={{ fontSize: '24px', fontWeight: '800', color: '#cbd5e1' }}>—</div>
-                <div style={{ fontSize: '11px', color: '#94a3b8' }}>No data</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>No data</div>
               </div>
             );
           })
@@ -221,26 +237,26 @@ export default function LeavePage() {
               : 0;
             return (
               <div key={i} style={{
-                background: 'white', borderRadius: '12px', padding: '16px',
-                border: '1px solid #e2e8f0',
+                background: 'var(--panel-bg)', borderRadius: '12px', padding: '16px',
+                border: '1px solid var(--border-color)',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>{b.leaveType}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>{b.leaveType}</span>
                   <span style={{ fontSize: '18px' }}>{c.icon}</span>
                 </div>
                 <div style={{ fontSize: '26px', fontWeight: '800', color: c.color, marginBottom: '2px' }}>
                   {b.remaining}
                 </div>
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '10px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
                   of {b.totalAllotted} days remaining
                 </div>
                 <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${pct}%`, background: c.color, borderRadius: '3px', transition: 'width 0.5s' }}/>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-                  <span style={{ fontSize: '10px', color: '#94a3b8' }}>Used: {b.used}</span>
-                  <span style={{ fontSize: '10px', color: '#94a3b8' }}>Total: {b.totalAllotted}</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Used: {b.used}</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Total: {b.totalAllotted}</span>
                 </div>
               </div>
             );
@@ -256,16 +272,16 @@ export default function LeavePage() {
           zIndex: 100, padding: '20px',
         }}>
           <div style={{
-            background: 'white', borderRadius: '16px',
+            background: 'var(--panel-bg)', borderRadius: '16px',
             padding: '28px', width: '100%', maxWidth: '480px',
             boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)' }}>
                 Apply for Leave
               </h2>
               <button onClick={() => setShowForm(false)}
-                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#94a3b8' }}>
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-secondary)' }}>
                 ✕
               </button>
             </div>
@@ -274,7 +290,7 @@ export default function LeavePage() {
 
               {/* Leave Type */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Leave Type <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <select
@@ -282,8 +298,8 @@ export default function LeavePage() {
                   onChange={e => setForm({ ...form, leaveType: e.target.value })}
                   style={{
                     width: '100%', padding: '10px 12px',
-                    border: '1.5px solid #e2e8f0', borderRadius: '10px',
-                    fontSize: '13px', outline: 'none', background: 'white',
+                    border: '1.5px solid var(--border-color)', borderRadius: '10px',
+                    fontSize: '13px', outline: 'none', background: 'var(--panel-bg)',
                   }}
                 >
                   {LEAVE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -293,7 +309,7 @@ export default function LeavePage() {
               {/* Dates */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                     Start Date <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
@@ -303,13 +319,13 @@ export default function LeavePage() {
                     required
                     style={{
                       width: '100%', padding: '10px 12px',
-                      border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                      border: '1.5px solid var(--border-color)', borderRadius: '10px',
                       fontSize: '13px', outline: 'none', boxSizing: 'border-box',
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                     End Date <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
@@ -319,7 +335,7 @@ export default function LeavePage() {
                     required
                     style={{
                       width: '100%', padding: '10px 12px',
-                      border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                      border: '1.5px solid var(--border-color)', borderRadius: '10px',
                       fontSize: '13px', outline: 'none', boxSizing: 'border-box',
                     }}
                   />
@@ -328,7 +344,7 @@ export default function LeavePage() {
 
               {/* Manager Dropdown */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Send To (Manager) <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <select
@@ -337,11 +353,11 @@ export default function LeavePage() {
                   required
                   style={{
                     width: '100%', padding: '10px 12px',
-                    border: '1.5px solid #e2e8f0', borderRadius: '10px',
-                    fontSize: '13px', outline: 'none', background: 'white',
+                    border: '1.5px solid var(--border-color)', borderRadius: '10px',
+                    fontSize: '13px', outline: 'none', background: 'var(--panel-bg)',
                   }}
-                  onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                  onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                 >
                   <option value="">Select Manager / HR...</option>
                   {managers.map(m => (
@@ -360,7 +376,7 @@ export default function LeavePage() {
 
               {/* Reason */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Reason <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <textarea
@@ -371,12 +387,29 @@ export default function LeavePage() {
                   rows={3}
                   style={{
                     width: '100%', padding: '10px 12px',
-                    border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                    border: '1.5px solid var(--border-color)', borderRadius: '10px',
                     fontSize: '13px', outline: 'none', resize: 'vertical',
                     boxSizing: 'border-box', fontFamily: 'inherit',
                   }}
-                  onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                  onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                />
+              </div>
+
+              {/* Attachment */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
+                  Attachment (Optional)
+                </label>
+                <input
+                  type="file"
+                  onChange={e => setAttachmentFile(e.target.files[0])}
+                  style={{
+                    width: '100%', padding: '8px 12px',
+                    border: '1.5px dashed var(--border-color)', borderRadius: '10px',
+                    fontSize: '13px', outline: 'none', background: 'var(--panel-bg)',
+                    boxSizing: 'border-box'
+                  }}
                 />
               </div>
 
@@ -385,8 +418,8 @@ export default function LeavePage() {
                 <button type="button" onClick={() => setShowForm(false)}
                   style={{
                     flex: 1, padding: '12px',
-                    background: 'white', color: '#374151',
-                    border: '1.5px solid #e2e8f0', borderRadius: '10px',
+                    background: 'var(--panel-bg)', color: 'var(--text-primary)',
+                    border: '1.5px solid var(--border-color)', borderRadius: '10px',
                     fontSize: '14px', fontWeight: '600', cursor: 'pointer',
                   }}>
                   Cancel
@@ -394,7 +427,7 @@ export default function LeavePage() {
                 <button type="submit" disabled={submitting}
                   style={{
                     flex: 1, padding: '12px',
-                    background: '#1e3a5f', color: 'white',
+                    background: 'var(--primary-color)', color: 'white',
                     border: 'none', borderRadius: '10px',
                     fontSize: '14px', fontWeight: '700',
                     cursor: submitting ? 'not-allowed' : 'pointer',
@@ -410,17 +443,17 @@ export default function LeavePage() {
 
       {/* Leave History Table */}
       <div className="table-responsive" style={{
-        background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0',
+        background: 'var(--panel-bg)', borderRadius: '12px', border: '1px solid var(--border-color)',
         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
       }}>
         <div style={{
-          padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
+          padding: '16px 20px', borderBottom: '1px solid var(--border-color)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)' }}>
             My Leave Requests
           </h3>
-          <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             {leaves.length} records
           </span>
         </div>
@@ -429,31 +462,31 @@ export default function LeavePage() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1.5fr 1fr 1fr 0.5fr 1.5fr 1fr 1fr',
-          padding: '10px 20px', background: '#f8fafc',
-          borderBottom: '1px solid #e2e8f0',
+          padding: '10px 20px', background: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
         }}>
           {['Leave Type', 'From', 'To', 'Days', 'Status', 'Applied On', 'Action'].map(h => (
-            <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               {h}
             </div>
           ))}
         </div>
 
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             Loading...
           </div>
         ) : leaves.length === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>🌴</div>
-            <div style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', marginBottom: '4px' }}>
+            <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
               No leave requests yet
             </div>
-            <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
               Apply for your first leave using the button above
             </div>
             <button onClick={() => setShowForm(true)}
-              style={{ padding: '10px 20px', background: '#1e3a5f', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
+              style={{ padding: '10px 20px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>
               + Apply Leave
             </button>
           </div>
@@ -464,19 +497,19 @@ export default function LeavePage() {
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1.5fr 1fr 1fr 0.5fr 1.5fr 1fr 1fr',
-                  padding: '13px 20px', borderBottom: '1px solid #f1f5f9',
+                  padding: '13px 20px', borderBottom: '1px solid var(--border-light)',
                   alignItems: 'center',
                 }}>
-                <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                   {l.leaveType} Leave
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>{l.startDate}</div>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>{l.endDate}</div>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{l.startDate}</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{l.endDate}</div>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>
                   {l.totalDays}
                 </div>
                 <div><Badge status={l.status}/></div>
-                <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                   {l.appliedAt
                     ? new Date(l.appliedAt).toLocaleDateString('en-IN')
                     : '--'}
@@ -518,20 +551,20 @@ export default function LeavePage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'center', gap: '8px', borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ padding: '14px 20px', display: 'flex', justifyContent: 'center', gap: '8px', borderTop: '1px solid var(--border-color)' }}>
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  style={{ padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page === 0 ? '#cbd5e1' : '#374151', background: 'white', cursor: page === 0 ? 'not-allowed' : 'pointer' }}>
+                  style={{ padding: '6px 14px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page === 0 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page === 0 ? 'not-allowed' : 'pointer' }}>
                   ← Prev
                 </button>
-                <span style={{ padding: '6px 14px', fontSize: '12px', color: '#64748b' }}>
+                <span style={{ padding: '6px 14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
                   Page {page + 1} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  style={{ padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'white', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}>
+                  style={{ padding: '6px 14px', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px', fontWeight: '600', color: page >= totalPages - 1 ? '#cbd5e1' : '#374151', background: 'var(--panel-bg)', cursor: page >= totalPages - 1 ? 'not-allowed' : 'pointer' }}>
                   Next →
                 </button>
               </div>

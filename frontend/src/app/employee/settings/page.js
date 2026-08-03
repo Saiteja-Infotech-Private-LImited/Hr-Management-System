@@ -70,14 +70,14 @@ export default function SettingsPage() {
   const inputStyle = {
     width: '100%',
     padding: '12px 44px 12px 14px',
-    border: '1.5px solid #e2e8f0',
+    border: '1.5px solid var(--border-color)',
     borderRadius: '10px',
     fontSize: '14px',
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'inherit',
-    color: '#1e293b',
-    background: 'white',
+    color: 'var(--text-primary)',
+    background: 'var(--panel-bg)',
   };
 
 
@@ -89,23 +89,23 @@ export default function SettingsPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
           Settings
         </h1>
-        <p style={{ fontSize: '13px', color: '#94a3b8' }}>Manage your account settings</p>
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Manage your account settings</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
         {/* Profile Info */}
         <div style={{
-          background: 'white', borderRadius: '14px',
-          border: '1px solid #e2e8f0',
+          background: 'var(--panel-bg)', borderRadius: '14px',
+          border: '1px solid var(--border-color)',
           boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden',
         }}>
           <div style={{
-            padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
-            background: 'linear-gradient(135deg, #1e3a5f, #2563eb)', color: 'white',
+            padding: '16px 20px', borderBottom: '1px solid var(--border-color)',
+            background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))', color: 'white',
           }}>
             <h3 style={{ fontSize: '15px', fontWeight: '700' }}>👤 Profile Information</h3>
           </div>
@@ -114,11 +114,11 @@ export default function SettingsPage() {
             <div style={{
               display: 'flex', alignItems: 'center', gap: '16px',
               marginBottom: '24px', padding: '16px',
-              background: '#f8fafc', borderRadius: '12px',
+              background: 'var(--bg-input)', borderRadius: '12px',
             }}>
               <div style={{
                 width: '64px', height: '64px',
-                background: 'linear-gradient(135deg, #1e3a5f, #3b82f6)',
+                background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))',
                 borderRadius: '50%', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', fontSize: '22px',
                 fontWeight: '800', color: 'white', flexShrink: 0,
@@ -126,11 +126,11 @@ export default function SettingsPage() {
                 {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <div>
-                <div style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b' }}>
+                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)' }}>
                   {user?.name}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>{user?.email}</div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{user?.email}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
                   {user?.employeeCode} · {user?.role}
                 </div>
               </div>
@@ -145,10 +145,10 @@ export default function SettingsPage() {
             ].map((item, i) => (
               <div key={i} style={{
                 display: 'flex', justifyContent: 'space-between',
-                padding: '10px 0', borderBottom: '1px solid #f1f5f9',
+                padding: '10px 0', borderBottom: '1px solid var(--border-light)',
               }}>
-                <span style={{ fontSize: '13px', color: '#64748b' }}>{item.label}</span>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.label}</span>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                   {item.value || '—'}
                 </span>
               </div>
@@ -168,13 +168,13 @@ export default function SettingsPage() {
 
         {/* Change Password */}
         <div style={{
-          background: 'white', borderRadius: '14px',
-          border: '1px solid #e2e8f0',
+          background: 'var(--panel-bg)', borderRadius: '14px',
+          border: '1px solid var(--border-color)',
           boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden',
         }}>
           <div style={{
-            padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
-            background: 'linear-gradient(135deg, #1e3a5f, #2563eb)', color: 'white',
+            padding: '16px 20px', borderBottom: '1px solid var(--border-color)',
+            background: 'linear-gradient(135deg, var(--primary-hover), var(--primary-color))', color: 'white',
           }}>
             <h3 style={{ fontSize: '15px', fontWeight: '700' }}>🔒 Change Password</h3>
           </div>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
 
               {/* Current Password */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Current Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -194,8 +194,8 @@ export default function SettingsPage() {
                     placeholder="Enter current password"
                     required
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
                   <EyeIcon show={showCurrent} toggle={() => setShowCurrent(!showCurrent)} />
                 </div>
@@ -203,7 +203,7 @@ export default function SettingsPage() {
 
               {/* New Password */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   New Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -214,8 +214,8 @@ export default function SettingsPage() {
                     placeholder="Enter new password"
                     required
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
                   <EyeIcon show={showNew} toggle={() => setShowNew(!showNew)} />
                 </div>
@@ -223,7 +223,7 @@ export default function SettingsPage() {
 
               {/* Confirm Password */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151', display: 'block', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
                   Confirm New Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -234,8 +234,8 @@ export default function SettingsPage() {
                     placeholder="Confirm new password"
                     required
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#1e3a5f'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
                   <EyeIcon show={showConfirm} toggle={() => setShowConfirm(!showConfirm)} />
                 </div>
@@ -243,11 +243,11 @@ export default function SettingsPage() {
 
               {/* Password Rules */}
               <div style={{
-                background: '#f8fafc', borderRadius: '10px',
+                background: 'var(--bg-input)', borderRadius: '10px',
                 padding: '14px', marginBottom: '20px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--border-color)',
               }}>
-                <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px' }}>
+                <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>
                   Password Requirements:
                 </div>
                 {[
@@ -273,7 +273,7 @@ export default function SettingsPage() {
                 disabled={changing}
                 style={{
                   width: '100%', padding: '13px',
-                  background: '#1e3a5f', color: 'white',
+                  background: 'var(--primary-color)', color: 'white',
                   border: 'none', borderRadius: '10px',
                   fontSize: '14px', fontWeight: '700',
                   cursor: changing ? 'not-allowed' : 'pointer',

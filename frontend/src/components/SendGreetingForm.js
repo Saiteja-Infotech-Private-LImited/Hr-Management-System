@@ -111,7 +111,7 @@ export default function SendGreetingForm() {
             maxWidth: '600px',
             margin: '0 auto',
             padding: '32px 24px',
-            background: 'white',
+            background: 'var(--panel-bg)',
             borderRadius: '12px',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         }}>
@@ -126,7 +126,7 @@ export default function SendGreetingForm() {
                     <h1 style={{
                         fontSize: '28px',
                         fontWeight: '700',
-                        color: '#1e293b',
+                        color: 'var(--text-primary)',
                         margin: 0,
                     }}>
                         Send Greeting to Candidate
@@ -134,7 +134,7 @@ export default function SendGreetingForm() {
                 </div>
                 <p style={{
                     fontSize: '13px',
-                    color: '#64748b',
+                    color: 'var(--text-secondary)',
                     margin: '8px 0 0 0',
                 }}>
                     Send admission greetings directly to candidate email
@@ -148,7 +148,7 @@ export default function SendGreetingForm() {
                         display: 'block',
                         fontSize: '13px',
                         fontWeight: '600',
-                        color: '#1e293b',
+                        color: 'var(--text-primary)',
                         marginBottom: '8px',
                     }}>
                         Candidate Name
@@ -163,13 +163,13 @@ export default function SendGreetingForm() {
                         style={{
                             width: '100%',
                             padding: '10px 12px',
-                            border: '1.5px solid #e2e8f0',
+                            border: '1.5px solid var(--border-color)',
                             borderRadius: '8px',
                             fontSize: '13px',
                             outline: 'none',
                             boxSizing: 'border-box',
-                            background: '#f8fafc',
-                            color: '#1e293b',
+                            background: 'var(--bg-input)',
+                            color: 'var(--text-primary)',
                             transition: 'all 0.2s',
                             opacity: loading ? 0.6 : 1,
                         }}
@@ -178,7 +178,7 @@ export default function SendGreetingForm() {
                             e.target.style.background = 'white';
                         }}
                         onBlurCapture={(e) => {
-                            e.target.style.borderColor = '#e2e8f0';
+                            e.target.style.borderColor = 'var(--border-color)';
                             e.target.style.background = '#f8fafc';
                         }}
                     />
@@ -189,7 +189,7 @@ export default function SendGreetingForm() {
                         display: 'block',
                         fontSize: '13px',
                         fontWeight: '600',
-                        color: '#1e293b',
+                        color: 'var(--text-primary)',
                         marginBottom: '8px',
                     }}>
                         Email Address
@@ -204,13 +204,13 @@ export default function SendGreetingForm() {
                         style={{
                             width: '100%',
                             padding: '10px 12px',
-                            border: '1.5px solid #e2e8f0',
+                            border: '1.5px solid var(--border-color)',
                             borderRadius: '8px',
                             fontSize: '13px',
                             outline: 'none',
                             boxSizing: 'border-box',
-                            background: '#f8fafc',
-                            color: '#1e293b',
+                            background: 'var(--bg-input)',
+                            color: 'var(--text-primary)',
                             transition: 'all 0.2s',
                             opacity: loading ? 0.6 : 1,
                         }}
@@ -219,7 +219,7 @@ export default function SendGreetingForm() {
                             e.target.style.background = 'white';
                         }}
                         onBlurCapture={(e) => {
-                            e.target.style.borderColor = '#e2e8f0';
+                            e.target.style.borderColor = 'var(--border-color)';
                             e.target.style.background = '#f8fafc';
                         }}
                     />
@@ -230,7 +230,7 @@ export default function SendGreetingForm() {
                         display: 'block',
                         fontSize: '13px',
                         fontWeight: '600',
-                        color: '#1e293b',
+                        color: 'var(--text-primary)',
                         marginBottom: '8px',
                     }}>
                         Greeting Preview
@@ -243,9 +243,9 @@ export default function SendGreetingForm() {
                         style={{
                             width: '100%',
                             padding: '12px 12px',
-                            border: '1.5px solid #e2e8f0',
+                            border: '1.5px solid var(--border-color)',
                             borderRadius: '8px',
-                            background: '#f8fafc',
+                            background: 'var(--bg-input)',
                             color: '#475569',
                             fontSize: '12px',
                             lineHeight: '1.6',
@@ -266,42 +266,42 @@ export default function SendGreetingForm() {
                     gap: '16px',
                 }}>
                     <div style={{
-                        border: '1.5px solid #e2e8f0',
+                        border: '1.5px solid var(--border-color)',
                         borderRadius: '8px',
                         padding: '12px 14px',
-                        background: '#f8fafc',
+                        background: 'var(--bg-input)',
                     }}>
                         <p style={{
                             fontSize: '11px',
-                            color: '#94a3b8',
+                            color: 'var(--text-secondary)',
                             margin: '0 0 6px 0',
                             fontWeight: '500',
                         }}>Name:</p>
                         <p style={{
                             fontSize: '13px',
                             fontWeight: '600',
-                            color: '#1e293b',
+                            color: 'var(--text-primary)',
                             margin: 0,
                         }}>
                             {candidateName || '[CANDIDATE_NAME]'}
                         </p>
                     </div>
                     <div style={{
-                        border: '1.5px solid #e2e8f0',
+                        border: '1.5px solid var(--border-color)',
                         borderRadius: '8px',
                         padding: '12px 14px',
-                        background: '#f8fafc',
+                        background: 'var(--bg-input)',
                     }}>
                         <p style={{
                             fontSize: '11px',
-                            color: '#94a3b8',
+                            color: 'var(--text-secondary)',
                             margin: '0 0 6px 0',
                             fontWeight: '500',
                         }}>Email:</p>
                         <p style={{
                             fontSize: '13px',
                             fontWeight: '600',
-                            color: '#1e293b',
+                            color: 'var(--text-primary)',
                             margin: 0,
                             wordBreak: 'break-all',
                         }}>
@@ -356,9 +356,9 @@ export default function SendGreetingForm() {
                         disabled={loading}
                         style={{
                             padding: '8px 16px',
-                            border: '1.5px solid #e2e8f0',
+                            border: '1.5px solid var(--border-color)',
                             borderRadius: '8px',
-                            background: 'white',
+                            background: 'var(--panel-bg)',
                             color: '#475569',
                             fontSize: '13px',
                             fontWeight: '600',
