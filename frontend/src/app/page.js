@@ -91,26 +91,6 @@ export default function Home() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="#16a34a"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
         </Link>
 
-        {/* Illustration */}
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', alignItems: 'flex-end' }}>
-          <svg viewBox="0 0 80 80" width="80" height="80">
-            <rect x="10" y="30" width="60" height="40" rx="4" fill="#dbeafe"/>
-            <rect x="20" y="40" width="40" height="4" rx="2" fill="#93c5fd"/>
-            <rect x="20" y="48" width="30" height="4" rx="2" fill="#bfdbfe"/>
-            <rect x="20" y="56" width="35" height="4" rx="2" fill="#bfdbfe"/>
-            <circle cx="40" cy="18" r="10" fill="#3b82f6"/>
-            <path d="M36 18l3 3 5-5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          </svg>
-          <svg viewBox="0 0 80 80" width="80" height="80">
-            <rect x="10" y="30" width="60" height="40" rx="4" fill="#dcfce7"/>
-            <rect x="20" y="40" width="40" height="4" rx="2" fill="#86efac"/>
-            <rect x="20" y="48" width="30" height="4" rx="2" fill="#bbf7d0"/>
-            <rect x="20" y="56" width="35" height="4" rx="2" fill="#bbf7d0"/>
-            <circle cx="40" cy="18" r="10" fill="#16a34a"/>
-            <path d="M36 18l3 3 5-5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          </svg>
-        </div>
-
         <p style={{ fontSize: '11px', color: '#cbd5e1' }}>© 2025 HRMS. All rights reserved.</p>
       </div>
     </div>

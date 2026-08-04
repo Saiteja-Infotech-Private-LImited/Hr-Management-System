@@ -297,6 +297,7 @@ export default function ForgotPasswordPage() {
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
+                  autoComplete="new-password"
                     type={showNew ? 'text' : 'password'}
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
@@ -317,6 +318,7 @@ export default function ForgotPasswordPage() {
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
+                    autoComplete="new-password"
                     type={showConfirm ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
