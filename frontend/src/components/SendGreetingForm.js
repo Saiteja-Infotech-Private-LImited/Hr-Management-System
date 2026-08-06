@@ -423,3 +423,4 @@ export default function SendGreetingForm() {
       `}</style>
         </div>
     );
+}
