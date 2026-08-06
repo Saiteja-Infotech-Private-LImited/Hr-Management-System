@@ -219,6 +219,10 @@ public class EmployeeService {
                     .executeUpdate();
             entityManager.createQuery("DELETE FROM TrainingEnrollment t WHERE t.employee.id = :id")
                     .setParameter("id", id).executeUpdate();
+            entityManager.createQuery("UPDATE Employee e SET e.manager = null WHERE e.manager.id = :id")
+                    .setParameter("id", id).executeUpdate();
+            entityManager.createQuery("DELETE FROM DocumentRequest d WHERE d.employee.id = :id")
+                    .setParameter("id", id).executeUpdate();
         }
         employeeRepository.delete(emp);
     }
