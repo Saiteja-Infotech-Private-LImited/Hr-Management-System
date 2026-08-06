@@ -433,18 +433,52 @@ export default function TrainingPage() {
 
                 {/* Max Participants */}
                 <div>
-                  <label style={labelStyle}>Max Participants</label>
+                  <label style={labelStyle}>
+                    Max Participants <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    required
                     value={form.maxParticipants}
-                    onChange={e => setForm(prev => ({ ...prev, maxParticipants: e.target.value }))}
                     placeholder="10"
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      // Allow complete deletion (backspace)
+                      if (value === "") {
+                        setForm((prev) => ({
+                          ...prev,
+                          maxParticipants: "",
+                        }));
+                        return;
+                      }
+
+                      // Allow only positive integers (1,2,3...)
+                      if (/^[1-9][0-9]*$/.test(value)) {
+                        setForm((prev) => ({
+                          ...prev,
+                          maxParticipants: value,
+                        }));
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      // Block invalid keys
+                      if (["-", "+", ".", "e", "E"].includes(e.key)) {
+                        e.preventDefault();
+                      }
+
+                      // Prevent 0 as the first digit only
+                      if (e.key === "0" && form.maxParticipants === "") {
+                        e.preventDefault();
+                      }
+                    }}
                     style={inputStyle}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                   />
                 </div>
-
                 {/* Venue */}
                 <div>
                   <label style={labelStyle}>Venue</label>

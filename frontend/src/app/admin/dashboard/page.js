@@ -1,15 +1,13 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import {
   getAllEmployees,
-  getPendingLeaves,
   getAttendanceByDate,
-  hrAction,
-  managerAction,
 } from '@/lib/adminApi';
 import { getUnreadCount } from '@/lib/employeeApi';
+import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 
 function StatCard({ label, value, sub, color, bg, icon }) {
@@ -36,8 +34,8 @@ function Badge({ status }) {
     APPROVED: { bg: '#dcfce7', color: '#16a34a' },
     PENDING: { bg: '#fef9c3', color: '#ca8a04' },
     REJECTED: { bg: '#fee2e2', color: '#dc2626' },
-    HR_PENDING: { bg: '#fff7ed', color: '#f59e0b' },
-    MANAGER_PENDING: { bg: '#eff6ff', color: '#3b82f6' },
+    CANCELLED: { bg: '#f1f5f9', color: '#64748b' },
+    CANCELED: { bg: '#f1f5f9', color: '#64748b' },
     CANCELLATION_PENDING: { bg: '#fdf4ff', color: '#9333ea' },
     ACTIVE: { bg: '#dcfce7', color: '#16a34a' },
     INACTIVE: { bg: '#fee2e2', color: '#dc2626' },
@@ -65,13 +63,13 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [actioning, setActioning] = useState(null);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     setLoading(true);
     const today = new Date().toISOString().split('T')[0];
     try {
       const [empRes, leaveRes, attRes, unreadRes] = await Promise.allSettled([
         getAllEmployees(0, 100),
-        getPendingLeaves(0, 5),
+        api.get('/api/leaves/pending?page=0&size=10'),
         getAttendanceByDate(today),
         getUnreadCount(),
       ]);
@@ -80,11 +78,10 @@ export default function AdminDashboard() {
         setEmployees(empRes.value.data?.data?.content || []);
       }
       if (leaveRes.status === 'fulfilled') {
-        const allLeaves = leaveRes.value.data?.data?.content || [];
-        setPendingLeaves(allLeaves);
+        setPendingLeaves(leaveRes.value.data?.data?.content || leaveRes.value.data?.data || []);
       }
       if (attRes.status === 'fulfilled') {
-        setTodayAttendance(attRes.value.data?.data?.content || []);
+        setTodayAttendance(attRes.value.data?.data?.content || attRes.value.data?.data || []);
       }
       if (unreadRes.status === 'fulfilled') {
         setUnreadCount(unreadRes.value.data?.data || 0);
@@ -95,76 +92,26 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    let active = true;
-    const loadInitial = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      try {
-        const [empRes, leaveRes, attRes, unreadRes] = await Promise.allSettled([
-          getAllEmployees(0, 100),
-          getPendingLeaves(0, 5),
-          getAttendanceByDate(today),
-          getUnreadCount(),
-        ]);
-        if (active) {
-          if (empRes.status === 'fulfilled') setEmployees(empRes.value.data?.data?.content || []);
-          if (leaveRes.status === 'fulfilled') setPendingLeaves(leaveRes.value.data?.data?.content || []);
-          if (attRes.status === 'fulfilled') setTodayAttendance(attRes.value.data?.data?.content || []);
-          if (unreadRes.status === 'fulfilled') setUnreadCount(unreadRes.value.data?.data || 0);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (active) {
-          toast.error('Failed to load dashboard');
-          console.error(err);
-          setLoading(false);
-        }
-      }
-    };
-    loadInitial();
-    return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+
+  // Single-stage: either Admin or HR can approve/reject directly — first click wins
   const handleLeaveAction = async (id, action) => {
     setActioning(id + action);
     try {
-      const leave = pendingLeaves.find(l => l.id === id);
-      const stage = leave?.approvalStage || leave?.status;
-
-      console.log('Leave stage:', stage);
-
-      if (stage === 'MANAGER_PENDING' || stage === 'PENDING') {
-        await managerAction(
-          id, action,
-          action === 'APPROVED'
-            ? 'Approved by Manager'
-            : 'Rejected by Manager'
-        );
-        toast.success(
-          action === 'APPROVED'
-            ? '✅ Forwarded to HR for verification!'
-            : '❌ Leave rejected!'
-        );
-      } else if (stage === 'HR_PENDING') {
-        await hrAction(
-          id, action,
-          action === 'APPROVED'
-            ? 'Approved by HR'
-            : 'Rejected by HR'
-        );
-        toast.success(
-          action === 'APPROVED'
-            ? '✅ Leave approved successfully!'
-            : '❌ Leave rejected!'
-        );
-      } else {
-        toast.error('Invalid leave stage: ' + stage);
-      }
+      await api.put(`/api/leaves/${id}/action`, {
+        action,
+        remarks: action === 'APPROVED' ? 'Approved' : 'Rejected',
+      });
+      toast.success(action === 'APPROVED' ? '✅ Leave approved!' : '❌ Leave rejected');
       fetchAll();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Action failed');
+      const msg = err.response?.data?.message || 'Action failed';
+      toast.error(msg.includes('already') ? '⚡ Someone already actioned this one' : msg);
+      fetchAll();
     } finally {
       setActioning(null);
     }
@@ -205,7 +152,7 @@ export default function AdminDashboard() {
             />
             <StatCard
               label="Pending Leaves"
-              value={pendingLeaves.length}
+              value={pendingLeaves.filter(l => l.status === 'PENDING').length}
               sub="Awaiting approval"
               color="#f59e0b" bg="#fff7ed" icon="⏳"
             />
@@ -220,10 +167,10 @@ export default function AdminDashboard() {
           {/* Main Grid */}
           <div className="dashboard-main-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
 
-            {/* Pending Leave Approvals */}
+            {/* Leave Approvals & Requests Section */}
             <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>⏳ Pending Approvals</h3>
+                <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>⏳ Leave Requests</h3>
                 <button
                   onClick={() => router.push('/admin/leave')}
                   style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' }}
@@ -235,57 +182,95 @@ export default function AdminDashboard() {
               {pendingLeaves.length === 0 ? (
                 <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
                   <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎉</div>
-                  No pending approvals
+                  No leave requests found
                 </div>
               ) : (
-                pendingLeaves.map((l, i) => (
-                  <div key={l.id || i} style={{ padding: '14px 20px', borderBottom: '1px solid #f1f5f9' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                      <div>
-                        <div style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b', marginBottom: '2px' }}>
-                          {l.employeeName}
+                pendingLeaves.map((l, i) => {
+                  const isCancelled = ['CANCELLED', 'CANCELED', 'CANCELLATION_PENDING'].includes(l.status);
+
+                  return (
+                    <div key={l.id || i} style={{ padding: '14px 20px', borderBottom: '1px solid #f1f5f9' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b', marginBottom: '2px' }}>
+                            {l.employeeName}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                            {l.leaveType} · {l.startDate} to {l.endDate} · {l.totalDays} day(s)
+                          </div>
                         </div>
-                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                          {l.leaveType} · {l.startDate} to {l.endDate} · {l.totalDays} day(s)
-                        </div>
+                        <Badge status={l.status} />
                       </div>
-                      <Badge status={l.status} />
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px', fontStyle: 'italic' }}>
+                        &quot;{l.reason}&quot;
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {isCancelled ? (
+                          /* Display explicit status if employee cancelled their leave */
+                          <div
+                            style={{
+                              padding: '6px 14px',
+                              backgroundColor: '#f1f5f9',
+                              color: '#64748b',
+                              border: '1px solid #cbd5e1',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                            }}
+                          >
+                            🚫 Leave was cancelled by the employee
+                          </div>
+                        ) : (
+                          <>
+                            {/* Approve Button */}
+                            <button
+                              onClick={() => handleLeaveAction(l.id, 'APPROVED')}
+                              disabled={actioning === l.id + 'APPROVED'}
+                              style={{
+                                padding: '6px 14px',
+                                backgroundColor: '#16a34a',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: actioning === l.id + 'APPROVED' ? 'not-allowed' : 'pointer',
+                                opacity: actioning === l.id + 'APPROVED' ? 0.7 : 1,
+                                transition: 'background-color 0.2s',
+                              }}
+                            >
+                              {actioning === l.id + 'APPROVED' ? '⏳ Processing...' : '✓ Approve'}
+                            </button>
+
+                            {/* Reject Button */}
+                            <button
+                              onClick={() => handleLeaveAction(l.id, 'REJECTED')}
+                              disabled={actioning === l.id + 'REJECTED'}
+                              style={{
+                                padding: '6px 14px',
+                                backgroundColor: '#fee2e2',
+                                color: '#dc2626',
+                                border: '1px solid #fca5a5',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: actioning === l.id + 'REJECTED' ? 'not-allowed' : 'pointer',
+                                opacity: actioning === l.id + 'REJECTED' ? 0.7 : 1,
+                                transition: 'background-color 0.2s',
+                              }}
+                            >
+                              {actioning === l.id + 'REJECTED' ? '⏳ Processing...' : '✗ Reject'}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px', fontStyle: 'italic' }}>
-                      &quot;{l.reason}&quot;
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        onClick={() => handleLeaveAction(l.id, 'APPROVED')}
-                        disabled={actioning === l.id + 'APPROVED'}
-                        style={{
-                          padding: '6px 16px', background: '#dcfce7',
-                          color: '#16a34a', border: '1px solid #bbf7d0',
-                          borderRadius: '6px', fontSize: '12px', fontWeight: '700',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {actioning === l.id + 'APPROVED' ? '⏳' :
-                          (l.approvalStage === 'MANAGER_PENDING')
-                            ? '✓ Forward to HR'
-                            : '✓ Approve'
-                        }
-                      </button>
-                      <button
-                        onClick={() => handleLeaveAction(l.id, 'REJECTED')}
-                        disabled={actioning === l.id + 'REJECTED'}
-                        style={{
-                          padding: '6px 16px', background: '#fee2e2',
-                          color: '#dc2626', border: '1px solid #fecaca',
-                          borderRadius: '6px', fontSize: '12px', fontWeight: '700',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {actioning === l.id + 'REJECTED' ? '⏳' : '✗ Reject'}
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 
@@ -361,7 +346,7 @@ export default function AdminDashboard() {
             <div className="table-responsive">
               <div className="admin-employees-table" style={{ minWidth: '680px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '0.5fr 2fr 1.5fr 1.5fr 1fr 1fr', padding: '10px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  {[' Emp ID', 'Name', 'Department', 'Designation', 'Role', 'Status'].map(h => (
+                  {['Emp ID', 'Name', 'Department', 'Designation', 'Role', 'Status'].map(h => (
                     <div key={h} style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       {h}
                     </div>
@@ -453,7 +438,7 @@ export default function AdminDashboard() {
                   background: a.color + '15',
                   borderRadius: '10px',
                   display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontSize: '20px', flexShrink: 0,
+                  justify: 'center', fontSize: '20px', flexShrink: 0,
                 }}>
                   {a.icon}
                 </div>

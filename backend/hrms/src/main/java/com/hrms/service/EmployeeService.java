@@ -168,6 +168,7 @@ public class EmployeeService {
             userCacheService.evict(emp.getEmail());
         }
     }
+
     @Transactional
     @CacheEvict(value = "dashboardData", allEntries = true)
     public void deleteEmployee(Long id) {
@@ -176,10 +177,25 @@ public class EmployeeService {
             userCacheService.evict(emp.getEmail());
         }
         if (entityManager != null) {
-            entityManager.createQuery("UPDATE LeaveRequest l SET l.manager = null WHERE l.manager.id = :id")
+            // manager_id / approved_by are legacy columns that may still exist on
+            // the leave_requests table from before the leave-approval redesign.
+            // They are no longer mapped as entity fields on LeaveRequest (the
+            // entity now uses reviewedBy / cancellationReviewedBy instead), so if
+            // the columns still exist as leftover DB columns with FK constraints,
+            // they must be nulled via native SQL, not JPQL. If you've already
+            // dropped those columns in the DB, these two calls are harmless no-ops
+            // — remove them once you've confirmed the columns are gone.
+            entityManager.createNativeQuery("UPDATE leave_requests SET manager_id = null WHERE manager_id = :id")
                     .setParameter("id", id).executeUpdate();
-            entityManager.createQuery("UPDATE LeaveRequest l SET l.approvedBy = null WHERE l.approvedBy.id = :id")
+            entityManager.createNativeQuery("UPDATE leave_requests SET approved_by = null WHERE approved_by = :id")
                     .setParameter("id", id).executeUpdate();
+
+            entityManager.createQuery("UPDATE LeaveRequest l SET l.reviewedBy = null WHERE l.reviewedBy.id = :id")
+                    .setParameter("id", id).executeUpdate();
+            entityManager.createQuery(
+                    "UPDATE LeaveRequest l SET l.cancellationReviewedBy = null WHERE l.cancellationReviewedBy.id = :id")
+                    .setParameter("id", id).executeUpdate();
+
             entityManager.createQuery("UPDATE Onboarding o SET o.assignedHr = null WHERE o.assignedHr.id = :id")
                     .setParameter("id", id).executeUpdate();
             entityManager.createQuery("UPDATE JobPosting j SET j.createdBy = null WHERE j.createdBy.id = :id")
@@ -195,16 +211,29 @@ public class EmployeeService {
                     .createQuery("UPDATE OnboardingDocument d SET d.reviewedByHr = null WHERE d.reviewedByHr.id = :id")
                     .setParameter("id", id).executeUpdate();
 
+            // attendance_break rows carry a FK to attendance.id — must be cleared
+            // before attendance rows for this employee can be deleted, or MySQL
+            // rejects the attendance delete with a FK violation.
+            entityManager.createNativeQuery(
+                    "DELETE FROM attendance_break WHERE attendance_id IN " +
+                            "(SELECT id FROM attendance WHERE employee_id = :id)")
+                    .setParameter("id", id).executeUpdate();
+
             entityManager.createQuery("DELETE FROM Attendance a WHERE a.employee.id = :id").setParameter("id", id)
                     .executeUpdate();
             entityManager.createQuery("DELETE FROM LeaveRequest l WHERE l.employee.id = :id").setParameter("id", id)
                     .executeUpdate();
             entityManager.createQuery("DELETE FROM LeaveBalance l WHERE l.employee.id = :id").setParameter("id", id)
                     .executeUpdate();
-            entityManager.createQuery("DELETE FROM Payroll p WHERE p.employee.id = :id").setParameter("id", id)
-                    .executeUpdate();
+
+            // Payslip rows carry a FK to payroll.id — must be deleted before
+            // Payroll rows, or MySQL rejects the payroll delete with a FK
+            // violation (this was the second FK-ordering bug found).
             entityManager.createQuery("DELETE FROM Payslip p WHERE p.employee.id = :id").setParameter("id", id)
                     .executeUpdate();
+            entityManager.createQuery("DELETE FROM Payroll p WHERE p.employee.id = :id").setParameter("id", id)
+                    .executeUpdate();
+
             entityManager.createQuery("DELETE FROM PerformanceReview p WHERE p.employee.id = :id")
                     .setParameter("id", id).executeUpdate();
             entityManager.createQuery("DELETE FROM Notification n WHERE n.recipient.id = :id").setParameter("id", id)
@@ -218,10 +247,6 @@ public class EmployeeService {
             entityManager.createQuery("DELETE FROM Onboarding o WHERE o.employee.id = :id").setParameter("id", id)
                     .executeUpdate();
             entityManager.createQuery("DELETE FROM TrainingEnrollment t WHERE t.employee.id = :id")
-                    .setParameter("id", id).executeUpdate();
-            entityManager.createQuery("UPDATE Employee e SET e.manager = null WHERE e.manager.id = :id")
-                    .setParameter("id", id).executeUpdate();
-            entityManager.createQuery("DELETE FROM DocumentRequest d WHERE d.employee.id = :id")
                     .setParameter("id", id).executeUpdate();
         }
         employeeRepository.delete(emp);

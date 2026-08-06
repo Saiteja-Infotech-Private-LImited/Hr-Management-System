@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -158,7 +159,7 @@ export default function SendGreetingForm() {
                         id="candidateName"
                         value={candidateName}
                         onChange={(e) => setCandidateName(e.target.value)}
-                        placeholder="Enter candidate name (e.g., Enter Name)"
+                        placeholder="Enter candidate name (e.g., John Doe)"
                         disabled={loading}
                         style={{
                             width: '100%',
@@ -199,7 +200,7 @@ export default function SendGreetingForm() {
                         id="recipientEmail"
                         value={recipientEmail}
                         onChange={(e) => setRecipientEmail(e.target.value)}
-                        placeholder="Enter email (e.g., name@gmail.com)"
+                        placeholder="Enter email (e.g., johndoe@gmail.com)"
                         disabled={loading}
                         style={{
                             width: '100%',
@@ -422,4 +423,3 @@ export default function SendGreetingForm() {
       `}</style>
         </div>
     );
-}
