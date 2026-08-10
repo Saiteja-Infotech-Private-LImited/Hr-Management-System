@@ -7,10 +7,9 @@ export default function MyReferrals() {
     const [referrals, setReferrals] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchMyReferrals();
-    }, []);
-
+    // =========================
+    // GET MY REFERRALS
+    // =========================
     const fetchMyReferrals = async () => {
         try {
             const res = await api.get("/api/recruitment/my-referrals");
@@ -20,7 +19,6 @@ export default function MyReferrals() {
                 res.data?.data ||
                 []
             );
-
         } catch (error) {
             console.error("Error fetching referrals:", error);
         } finally {
@@ -29,11 +27,16 @@ export default function MyReferrals() {
     };
 
     // =========================
+    // LOAD REFERRALS
+    // =========================
+    useEffect(() => {
+        fetchMyReferrals();
+    }, []);
+
+    // =========================
     // STATUS TEXT
     // =========================
-
     const getStatusText = (status) => {
-
         if (status === "APPLIED") {
             return "Pending";
         }
@@ -52,9 +55,7 @@ export default function MyReferrals() {
     // =========================
     // STATUS STYLE
     // =========================
-
     const getStatusStyle = (status) => {
-
         if (status === "SHORTLISTED") {
             return {
                 background: "#dcfce7",
@@ -75,6 +76,9 @@ export default function MyReferrals() {
         };
     };
 
+    // =========================
+    // LOADING
+    // =========================
     if (loading) {
         return (
             <div className="p-6 text-gray-500">
@@ -86,7 +90,9 @@ export default function MyReferrals() {
     return (
         <div>
 
+            {/* ========================= */}
             {/* HEADER */}
+            {/* ========================= */}
 
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
                 My Referrals
@@ -96,7 +102,9 @@ export default function MyReferrals() {
                 Track the candidates you have referred.
             </p>
 
+            {/* ========================= */}
             {/* NO REFERRALS */}
+            {/* ========================= */}
 
             {referrals.length === 0 ? (
 
@@ -120,7 +128,9 @@ export default function MyReferrals() {
                                 className="bg-white rounded-xl shadow p-6 border border-gray-100"
                             >
 
+                                {/* ========================= */}
                                 {/* NAME + STATUS */}
+                                {/* ========================= */}
 
                                 <div className="flex justify-between items-start mb-4">
 
@@ -150,7 +160,9 @@ export default function MyReferrals() {
 
                                 </div>
 
+                                {/* ========================= */}
                                 {/* CANDIDATE DETAILS */}
+                                {/* ========================= */}
 
                                 <div className="space-y-2 text-sm text-gray-600">
 
@@ -178,7 +190,9 @@ export default function MyReferrals() {
 
                                 </div>
 
+                                {/* ========================= */}
                                 {/* RESUME */}
+                                {/* ========================= */}
 
                                 {referral.resumeUrl && (
 
@@ -201,9 +215,13 @@ export default function MyReferrals() {
 
                                 )}
 
+                                {/* ========================= */}
                                 {/* STATUS MESSAGE */}
+                                {/* ========================= */}
 
                                 <div className="mt-4 pt-4 border-t border-gray-100">
+
+                                    {/* PENDING */}
 
                                     {referral.status === "APPLIED" && (
 
@@ -213,6 +231,8 @@ export default function MyReferrals() {
 
                                     )}
 
+                                    {/* APPROVED */}
+
                                     {referral.status === "SHORTLISTED" && (
 
                                         <p className="text-sm text-green-600 font-semibold">
@@ -220,6 +240,8 @@ export default function MyReferrals() {
                                         </p>
 
                                     )}
+
+                                    {/* REJECTED */}
 
                                     {referral.status === "REJECTED" && (
 

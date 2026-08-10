@@ -12,11 +12,6 @@ export default function JobOpenings() {
 
     const router = useRouter();
 
-    useEffect(() => {
-        fetchJobs();
-        fetchMyReferrals();
-    }, []);
-
     // =========================
     // GET JOBS
     // =========================
@@ -54,6 +49,14 @@ export default function JobOpenings() {
             setLoadingReferrals(false);
         }
     };
+
+    // =========================
+    // LOAD DATA
+    // =========================
+    useEffect(() => {
+        fetchJobs();
+        fetchMyReferrals();
+    }, []);
 
     // =========================
     // STATUS TEXT
@@ -98,6 +101,9 @@ export default function JobOpenings() {
         };
     };
 
+    // =========================
+    // LOADING
+    // =========================
     if (loading) {
         return (
             <div className="p-6 text-gray-500">
@@ -134,9 +140,13 @@ export default function JobOpenings() {
                             className="bg-white rounded-xl shadow p-6 border border-gray-100"
                         >
 
+                            {/* JOB TITLE */}
+
                             <h2 className="text-xl font-bold text-slate-900 mb-3">
                                 {job.title}
                             </h2>
+
+                            {/* JOB DETAILS */}
 
                             <p className="text-gray-600 mb-1">
                                 Department: {job.department}
@@ -157,6 +167,8 @@ export default function JobOpenings() {
                             <p className="text-gray-600 mb-4">
                                 Salary: {job.salaryRange}
                             </p>
+
+                            {/* VIEW DETAILS */}
 
                             <button
                                 onClick={() =>
