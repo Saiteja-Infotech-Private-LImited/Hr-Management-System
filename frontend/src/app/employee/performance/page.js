@@ -1,7 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
+import { TrendingUp, MessageSquare, FileText, Loader2, Check, CheckCircle, MessageCircle } from 'lucide-react';
 
 function StarRating({ value }) {
   return (
@@ -9,7 +10,7 @@ function StarRating({ value }) {
       {[1, 2, 3, 4, 5].map(s => (
         <span key={s} style={{ fontSize: '18px', color: s <= Math.round(value) ? '#f59e0b' : '#e2e8f0' }}>★</span>
       ))}
-      <span style={{ fontSize: '13px', color: '#64748b', marginLeft: '6px', fontWeight: '600' }}>
+      <span style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '6px', fontWeight: '600' }}>
         {value}/5
       </span>
     </div>
@@ -18,12 +19,12 @@ function StarRating({ value }) {
 
 function Badge({ status }) {
   const map = {
-    DRAFT: { bg: '#f1f5f9', color: '#64748b' },
+    DRAFT: { bg: '#f1f5f9', color: 'var(--text-secondary)' },
     SUBMITTED: { bg: '#eff6ff', color: '#3b82f6' },
     ACKNOWLEDGED: { bg: '#dcfce7', color: '#16a34a' },
     IN_PROGRESS: { bg: '#fff7ed', color: '#f59e0b' },
   };
-  const s = map[status] || { bg: '#f1f5f9', color: '#64748b' };
+  const s = map[status] || { bg: '#f1f5f9', color: 'var(--text-secondary)' };
   return (
     <span style={{ background: s.bg, color: s.color, padding: '4px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
       {status}
@@ -95,16 +96,16 @@ export default function EmployeePerformancePage() {
 
   const renderContent = () => {
     if (loading) {
-      return <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>Loading...</div>;
+      return <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>Loading...</div>;
     }
     if (reviews.length === 0) {
       return (
-        <div style={{ background: 'white', borderRadius: '12px', padding: '80px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+        <div style={{ background: 'var(--card-bg)', borderRadius: '12px', padding: '80px', textAlign: 'center', border: '1px solid var(--card-border)' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>⭐</div>
-          <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+          <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }}>
             No performance reviews yet
           </div>
-          <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
             Your manager will create a review for you
           </div>
         </div>
@@ -114,7 +115,7 @@ export default function EmployeePerformancePage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {reviews.map((r) => (
           <div key={r.id} style={{
-            background: 'white', borderRadius: '14px',
+            background: 'var(--card-bg)', borderRadius: '14px',
             border: `2px solid ${getStatusBorderColor(r.status)}`,
             boxShadow: '0 1px 6px rgba(0,0,0,0.04)', overflow: 'hidden',
           }}>
@@ -125,16 +126,16 @@ export default function EmployeePerformancePage() {
               background: getStatusHeaderBg(r.status),
             }}>
               <div>
-                <div style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+                <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
                   {r.reviewPeriod}
                 </div>
-                <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Reviewed by: <strong style={{ color: '#374151' }}>{r.reviewerName}</strong> · {r.reviewDate}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>Overall Rating</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Overall Rating</div>
                   <StarRating value={r.overallRating} />
                 </div>
                 <Badge status={r.status} />
@@ -151,10 +152,10 @@ export default function EmployeePerformancePage() {
                   { label: 'Productivity', value: r.productivity, color: '#f59e0b' },
                   { label: 'Leadership', value: r.leadership, color: '#ec4899' },
                 ].map(s => (
-                  <div key={s.label} style={{ background: '#f8fafc', borderRadius: '10px', padding: '12px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                    <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '6px', fontWeight: '600' }}>{s.label}</div>
+                  <div key={s.label} style={{ background: 'var(--bg-primary)', borderRadius: '10px', padding: '12px', border: '1px solid var(--card-border)', textAlign: 'center' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '600' }}>{s.label}</div>
                     <div style={{ fontSize: '22px', fontWeight: '900', color: s.color, marginBottom: '4px' }}>{s.value}</div>
-                    <div style={{ height: '4px', background: '#e2e8f0', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '4px', background: 'var(--card-border)', borderRadius: '2px', overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${(s.value / 5) * 100}%`, background: s.color, borderRadius: '2px' }} />
                     </div>
                   </div>
@@ -165,7 +166,7 @@ export default function EmployeePerformancePage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '20px' }}>
                 {[
                   { label: '💪 Strengths', value: r.strengths, color: '#16a34a', bg: '#f0fdf4' },
-                  { label: '📈 Improvements', value: r.improvements, color: '#f59e0b', bg: '#fff7ed' },
+                  { label: <><TrendingUp size={16} style={{ display: 'inline', marginRight: '4px' }} /> Improvements</>, value: r.improvements, color: '#f59e0b', bg: '#fff7ed' },
                   { label: '🎯 Goals', value: r.goals, color: '#3b82f6', bg: '#eff6ff' },
                 ].map(d => d.value && (
                   <div key={d.label} style={{ background: d.bg, borderRadius: '10px', padding: '14px', border: `1px solid ${d.color}30` }}>
@@ -178,9 +179,9 @@ export default function EmployeePerformancePage() {
               {/* Employee Comments (if acknowledged) */}
               {r.employeeComments && (
                 <div style={{ background: '#f0fdf4', borderRadius: '10px', padding: '14px', border: '1px solid #bbf7d0', marginBottom: '16px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: '700', color: '#16a34a', marginBottom: '6px' }}>
-                    💬 Your Comments
-                  </div>
+                  <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                    <MessageSquare size={16} style={{ display: 'inline', marginRight: '4px' }} /> Your Comments
+                  </h4>
                   <div style={{ fontSize: '13px', color: '#374151', lineHeight: 1.6 }}>
                     {r.employeeComments}
                   </div>
@@ -190,10 +191,10 @@ export default function EmployeePerformancePage() {
               {/* Acknowledge Section */}
               {r.status === 'SUBMITTED' && (
                 <div style={{ background: '#eff6ff', borderRadius: '12px', padding: '16px', border: '1px solid #bfdbfe' }}>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e3a5f', marginBottom: '4px' }}>
-                    📝 Acknowledge This Review
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '12px' }}>
+                  <h4 style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '12px' }}>
+                    <FileText size={16} style={{ display: 'inline', marginRight: '4px' }} /> Acknowledge This Review
+                  </h4>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                     Add your comments and acknowledge to complete the review process
                   </div>
 
@@ -209,7 +210,7 @@ export default function EmployeePerformancePage() {
                           border: '1.5px solid #bfdbfe', borderRadius: '10px',
                           fontSize: '13px', outline: 'none', resize: 'vertical',
                           boxSizing: 'border-box', fontFamily: 'inherit',
-                          marginBottom: '12px', background: 'white',
+                          marginBottom: '12px', background: 'var(--card-bg)',
                         }}
                       />
                       <div style={{ display: 'flex', gap: '10px' }}>
@@ -224,11 +225,11 @@ export default function EmployeePerformancePage() {
                             opacity: acknowledging ? 0.7 : 1,
                           }}
                         >
-                          {acknowledging ? '⏳ Acknowledging...' : '✓ Acknowledge Review'}
+                          {acknowledging ? <><Loader2 size={16} className="animate-spin" style={{ display: 'inline', marginRight: '6px' }} /> Acknowledging...</> : <><Check size={16} style={{ display: 'inline', marginRight: '6px' }} /> Acknowledge Review</>}
                         </button>
                         <button
                           onClick={() => { setSelected(null); setComment(''); }}
-                          style={{ padding: '12px 20px', background: 'white', color: '#374151', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                          style={{ padding: '12px 20px', background: 'var(--card-bg)', color: '#374151', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
                         >
                           Cancel
                         </button>
@@ -243,7 +244,7 @@ export default function EmployeePerformancePage() {
                         fontSize: '13px', fontWeight: '700', cursor: 'pointer',
                       }}
                     >
-                      ✍️ Add Comments & Acknowledge
+                      <MessageCircle size={14} style={{ display: 'inline', marginRight: '4px' }} /> Add Comments & Acknowledge
                     </button>
                   )}
                 </div>
@@ -252,7 +253,7 @@ export default function EmployeePerformancePage() {
               {/* Already acknowledged message */}
               {r.status === 'ACKNOWLEDGED' && (
                 <div style={{ background: '#f0fdf4', borderRadius: '10px', padding: '12px 16px', border: '1px solid #bbf7d0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '20px' }}>✅</span>
+                  <span style={{ color: '#16a34a' }}><CheckCircle size={20} /></span>
                   <span style={{ fontSize: '13px', color: '#16a34a', fontWeight: '600' }}>
                     You have acknowledged this review
                   </span>
@@ -269,7 +270,7 @@ export default function EmployeePerformancePage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           My Performance Reviews
           {pendingCount > 0 && (
             <span style={{ background: '#f59e0b', color: 'white', borderRadius: '20px', padding: '2px 10px', fontSize: '13px', fontWeight: '700' }}>
@@ -277,7 +278,7 @@ export default function EmployeePerformancePage() {
             </span>
           )}
         </h1>
-        <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
           View your performance reviews and acknowledge them
         </p>
       </div>
