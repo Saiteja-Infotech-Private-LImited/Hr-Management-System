@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getMyOnboarding, getMyDocuments, uploadFile, uploadOnboardingDocument } from '@/lib/employeeApi';
 import toast from 'react-hot-toast';
+import { FileText, Loader2, UploadCloud, MessageSquare } from 'lucide-react';
 
 const DOC_KEY_LABELS = {
     OFFER_LETTER: 'Offer Letter',
@@ -19,7 +20,7 @@ function StatusPill({ status }) {
         APPROVED: { bg: '#dcfce7', color: '#16a34a', label: 'Approved' },
         REJECTED: { bg: '#fee2e2', color: '#dc2626', label: 'Rejected' },
     };
-    const s = map[status] || { bg: '#f1f5f9', color: '#64748b', label: 'Not Submitted' };
+    const s = map[status] || { bg: '#f1f5f9', color: 'var(--text-secondary)', label: 'Not Submitted' };
     return (
         <span style={{
             background: s.bg, color: s.color, padding: '6px 16px', borderRadius: '20px',
@@ -40,19 +41,16 @@ function DocumentRow({ documentKey, doc, onUpload, isUploading }) {
 
     return (
         <div style={{
-            background: 'white', borderRadius: '14px',
+            background: 'var(--card-bg)', borderRadius: '14px',
             border: isRejected ? '1.5px solid #fecaca' : '1px solid #e2e8f0',
             padding: '18px 20px', marginBottom: '12px',
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                    width: '46px', height: '46px', borderRadius: '12px', background: '#f1f5f9',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0,
-                }}>
-                    📄
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', flexShrink: 0 }}>
+                    <FileText size={20} strokeWidth={1.5} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>
                         {DOC_KEY_LABELS[documentKey]}
                     </div>
                     {doc?.fileName && (
@@ -84,7 +82,7 @@ function DocumentRow({ documentKey, doc, onUpload, isUploading }) {
                         color: !canUpload ? '#94a3b8' : isRejected ? '#dc2626' : '#3b82f6',
                         cursor: (!canUpload || isUploading) ? 'not-allowed' : 'pointer',
                     }}>
-                    {isUploading ? 'Uploading...' : isRejected ? 'Re-upload' : 'Upload'}
+                    {isUploading ? <><Loader2 size={12} className="animate-spin" style={{ display: 'inline', marginRight: '4px' }} /> Uploading...</> : isRejected ? 'Re-upload' : 'Upload'}
                 </button>
             </div>
 
@@ -95,7 +93,7 @@ function DocumentRow({ documentKey, doc, onUpload, isUploading }) {
                     padding: '10px 14px',
                 }}>
                     <div style={{ fontSize: '13px', color: '#dc2626' }}>
-                        💬 {doc.rejectionRemarks}
+                        <MessageSquare size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} /> {doc.rejectionRemarks}
                     </div>
                 </div>
             )}
@@ -152,13 +150,13 @@ export default function EmployeeOnboardingDocumentsPage() {
     const docsByKey = documents.reduce((acc, d) => { acc[d.documentKey] = d; return acc; }, {});
 
     if (loading) {
-        return <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>;
+        return <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>;
     }
 
     if (!onboarding) {
         return (
-            <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '60px', textAlign: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>No onboarding checklist yet</div>
+            <div style={{ background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--card-border)', padding: '60px', textAlign: 'center' }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>No onboarding checklist yet</div>
             </div>
         );
     }
@@ -166,10 +164,10 @@ export default function EmployeeOnboardingDocumentsPage() {
     return (
         <div>
             <div style={{ marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
                     My Documents
                 </h1>
-                <p style={{ fontSize: '14px', color: '#94a3b8' }}>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
                     Upload your onboarding documents for HR review.
                 </p>
             </div>

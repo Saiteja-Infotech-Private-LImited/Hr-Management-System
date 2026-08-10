@@ -2,14 +2,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getMyOnboarding } from '@/lib/employeeApi';
 import toast from 'react-hot-toast';
+import { FileText, IdCard, GraduationCap, Landmark, Mail, Lock, Clock, CheckCircle } from 'lucide-react';
 
 const CHECKLIST_ITEMS = [
-    { key: 'offerLetterSigned', label: 'Offer Letter Signed', icon: '📄' },
-    { key: 'idProofSubmitted', label: 'ID Proof Submitted', icon: '🪪' },
-    { key: 'educationDocsSubmitted', label: 'Education Docs Submitted', icon: '🎓' },
-    { key: 'bankDetailsSubmitted', label: 'Bank Details Submitted', icon: '🏦' },
-    { key: 'emailCreated', label: 'Email Created', icon: '📧' },
-    { key: 'systemAccessGiven', label: 'System Access Given', icon: '🔐' },
+    { key: 'offerLetterSigned', label: 'Offer Letter Signed', icon: <FileText size={18} /> },
+    { key: 'idProofSubmitted', label: 'ID Proof Submitted', icon: <IdCard size={18} /> },
+    { key: 'educationDocsSubmitted', label: 'Education Docs Submitted', icon: <GraduationCap size={18} /> },
+    { key: 'bankDetailsSubmitted', label: 'Bank Details Submitted', icon: <Landmark size={18} /> },
+    { key: 'emailCreated', label: 'Email Created', icon: <Mail size={18} /> },
+    { key: 'systemAccessGiven', label: 'System Access Given', icon: <Lock size={18} /> },
 ];
 
 export default function EmployeeOnboardingChecklistPage() {
@@ -31,13 +32,13 @@ export default function EmployeeOnboardingChecklistPage() {
     useEffect(() => { fetchData(); }, [fetchData]);
 
     if (loading) {
-        return <div style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>;
+        return <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>;
     }
 
     if (!onboarding) {
         return (
-            <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '60px', textAlign: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>No onboarding checklist yet</div>
+            <div style={{ background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--card-border)', padding: '60px', textAlign: 'center' }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>No onboarding checklist yet</div>
             </div>
         );
     }
@@ -48,15 +49,15 @@ export default function EmployeeOnboardingChecklistPage() {
     return (
         <div>
             <div style={{ marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
                     Onboarding Checklist
                 </h1>
-                <p style={{ fontSize: '14px', color: '#94a3b8' }}>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
                     Track your onboarding progress — {onboarding.completionPercent}% complete.
                 </p>
             </div>
 
-            <div style={{ marginBottom: '20px', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ marginBottom: '20px', height: '8px', background: 'var(--card-border)', borderRadius: '4px', overflow: 'hidden' }}>
                 <div style={{
                     height: '100%', borderRadius: '4px',
                     background: onboarding.completionPercent === 100 ? '#16a34a' : '#4f46e5',
@@ -66,19 +67,19 @@ export default function EmployeeOnboardingChecklistPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 {/* Pending box */}
-                <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                <div style={{ background: 'var(--card-bg)', borderRadius: '14px', border: '1px solid var(--card-border)', padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
                         <div style={{
                             width: '28px', height: '28px', borderRadius: '8px', background: '#fef9c3',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
-                        }}>⏳</div>
-                        <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ca8a04',
+                        }}><Clock size={16} strokeWidth={2.5} /></div>
+                        <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>
                             To Do ({pendingItems.length})
                         </div>
                     </div>
 
                     {pendingItems.length === 0 ? (
-                        <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
+                        <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
                             Nothing pending — great job! 🎉
                         </div>
                     ) : (
@@ -99,19 +100,19 @@ export default function EmployeeOnboardingChecklistPage() {
                 </div>
 
                 {/* Completed box */}
-                <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #e2e8f0', padding: '20px' }}>
+                <div style={{ background: 'var(--card-bg)', borderRadius: '14px', border: '1px solid var(--card-border)', padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
                         <div style={{
                             width: '28px', height: '28px', borderRadius: '8px', background: '#dcfce7',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
-                        }}>✅</div>
-                        <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16a34a',
+                        }}><CheckCircle size={16} strokeWidth={2.5} /></div>
+                        <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)' }}>
                             Completed ({completedItems.length})
                         </div>
                     </div>
 
                     {completedItems.length === 0 ? (
-                        <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
+                        <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
                             Nothing completed yet.
                         </div>
                     ) : (

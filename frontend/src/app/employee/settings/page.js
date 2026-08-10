@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff, Lock, Info, Loader2 } from 'lucide-react';
 
 const EyeIcon = ({ show, toggle }) => (
   <button type="button" onClick={toggle}
@@ -80,8 +81,8 @@ export default function SettingsPage() {
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'inherit',
-    color: '#1e293b',
-    background: 'white',
+    color: 'var(--text-primary)',
+    background: 'var(--card-bg)',
   };
 
 
@@ -93,22 +94,22 @@ export default function SettingsPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#1e293b', marginBottom: '4px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
           Settings
         </h1>
-        <p style={{ fontSize: '13px', color: '#94a3b8' }}>Manage your account settings</p>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Manage your account settings</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
 
         {/* Profile Info */}
         <div style={{
-          background: 'white', borderRadius: '14px',
-          border: '1px solid #e2e8f0',
+          background: 'var(--card-bg)', borderRadius: '14px',
+          border: '1px solid var(--card-border)',
           boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden',
         }}>
           <div style={{
-            padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
+            padding: '16px 20px', borderBottom: '1px solid var(--card-border)',
             background: 'linear-gradient(135deg, #1e3a5f, #2563eb)', color: 'white',
           }}>
             <h3 style={{ fontSize: '15px', fontWeight: '700' }}>👤 Profile Information</h3>
@@ -118,7 +119,7 @@ export default function SettingsPage() {
             <div style={{
               display: 'flex', alignItems: 'center', gap: '16px',
               marginBottom: '24px', padding: '16px',
-              background: '#f8fafc', borderRadius: '12px',
+              background: 'var(--bg-primary)', borderRadius: '12px',
             }}>
               <div style={{
                 width: '64px', height: '64px',
@@ -130,11 +131,11 @@ export default function SettingsPage() {
                 {user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
               </div>
               <div>
-                <div style={{ fontSize: '18px', fontWeight: '800', color: '#1e293b' }}>
+                <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)' }}>
                   {user?.name}
                 </div>
-                <div style={{ fontSize: '13px', color: '#64748b' }}>{user?.email}</div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{user?.email}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                   {user?.employeeCode} · {user?.role}
                 </div>
               </div>
@@ -151,36 +152,30 @@ export default function SettingsPage() {
                 display: 'flex', justifyContent: 'space-between',
                 padding: '10px 0', borderBottom: '1px solid #f1f5f9',
               }}>
-                <span style={{ fontSize: '13px', color: '#64748b' }}>{item.label}</span>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.label}</span>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                   {item.value || '—'}
                 </span>
               </div>
             ))}
 
-            <div style={{
-              marginTop: '16px', padding: '12px',
-              background: '#eff6ff', borderRadius: '8px',
-              border: '1px solid #bfdbfe',
-            }}>
-              <div style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '600' }}>
-                ℹ️ To update profile info, contact your HR Admin
-              </div>
+            <div style={{ padding: '12px', background: '#eef2ff', borderRadius: '10px', marginTop: '24px', fontSize: '13px', color: '#4f46e5', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Info size={16} /> To update profile info, contact your HR Admin
             </div>
           </div>
         </div>
 
         {/* Change Password */}
         <div style={{
-          background: 'white', borderRadius: '14px',
-          border: '1px solid #e2e8f0',
+          background: 'var(--card-bg)', borderRadius: '14px',
+          border: '1px solid var(--card-border)',
           boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden',
         }}>
           <div style={{
-            padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
+            padding: '16px 20px', borderBottom: '1px solid var(--card-border)',
             background: 'linear-gradient(135deg, #1e3a5f, #2563eb)', color: 'white',
           }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '700' }}>🔒 Change Password</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}><Lock size={16} /> Change Password</h3>
           </div>
           <div style={{ padding: '20px' }}>
             <form onSubmit={handleChangePassword}>
@@ -247,9 +242,9 @@ export default function SettingsPage() {
 
               {/* Password Rules */}
               <div style={{
-                background: '#f8fafc', borderRadius: '10px',
+                background: 'var(--bg-primary)', borderRadius: '10px',
                 padding: '14px', marginBottom: '20px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--card-border)',
               }}>
                 <div style={{ fontSize: '12px', fontWeight: '700', color: '#374151', marginBottom: '8px' }}>
                   Password Requirements:
@@ -286,7 +281,7 @@ export default function SettingsPage() {
                   justifyContent: 'center', gap: '8px',
                 }}
               >
-                {changing ? '⏳ Changing...' : (
+                {changing ? <><Loader2 size={14} className="animate-spin" style={{ display: 'inline', marginRight: '4px' }} /> Changing...</> : (
                   <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
