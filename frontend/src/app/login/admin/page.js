@@ -82,7 +82,7 @@ export default function AdminLogin() {
             <div className="w-8 h-8 rounded bg-transparent border-2 border-[#10b981] dark:border-[#c084fc] flex items-center justify-center transition-colors">
               <span className="text-[#10b981] dark:text-[#c084fc] font-bold text-lg leading-none">H</span>
             </div>
-            <span className="text-white font-bold text-[17px] tracking-tight">HRMS Admin</span>
+            <span className="text-white font-bold text-[17px] tracking-tight">Saiteja Infotech Private Limited / Admin</span>
           </div>
           <h1 className="text-white text-4xl xl:text-5xl font-bold leading-[1.1] mb-4 tracking-tight">
             Manage your<br/><span className="dark:text-[#c084fc] text-white">workforce</span> effectively.
@@ -221,7 +221,7 @@ export default function AdminLogin() {
         {/* Footer */}
         <div className="absolute bottom-6 left-0 w-full px-6 xl:px-12 flex flex-col xl:flex-row justify-between items-center gap-4 text-[10px] text-slate-400 ">
           <div className="flex flex-col text-center xl:text-left">
-            <span className="font-semibold text-slate-500 uppercase tracking-wider">© 2026 Saiteja Infotech Private Limited.</span>
+            <span className="font-semibold text-slate-500 uppercase tracking-wider">© 2025 Saiteja Infotech Private Limited.</span>
             <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5">All rights reserved.</span>
           </div>
           <div className="flex gap-6 items-center">

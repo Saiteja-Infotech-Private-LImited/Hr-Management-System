@@ -241,7 +241,7 @@ export default function LeavePage() {
           style={{
             padding: '12px 22px',
             background: 'var(--primary)',
-            color: 'white', border: 'none', borderRadius: '10px',
+            color: 'var(--text-primary)', border: 'none', borderRadius: '10px',
             fontSize: '13px', fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '6px',
             boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
