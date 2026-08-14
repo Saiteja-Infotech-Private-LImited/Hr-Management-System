@@ -252,20 +252,20 @@ export default function AttendanceReport() {
                                     padding: '12px 20px', borderBottom: '1px solid #f1f5f9', alignItems: 'center',
                                 }}>
                                     <div>
-                                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>
+                                        <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
                                             {r.employeeName}
                                         </div>
-                                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>{r.employeeCode}</div>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{r.employeeCode}</div>
                                     </div>
-                                    <div style={{ fontSize: '13px', color: '#64748b' }}>{r.departmentName || '—'}</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{r.departmentName || '—'}</div>
                                     <div><StatusBadge status={r.status} /></div>
-                                    <div style={{ fontSize: '13px', color: '#64748b' }}>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                                         {r.checkIn ? String(r.checkIn).slice(0, 5) : '--'}
                                     </div>
-                                    <div style={{ fontSize: '13px', color: '#64748b' }}>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                                         {r.checkOut ? String(r.checkOut).slice(0, 5) : '--'}
                                     </div>
-                                    <div style={{ fontSize: '13px', color: r.onBreak ? '#f59e0b' : '#64748b', fontWeight: r.onBreak ? '700' : '400' }}>
+                                    <div style={{ fontSize: '13px', color: r.onBreak ? '#f59e0b' : 'var(--text-secondary)', fontWeight: r.onBreak ? '700' : '400' }}>
                                         {r.onBreak ? 'On break' : formatBreakTimes(r.breaks)}
                                     </div>
                                     <div>
