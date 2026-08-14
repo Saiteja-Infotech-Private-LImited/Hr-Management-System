@@ -22,24 +22,24 @@ function PayslipListItem({ p, selected, onSelect, formatCurrency }) {
         border: 'none',
         display: 'block',
         padding: '16px 20px',
-        borderBottom: '1px solid #f1f5f9',
-        cursor: 'pointer',
-        background: isSelected ? '#eff6ff' : 'white',
-        borderLeft: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
-        transition: 'all 0.15s',
-      }}
-      onMouseEnter={e => {
-        if (!isSelected) e.currentTarget.style.background = '#f8fafc';
-      }}
-      onMouseLeave={e => {
-        if (!isSelected) e.currentTarget.style.background = 'white';
-      }}
-      onFocus={e => {
-        if (!isSelected) e.currentTarget.style.background = '#f8fafc';
-      }}
-      onBlur={e => {
-        if (!isSelected) e.currentTarget.style.background = 'white';
-      }}
+              borderBottom: '1px solid var(--border-color, rgba(148, 163, 184, 0.2))',
+      cursor: 'pointer',
+      background: isSelected ? 'var(--bg-active, rgba(59, 130, 246, 0.1))' : 'transparent',
+      borderLeft: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
+      transition: 'all 0.15s',
+    }}
+    onMouseEnter={e => {
+      if (!isSelected) e.currentTarget.style.background = 'var(--bg-hover, rgba(148, 163, 184, 0.1))';
+    }}
+    onMouseLeave={e => {
+      if (!isSelected) e.currentTarget.style.background = 'transparent';
+    }}
+    onFocus={e => {
+      if (!isSelected) e.currentTarget.style.background = 'var(--bg-hover, rgba(148, 163, 184, 0.1))';
+    }}
+    onBlur={e => {
+      if (!isSelected) e.currentTarget.style.background = 'transparent';
+    }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
@@ -180,13 +180,6 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
     { label: 'Special Allowance', value: selected.specialAllowance },
   ];
 
-  const deductionsList = [
-    { label: 'ESI ', value: selected.esi },
-    { label: 'TDS', value: selected.tds },
-    { label: 'PF', value: 0 },
-    { label: 'Professional Tax', value: 0 },
-  ];
-
   return (
     <div style={{
       background: 'var(--card-bg)', borderRadius: '12px',
@@ -248,9 +241,9 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
         </div>
       </div>
 
-      {/* Earnings & Deductions */}
+      {/* Earnings (Deductions removed) */}
       <div style={{ padding: '20px 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+        <div style={{ marginBottom: '20px' }}>
 
           {/* Earnings */}
           <div>
@@ -276,31 +269,6 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
               <span style={{ color: '#16a34a' }}>{formatCurrency(selected.grossSalary)}</span>
             </div>
           </div>
-
-          {/* Deductions */}
-          <div>
-            <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>
-              Deductions
-            </div>
-            {deductionsList.map((item) => (
-              <div key={item.label} style={{
-                display: 'flex', justifyContent: 'space-between',
-                padding: '8px 0', borderBottom: '1px solid #f1f5f9',
-                fontSize: '13px',
-              }}>
-                <span style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
-                <span style={{ fontWeight: '600', color: '#dc2626' }}>{formatCurrency(item.value)}</span>
-              </div>
-            ))}
-            <div style={{
-              display: 'flex', justifyContent: 'space-between',
-              padding: '10px 0', fontSize: '14px', fontWeight: '800',
-              color: 'var(--text-primary)', borderTop: '2px solid #e2e8f0', marginTop: '4px',
-            }}>
-              <span>Total Deductions</span>
-              <span style={{ color: '#dc2626' }}>{formatCurrency(selected.totalDeductions)}</span>
-            </div>
-          </div>
         </div>
 
         {/* Net Salary */}
@@ -313,7 +281,7 @@ function PayslipDetailView({ selected, loadingDetail, formatCurrency }) {
         }}>
           <div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>NET SALARY</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Gross - Total Deductions</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Equal to Gross Salary</div>
           </div>
           <div style={{ fontSize: '28px', fontWeight: '900', color: '#16a34a' }}>
             {formatCurrency(selected.netSalary)}
