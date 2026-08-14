@@ -567,10 +567,14 @@ export default function LeavePage() {
             padding: '12px 22px',
             background: 'var(--primary)',
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0bca2f814b8ecb7df0e2bdf82d21bd3cd4926b3d
             color: 'var(--text-primary)', border: 'none', borderRadius: '10px',
             fontSize: '13px', fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: '6px',
             boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+<<<<<<< HEAD
 =======
             color: 'white',
             border: 'none',
@@ -584,6 +588,8 @@ export default function LeavePage() {
             boxShadow:
               '0 4px 12px rgba(99, 102, 241, 0.3)'
 >>>>>>> dd50f91147205d3363604e3c6de593cabf1bc30d
+=======
+>>>>>>> 0bca2f814b8ecb7df0e2bdf82d21bd3cd4926b3d
           }}
         >
           <Sparkles size={16} />
