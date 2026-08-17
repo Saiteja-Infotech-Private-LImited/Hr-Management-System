@@ -29,7 +29,7 @@ Hr-Management-System/
 └── frontend/                # Next.js 14 / React Web Application (Tailwind CSS, Axios)
     └── Dockerfile           # Multi-stage build (Deps -> Next.js standalone builder -> runner)
 ```
-
+ 
 ---
 
 ## Quick Start Guide (One-Command Deployment)
