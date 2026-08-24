@@ -15,31 +15,42 @@ public class SessionActivityService {
     private long inactivityTimeout;
 
     /**
-     * Starts or resets the activity timer for a user.
+     * Start or refresh the user's activity timer.
      */
     public void recordActivity(String email) {
+
         if (email == null || email.isBlank()) {
             return;
         }
 
-        lastActivity.put(normalizeEmail(email), System.currentTimeMillis());
+        lastActivity.put(
+                normalizeEmail(email),
+                System.currentTimeMillis());
     }
 
     /**
-     * Checks whether the user has been inactive for longer
-     * than the configured timeout.
+     * Check whether the session has expired.
      */
     public boolean isSessionExpired(String email) {
+
         if (email == null || email.isBlank()) {
             return true;
         }
 
         String key = normalizeEmail(email);
+
         Long lastActiveTime = lastActivity.get(key);
 
-        // No activity record means the session has not been initialized.
+        /*
+         * IMPORTANT:
+         *
+         * If there is no activity record yet, don't immediately
+         * destroy a freshly authenticated JWT session.
+         *
+         * The JWT itself has already been validated by JwtUtil.
+         */
         if (lastActiveTime == null) {
-            return true;
+            return false;
         }
 
         long inactiveTime = System.currentTimeMillis() - lastActiveTime;
@@ -48,9 +59,10 @@ public class SessionActivityService {
     }
 
     /**
-     * Returns the remaining inactivity time in milliseconds.
+     * Get remaining inactivity time.
      */
     public long getRemainingTime(String email) {
+
         if (email == null || email.isBlank()) {
             return 0;
         }
@@ -58,28 +70,30 @@ public class SessionActivityService {
         Long lastActiveTime = lastActivity.get(normalizeEmail(email));
 
         if (lastActiveTime == null) {
-            return 0;
+            return inactivityTimeout;
         }
 
-        long remaining = inactivityTimeout
-                - (System.currentTimeMillis() - lastActiveTime);
+        long remaining = inactivityTimeout -
+                (System.currentTimeMillis() - lastActiveTime);
 
         return Math.max(remaining, 0);
     }
 
     /**
-     * Removes the user's activity information.
+     * Remove user's activity.
      */
     public void removeActivity(String email) {
+
         if (email == null || email.isBlank()) {
             return;
         }
 
-        lastActivity.remove(normalizeEmail(email));
+        lastActivity.remove(
+                normalizeEmail(email));
     }
 
     /**
-     * Clears all tracked activity.
+     * Clear all activity.
      */
     public void clearAll() {
         lastActivity.clear();
