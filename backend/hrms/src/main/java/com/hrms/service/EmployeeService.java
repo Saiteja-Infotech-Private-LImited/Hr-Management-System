@@ -1,25 +1,24 @@
 package com.hrms.service;
 
-import com.hrms.exception.EmployeeAlreadyExists;
 import com.hrms.dto.EmployeeDTOs;
 import com.hrms.entity.Employee;
+import com.hrms.enums.Role;
+import com.hrms.exception.EmployeeAlreadyExists;
 import com.hrms.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.NoSuchElementException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.hrms.enums.Role;
 
 @Service
 @RequiredArgsConstructor
@@ -41,27 +40,46 @@ public class EmployeeService {
 
     @Transactional
     @CacheEvict(value = "dashboardData", allEntries = true)
-    public EmployeeDTOs.Response createEmployee(EmployeeDTOs.CreateRequest req) {
+    public EmployeeDTOs.Response createEmployee(
+            EmployeeDTOs.CreateRequest req) {
 
-        if (req.getEmail() == null || req.getEmail().trim().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+        if (req.getEmail() == null
+                || req.getEmail().trim().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Email is required");
         }
 
-        String email = req.getEmail().trim().toLowerCase();
+        String email = req.getEmail()
+                .trim()
+                .toLowerCase();
+
         req.setEmail(email);
 
-        if (req.getEmployeeId() == null || req.getEmployeeId().trim().isBlank()) {
-            throw new IllegalArgumentException("Employee ID is required");
+        if (req.getEmployeeId() == null
+                || req.getEmployeeId().trim().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Employee ID is required");
         }
 
-        if (req.getPassword() == null || req.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
+        if (req.getPassword() == null
+                || req.getPassword().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Password is required");
         }
 
-        String employeeId = req.getEmployeeId().trim().toUpperCase();
+        String employeeId = req.getEmployeeId()
+                .trim()
+                .toUpperCase();
 
-        if (employeeRepository.findByEmployeeId(employeeId).isPresent()) {
-            throw new IllegalArgumentException("Employee ID already exists");
+        if (employeeRepository
+                .findByEmployeeId(employeeId)
+                .isPresent()) {
+
+            throw new IllegalArgumentException(
+                    "Employee ID already exists");
         }
 
         Optional<Employee> existingOpt = employeeRepository.findByEmail(email);
@@ -71,39 +89,56 @@ public class EmployeeService {
             Employee existing = existingOpt.get();
 
             if (existing.isActive()) {
+
                 throw new EmployeeAlreadyExists(email);
             }
 
             if (req.getFirstName() != null) {
-                existing.setFirstName(req.getFirstName().trim());
+
+                existing.setFirstName(
+                        req.getFirstName().trim());
             }
 
             if (req.getLastName() != null) {
-                existing.setLastName(req.getLastName().trim());
+
+                existing.setLastName(
+                        req.getLastName().trim());
             }
 
             existing.setEmail(email);
+
             existing.setEmployeeId(employeeId);
 
-            if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            if (req.getPassword() != null
+                    && !req.getPassword().isBlank()) {
+
                 existing.setPassword(
-                        passwordEncoder.encode(req.getPassword()));
+                        passwordEncoder.encode(
+                                req.getPassword()));
             }
 
             if (req.getPhone() != null) {
-                existing.setPhone(req.getPhone().trim());
+
+                existing.setPhone(
+                        req.getPhone().trim());
             }
 
             if (req.getDepartment() != null) {
-                existing.setDepartment(req.getDepartment().trim());
+
+                existing.setDepartment(
+                        req.getDepartment().trim());
             }
 
             if (req.getDesignation() != null) {
-                existing.setDesignation(req.getDesignation().trim());
+
+                existing.setDesignation(
+                        req.getDesignation().trim());
             }
 
             if (req.getBasicSalary() != null) {
-                existing.setBasicSalary(req.getBasicSalary());
+
+                existing.setBasicSalary(
+                        req.getBasicSalary());
             }
 
             existing.setDateOfJoining(
@@ -112,70 +147,95 @@ public class EmployeeService {
                             : LocalDate.now());
 
             if (req.getDateOfBirth() != null) {
-                existing.setDateOfBirth(req.getDateOfBirth());
+
+                existing.setDateOfBirth(
+                        req.getDateOfBirth());
             }
 
             if (req.getRole() != null) {
-                existing.setRole(req.getRole());
+
+                existing.setRole(
+                        req.getRole());
             }
 
             existing.setActive(true);
 
             if (userCacheService != null) {
+
                 userCacheService.evict(email);
             }
 
-            return toResponse(employeeRepository.save(existing));
+            return toResponse(
+                    employeeRepository.save(existing));
         }
 
         Employee emp = Employee.builder()
+
                 .employeeId(employeeId)
+
                 .firstName(
                         req.getFirstName() != null
                                 ? req.getFirstName().trim()
                                 : null)
+
                 .lastName(
                         req.getLastName() != null
                                 ? req.getLastName().trim()
                                 : null)
+
                 .email(email)
+
                 .password(
-                        passwordEncoder.encode(req.getPassword()))
+                        passwordEncoder.encode(
+                                req.getPassword()))
+
                 .phone(
                         req.getPhone() != null
                                 ? req.getPhone().trim()
                                 : null)
+
                 .department(
                         req.getDepartment() != null
                                 ? req.getDepartment().trim()
                                 : null)
+
                 .designation(
                         req.getDesignation() != null
                                 ? req.getDesignation().trim()
                                 : null)
-                .basicSalary(req.getBasicSalary())
+
+                .basicSalary(
+                        req.getBasicSalary())
+
                 .dateOfJoining(
                         req.getDateOfJoining() != null
                                 ? req.getDateOfJoining()
                                 : LocalDate.now())
-                .dateOfBirth(req.getDateOfBirth())
+
+                .dateOfBirth(
+                        req.getDateOfBirth())
+
                 .role(
                         req.getRole() != null
                                 ? req.getRole()
                                 : Role.EMPLOYEE)
+
                 .active(true)
+
                 .build();
 
-        return toResponse(employeeRepository.save(emp));
+        return toResponse(
+                employeeRepository.save(emp));
     }
 
     // ============================================================
     // GET ALL EMPLOYEES
     // ============================================================
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     @Cacheable("dashboardData")
-    public Page<EmployeeDTOs.Response> getAllEmployees(Pageable pageable) {
+    public Page<EmployeeDTOs.Response> getAllEmployees(
+            Pageable pageable) {
 
         return employeeRepository
                 .findAll(pageable)
@@ -186,13 +246,15 @@ public class EmployeeService {
     // GET BY DEPARTMENT
     // ============================================================
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<EmployeeDTOs.Response> getByDepartment(
             String department,
             Pageable pageable) {
 
         return employeeRepository
-                .findByDepartmentIgnoreCase(department, pageable)
+                .findByDepartmentIgnoreCase(
+                        department,
+                        pageable)
                 .map(this::toResponse);
     }
 
@@ -200,10 +262,11 @@ public class EmployeeService {
     // GET EMPLOYEE BY ID
     // ============================================================
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public EmployeeDTOs.Response getById(Long id) {
 
-        return toResponse(findById(id));
+        return toResponse(
+                findById(id));
     }
 
     // ============================================================
@@ -229,13 +292,18 @@ public class EmployeeService {
                     .trim()
                     .toUpperCase();
 
-            Optional<Employee> existingEmployee = employeeRepository.findByEmployeeId(employeeId);
+            Optional<Employee> existingEmployee = employeeRepository
+                    .findByEmployeeId(employeeId);
 
             if (existingEmployee.isPresent()
-                    && !existingEmployee.get().getId().equals(id)) {
+                    && !existingEmployee
+                            .get()
+                            .getId()
+                            .equals(id)) {
 
                 throw new IllegalArgumentException(
-                        "Employee ID already exists: " + employeeId);
+                        "Employee ID already exists: "
+                                + employeeId);
             }
 
             emp.setEmployeeId(employeeId);
@@ -254,13 +322,18 @@ public class EmployeeService {
                     .trim()
                     .toLowerCase();
 
-            Optional<Employee> existingEmail = employeeRepository.findByEmail(email);
+            Optional<Employee> existingEmail = employeeRepository
+                    .findByEmail(email);
 
             if (existingEmail.isPresent()
-                    && !existingEmail.get().getId().equals(id)) {
+                    && !existingEmail
+                            .get()
+                            .getId()
+                            .equals(id)) {
 
                 throw new IllegalArgumentException(
-                        "Email already exists: " + email);
+                        "Email already exists: "
+                                + email);
             }
 
             emp.setEmail(email);
@@ -370,8 +443,11 @@ public class EmployeeService {
         // PASSWORD
         // --------------------------------------------------------
 
-        // Never replace the existing password with an empty value.
-        // Only encode and update when a new password is supplied.
+        /*
+         * Important:
+         * Do not overwrite the existing password when the
+         * password field is empty.
+         */
 
         if (req.getPassword() != null
                 && !req.getPassword().trim().isEmpty()) {
@@ -382,7 +458,7 @@ public class EmployeeService {
         }
 
         // --------------------------------------------------------
-        // SAVE
+        // SAVE UPDATED EMPLOYEE
         // --------------------------------------------------------
 
         Employee saved = employeeRepository.save(emp);
@@ -394,9 +470,11 @@ public class EmployeeService {
         if (userCacheService != null) {
 
             if (oldEmail != null
-                    && !oldEmail.equals(saved.getEmail())) {
+                    && !oldEmail.equals(
+                            saved.getEmail())) {
 
-                userCacheService.evict(oldEmail);
+                userCacheService.evict(
+                        oldEmail);
             }
 
             if (saved.getEmail() != null) {
@@ -407,7 +485,7 @@ public class EmployeeService {
         }
 
         // --------------------------------------------------------
-        // RETURN UPDATED EMPLOYEE
+        // RETURN UPDATED DATA
         // --------------------------------------------------------
 
         return toResponse(saved);
@@ -577,7 +655,7 @@ public class EmployeeService {
     // SEARCH
     // ============================================================
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<EmployeeDTOs.Response> search(
             String q,
             Pageable pageable) {
@@ -591,7 +669,7 @@ public class EmployeeService {
     // GET MANAGERS
     // ============================================================
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<EmployeeDTOs.Response> getManagers() {
 
         return employeeRepository
@@ -607,7 +685,7 @@ public class EmployeeService {
     }
 
     // ============================================================
-    // FIND BY ID
+    // FIND EMPLOYEE BY ID
     // ============================================================
 
     public Employee findById(Long id) {
@@ -620,14 +698,15 @@ public class EmployeeService {
     }
 
     // ============================================================
-    // CONVERT ENTITY → RESPONSE
+    // ENTITY → RESPONSE
     // ============================================================
 
     public EmployeeDTOs.Response toResponse(Employee e) {
 
         EmployeeDTOs.Response r = new EmployeeDTOs.Response();
 
-        r.setId(e.getId());
+        r.setId(
+                e.getId());
 
         r.setEmployeeId(
                 e.getEmployeeId());

@@ -34,12 +34,14 @@ public class EmployeeController {
         public ResponseEntity<ApiResponse<EmployeeDTOs.Response>> create(
                         @Valid @RequestBody EmployeeDTOs.CreateRequest req) {
 
+                EmployeeDTOs.Response employee = employeeService.createEmployee(req);
+
                 return ResponseEntity
                                 .status(HttpStatus.CREATED)
                                 .body(
                                                 ApiResponse.success(
-                                                                "Employee created",
-                                                                employeeService.createEmployee(req)));
+                                                                "Employee created successfully",
+                                                                employee));
         }
 
         // ============================================================
@@ -66,19 +68,22 @@ public class EmployeeController {
                                 && !department.equalsIgnoreCase(
                                                 "All Departments")) {
 
+                        Page<EmployeeDTOs.Response> employees = employeeService.getByDepartment(
+                                        department,
+                                        pageable);
+
                         return ResponseEntity.ok(
                                         ApiResponse.success(
                                                         "Employees fetched",
-                                                        employeeService.getByDepartment(
-                                                                        department,
-                                                                        pageable)));
+                                                        employees));
                 }
+
+                Page<EmployeeDTOs.Response> employees = employeeService.getAllEmployees(pageable);
 
                 return ResponseEntity.ok(
                                 ApiResponse.success(
                                                 "Employees fetched",
-                                                employeeService.getAllEmployees(
-                                                                pageable)));
+                                                employees));
         }
 
         // ============================================================
@@ -90,10 +95,12 @@ public class EmployeeController {
         public ResponseEntity<ApiResponse<EmployeeDTOs.Response>> getById(
                         @PathVariable Long id) {
 
+                EmployeeDTOs.Response employee = employeeService.getById(id);
+
                 return ResponseEntity.ok(
                                 ApiResponse.success(
                                                 "Employee found",
-                                                employeeService.getById(id)));
+                                                employee));
         }
 
         // ============================================================
@@ -152,12 +159,14 @@ public class EmployeeController {
                                                 Sort.Direction.ASC,
                                                 "employeeId"));
 
+                Page<EmployeeDTOs.Response> results = employeeService.search(
+                                q,
+                                pageable);
+
                 return ResponseEntity.ok(
                                 ApiResponse.success(
                                                 "Search results",
-                                                employeeService.search(
-                                                                q,
-                                                                pageable)));
+                                                results));
         }
 
         // ============================================================

@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 
 public class EmployeeDTOs {
 
+    // ============================================================
+    // CREATE EMPLOYEE REQUEST
+    // ============================================================
+
     @Data
     public static class CreateRequest {
 
@@ -49,6 +53,10 @@ public class EmployeeDTOs {
         private Role role;
     }
 
+    // ============================================================
+    // UPDATE EMPLOYEE REQUEST
+    // ============================================================
+
     @Data
     public static class UpdateRequest {
 
@@ -79,6 +87,10 @@ public class EmployeeDTOs {
 
         private String password;
     }
+
+    // ============================================================
+    // EMPLOYEE RESPONSE
+    // ============================================================
 
     @Data
     public static class Response {
