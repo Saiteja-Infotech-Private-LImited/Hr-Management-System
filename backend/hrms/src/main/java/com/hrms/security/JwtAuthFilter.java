@@ -1,10 +1,12 @@
 package com.hrms.security;
 
 import com.hrms.service.SessionActivityService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,81 +47,88 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
-        if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
+        if (!StringUtils.hasText(token)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-            try {
-                String email = jwtUtil.extractEmail(token);
+        if (!jwtUtil.validateToken(token)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-                /*
-                 * Check whether the user has been inactive
-                 * for the configured timeout period.
-                 */
-                if (sessionActivityService.isSessionExpired(email)) {
+        try {
 
-                    SecurityContextHolder.clearContext();
+            String email = jwtUtil.extractEmail(token);
 
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.setCharacterEncoding("UTF-8");
-
-                    response.getWriter().write(
-                            "{\"success\":false,\"message\":\"Session expired due to inactivity. Please login again.\"}"
-                    );
-
-                    return;
-                }
-
-                UserDetails user =
-                        userDetailsService.loadUserByUsername(email);
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                user.getAuthorities()
-                        );
-
-                auth.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(auth);
-
-                /*
-                 * The authenticated request itself represents
-                 * activity on the HRMS portal.
-                 *
-                 * Therefore the 5-minute inactivity timer
-                 * starts again from this request.
-                 */
-                sessionActivityService.recordActivity(email);
-
-            } catch (Exception e) {
+            /*
+             * Check inactivity BEFORE refreshing activity.
+             *
+             * This is important because otherwise every request
+             * would automatically keep an expired session alive.
+             */
+            if (sessionActivityService.isSessionExpired(email)) {
 
                 SecurityContextHolder.clearContext();
 
-                /*
-                 * If the exception was caused by the session
-                 * inactivity check, the response has already
-                 * been handled above.
-                 */
-                if (!response.isCommitted()) {
-                    response.setStatus(
-                            HttpServletResponse.SC_UNAUTHORIZED
-                    );
-                }
+                response.setStatus(
+                        HttpServletResponse.SC_UNAUTHORIZED);
+
+                response.setContentType(
+                        "application/json");
+
+                response.setCharacterEncoding("UTF-8");
+
+                response.getWriter().write(
+                        "{\"success\":false,\"message\":\"Session expired due to inactivity. Please login again.\"}");
 
                 return;
             }
+
+            /*
+             * Load employee.
+             */
+            UserDetails user = userDetailsService.loadUserByUsername(email);
+
+            /*
+             * Create authentication.
+             */
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    user.getAuthorities());
+
+            auth.setDetails(
+                    new WebAuthenticationDetailsSource()
+                            .buildDetails(request));
+
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(auth);
+
+            /*
+             * Refresh activity ONLY after successful authentication.
+             */
+            sessionActivityService.recordActivity(email);
+
+        } catch (Exception e) {
+
+            SecurityContextHolder.clearContext();
+
+            if (!response.isCommitted()) {
+
+                response.setStatus(
+                        HttpServletResponse.SC_UNAUTHORIZED);
+            }
+
+            return;
         }
 
         chain.doFilter(request, response);
     }
 
-    private String extractToken(HttpServletRequest request) {
+    private String extractToken(
+            HttpServletRequest request) {
 
         String header = request.getHeader("Authorization");
 

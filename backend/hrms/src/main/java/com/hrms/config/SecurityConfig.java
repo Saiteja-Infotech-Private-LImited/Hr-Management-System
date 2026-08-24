@@ -2,22 +2,29 @@ package com.hrms.config;
 
 import com.hrms.repository.EmployeeRepository;
 import com.hrms.security.JwtAuthFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,201 +36,288 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // Fully public — no token needed at all
-    private static final String[] PUBLIC_URLS = {
-            "/api/auth/login",
-            "/api/auth/refresh",
-            "/api/auth/forgot-password",
-            "/api/auth/reset-password",
+        // ============================================================
+        // PUBLIC URLS
+        // ============================================================
 
-            "/api/files/**",
-            "/api/recruitment/jobs",
-            "/api/recruitment/jobs/*/apply",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/api-docs/**",
-            "/api/employees/managers",
-            "/v3/api-docs/**",
-            "/api/greeting/status",
-            "/api/upload/document"
-    };
+        private static final String[] PUBLIC_URLS = {
 
-    private static final String[] ADMIN_HR_URLS = {
-            "/api/employees/search",
-            "/api/payroll/generate",
-            "/api/payroll/month",
-            "/api/payroll/*/mark-paid",
-            "/api/payslips/generate/**",
-            "/api/leaves/pending",
-            "/api/leaves/pending-cancellations",
-            "/api/leaves",
-            "/api/leaves/*/hr-action",
-            "/api/leaves/*/cancel-action",
-            "/api/attendance/admin/**",
-            "/api/performance",
-            "/api/performance/*/update",
+                        // Authentication
+                        "/api/auth/login",
 
-            "/api/trainings/enrollments/*/complete",
-            "/api/recruitment/jobs/all",
-            "/api/recruitment/jobs",
-            "/api/recruitment/applications/**",
-            "/api/onboarding/init/**",
-            "/api/onboarding/pending",
-            "/api/onboarding",
+                        // OTP LOGIN
+                        "/api/auth/verify-login-otp",
+                        "/api/auth/resend-login-otp",
 
-            "/api/greeting/send",
-            "/api/greeting/templates",
-            "/api/greeting/templates/**",
-            "/api/greeting/history",
-            "/api/greeting/history/**",
+                        // Token
+                        "/api/auth/refresh",
 
-            "/api/greeting/send-online-interview",
-            "/api/greeting/send-offline-interview",
-            "/api/greeting/send-offer-letter",
+                        // Password
+                        "/api/auth/forgot-password",
+                        "/api/auth/reset-password",
 
-            "/api/document-request/send",
-            "/api/document-request/list"
-    };
+                        // Files
+                        "/api/files/**",
 
-    @Bean
-    public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            JwtAuthFilter jwtAuthFilter,
-            AuthenticationProvider authenticationProvider) throws Exception {
+                        // Recruitment
+                        "/api/recruitment/jobs",
+                        "/api/recruitment/jobs/*/apply",
 
-        http
-                .csrf(csrf -> csrf.disable())
+                        // Swagger
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/api-docs/**",
+                        "/v3/api-docs/**",
 
-                .cors(cors ->
-                        cors.configurationSource(corsConfigurationSource())
-                )
+                        // Public managers
+                        "/api/employees/managers",
 
-                /*
-                 * HRMS uses JWT authentication.
-                 * We intentionally keep Spring Security stateless.
-                 */
-                .sessionManagement(sm ->
-                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        // Greeting
+                        "/api/greeting/status",
 
-                .authorizeHttpRequests(auth -> auth
+                        // Upload
+                        "/api/upload/document"
+        };
 
-                        // Public endpoints
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+        // ============================================================
+        // ADMIN / HR URLS
+        // ============================================================
 
-                        // Managers endpoint
-                        .requestMatchers("/api/employees/managers").permitAll()
+        private static final String[] ADMIN_HR_URLS = {
 
-                        // Admin / HR only
-                        .requestMatchers(ADMIN_HR_URLS)
-                        .hasAnyRole("ADMIN", "HR")
+                        "/api/employees/search",
 
-                        // Authenticated users
-                        .requestMatchers("/api/auth/change-password")
-                        .authenticated()
+                        // Payroll
+                        "/api/payroll/generate",
+                        "/api/payroll/month",
+                        "/api/payroll/*/mark-paid",
+                        "/api/payslips/generate/**",
 
-                        .requestMatchers("/api/attendance/check-in")
-                        .authenticated()
+                        // Leave
+                        "/api/leaves/pending",
+                        "/api/leaves/pending-cancellations",
+                        "/api/leaves",
+                        "/api/leaves/*/hr-action",
+                        "/api/leaves/*/cancel-action",
 
-                        .requestMatchers("/api/attendance/check-out")
-                        .authenticated()
+                        // Attendance
+                        "/api/attendance/admin/**",
 
-                        .requestMatchers("/api/attendance/my")
-                        .authenticated()
+                        // Performance
+                        "/api/performance",
+                        "/api/performance/*/update",
 
-                        .requestMatchers("/api/attendance/my/**")
-                        .authenticated()
+                        // Training
+                        "/api/trainings/enrollments/*/complete",
 
-                        /*
-                         * Every other API requires authentication.
-                         *
-                         * JwtAuthFilter runs before this authorization
-                         * decision and checks JWT + inactivity.
-                         */
-                        .anyRequest()
-                        .authenticated()
-                )
+                        // Recruitment
+                        "/api/recruitment/jobs/all",
+                        "/api/recruitment/jobs",
+                        "/api/recruitment/applications/**",
 
-                .authenticationProvider(authenticationProvider)
+                        // Onboarding
+                        "/api/onboarding/init/**",
+                        "/api/onboarding/pending",
+                        "/api/onboarding",
 
-                /*
-                 * JWT authentication + inactivity validation.
-                 */
-                .addFilterBefore(
-                        jwtAuthFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                        // Greeting
+                        "/api/greeting/send",
+                        "/api/greeting/templates",
+                        "/api/greeting/templates/**",
+                        "/api/greeting/history",
+                        "/api/greeting/history/**",
 
-        return http.build();
-    }
+                        "/api/greeting/send-online-interview",
+                        "/api/greeting/send-offline-interview",
+                        "/api/greeting/send-offer-letter",
 
-    @Bean
-    public UserDetailsService userDetailsService(
-            EmployeeRepository employeeRepository) {
+                        // Document Request
+                        "/api/document-request/send",
+                        "/api/document-request/list"
+        };
 
-        return username ->
-                employeeRepository.findByEmail(username)
-                        .orElseThrow(() ->
-                                new UsernameNotFoundException(
-                                        "User not found: " + username
-                                )
-                        );
-    }
+        // ============================================================
+        // SECURITY FILTER CHAIN
+        // ============================================================
 
-    @Bean
-    public AuthenticationProvider authenticationProvider(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
+        @Bean
+        public SecurityFilterChain filterChain(
+                        HttpSecurity http,
+                        JwtAuthFilter jwtAuthFilter,
+                        AuthenticationProvider authenticationProvider)
+                        throws Exception {
 
-        DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider();
+                http
 
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
+                                // ------------------------------------------------
+                                // CSRF
+                                // ------------------------------------------------
+                                .csrf(csrf -> csrf.disable())
 
-        return provider;
-    }
+                                // ------------------------------------------------
+                                // CORS
+                                // ------------------------------------------------
+                                .cors(cors -> cors.configurationSource(
+                                                corsConfigurationSource()))
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+                                // ------------------------------------------------
+                                // JWT / STATELESS
+                                // ------------------------------------------------
+                                .sessionManagement(sm -> sm.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
 
-        return config.getAuthenticationManager();
-    }
+                                // ------------------------------------------------
+                                // AUTHORIZATION
+                                // ------------------------------------------------
+                                .authorizeHttpRequests(auth -> auth
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                                                // Public
+                                                .requestMatchers(PUBLIC_URLS)
+                                                .permitAll()
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+                                                // Managers
+                                                .requestMatchers(
+                                                                "/api/employees/managers")
+                                                .permitAll()
 
-        CorsConfiguration config = new CorsConfiguration();
+                                                // Admin / HR
+                                                .requestMatchers(ADMIN_HR_URLS)
+                                                .hasAnyRole("ADMIN", "HR")
 
-        config.setAllowedOriginPatterns(List.of("*"));
+                                                // Authenticated password update
+                                                .requestMatchers(
+                                                                "/api/auth/change-password")
+                                                .authenticated()
 
-        config.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "PATCH",
-                "OPTIONS"
-        ));
+                                                .requestMatchers(
+                                                                "/api/auth/update-password")
+                                                .authenticated()
 
-        config.setAllowedHeaders(List.of("*"));
+                                                // Attendance
+                                                .requestMatchers(
+                                                                "/api/attendance/check-in")
+                                                .authenticated()
 
-        config.setAllowCredentials(true);
+                                                .requestMatchers(
+                                                                "/api/attendance/check-out")
+                                                .authenticated()
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+                                                .requestMatchers(
+                                                                "/api/attendance/my")
+                                                .authenticated()
 
-        source.registerCorsConfiguration(
-                "/**",
-                config
-        );
+                                                .requestMatchers(
+                                                                "/api/attendance/my/**")
+                                                .authenticated()
 
-        return source;
-    }
+                                                // Everything else
+                                                .anyRequest()
+                                                .authenticated())
+
+                                // ------------------------------------------------
+                                // AUTH PROVIDER
+                                // ------------------------------------------------
+                                .authenticationProvider(
+                                                authenticationProvider)
+
+                                // ------------------------------------------------
+                                // JWT FILTER
+                                // ------------------------------------------------
+                                .addFilterBefore(
+                                                jwtAuthFilter,
+                                                UsernamePasswordAuthenticationFilter.class);
+
+                return http.build();
+        }
+
+        // ============================================================
+        // USER DETAILS SERVICE
+        // ============================================================
+
+        @Bean
+        public UserDetailsService userDetailsService(
+                        EmployeeRepository employeeRepository) {
+
+                return username -> employeeRepository
+                                .findByEmail(username)
+                                .orElseThrow(() -> new UsernameNotFoundException(
+                                                "User not found: " + username));
+        }
+
+        // ============================================================
+        // AUTHENTICATION PROVIDER
+        // ============================================================
+
+        @Bean
+        public AuthenticationProvider authenticationProvider(
+                        UserDetailsService userDetailsService,
+                        PasswordEncoder passwordEncoder) {
+
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+                provider.setUserDetailsService(
+                                userDetailsService);
+
+                provider.setPasswordEncoder(
+                                passwordEncoder);
+
+                return provider;
+        }
+
+        // ============================================================
+        // AUTHENTICATION MANAGER
+        // ============================================================
+
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration config)
+                        throws Exception {
+
+                return config.getAuthenticationManager();
+        }
+
+        // ============================================================
+        // PASSWORD ENCODER
+        // ============================================================
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+
+                return new BCryptPasswordEncoder();
+        }
+
+        // ============================================================
+        // CORS
+        // ============================================================
+
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+
+                CorsConfiguration config = new CorsConfiguration();
+
+                config.setAllowedOriginPatterns(
+                                List.of("*"));
+
+                config.setAllowedMethods(
+                                List.of(
+                                                "GET",
+                                                "POST",
+                                                "PUT",
+                                                "DELETE",
+                                                "PATCH",
+                                                "OPTIONS"));
+
+                config.setAllowedHeaders(
+                                List.of("*"));
+
+                config.setAllowCredentials(true);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+                source.registerCorsConfiguration(
+                                "/**",
+                                config);
+
+                return source;
+        }
 }

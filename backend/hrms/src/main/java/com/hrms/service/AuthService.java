@@ -5,170 +5,292 @@ import com.hrms.entity.Employee;
 import com.hrms.enums.Role;
 import com.hrms.repository.EmployeeRepository;
 import com.hrms.security.JwtUtil;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
-    private final EmployeeRepository employeeRepository;
-    private final UserCacheService userCacheService;
-    private final JwtUtil jwtUtil;
-    private final SessionActivityService sessionActivityService;
+        private final AuthenticationManager authenticationManager;
+        private final EmployeeRepository employeeRepository;
+        private final UserCacheService userCacheService;
+        private final JwtUtil jwtUtil;
+        private final SessionActivityService sessionActivityService;
+        private final OtpService otpService;
+        private final EmailService emailService;
 
-    public AuthDTOs.AuthResponse login(AuthDTOs.LoginRequest request) {
+        // ============================================================
+        // LOGIN
+        // ============================================================
 
-        Employee emp;
-        try {
-            emp = userCacheService.getByEmail(request.getEmail());
-        } catch (Exception e) {
-            throw new BadCredentialsException("Invalid email or password");
+        public AuthDTOs.AuthResponse login(
+                        AuthDTOs.LoginRequest request) {
+
+                Employee emp;
+
+                try {
+
+                        emp = userCacheService
+                                        .getByEmail(request.getEmail());
+
+                } catch (Exception e) {
+
+                        throw new BadCredentialsException(
+                                        "Invalid email or password");
+                }
+
+                // ========================================================
+                // CHECK LOGIN TYPE
+                // ========================================================
+
+                if ("EMPLOYEE".equalsIgnoreCase(
+                                request.getLoginType())) {
+
+                        if (emp.getRole() != Role.EMPLOYEE) {
+
+                                throw new BadCredentialsException(
+                                                "This account belongs to Admin/HR. Please use the Admin/HR login portal.");
+                        }
+
+                } else if ("ADMIN".equalsIgnoreCase(
+                                request.getLoginType())) {
+
+                        if (emp.getRole() == Role.EMPLOYEE) {
+
+                                throw new BadCredentialsException(
+                                                "This account is an Employee account. Please use the Employee login portal.");
+                        }
+                }
+
+                // ========================================================
+                // VERIFY EMAIL + PASSWORD
+                // ========================================================
+
+                Authentication auth = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getEmail(),
+                                                request.getPassword()));
+
+                Employee authenticated = (Employee) auth.getPrincipal();
+
+                // ========================================================
+                // GENERATE LOGIN OTP
+                // ========================================================
+
+                String otp = otpService.generateAndSaveOtp(
+                                authenticated.getEmail());
+
+                // ========================================================
+                // SEND OTP EMAIL
+                // ========================================================
+
+                emailService.sendOtpEmail(
+                                authenticated.getEmail(),
+                                otp,
+                                authenticated.getFirstName()
+                                                + " "
+                                                + authenticated.getLastName());
+
+                // ========================================================
+                // IMPORTANT
+                //
+                // DO NOT START SESSION TIMER HERE.
+                // DO NOT GENERATE JWT HERE.
+                //
+                // Session starts only after OTP verification.
+                // ========================================================
+
+                AuthDTOs.AuthResponse response = new AuthDTOs.AuthResponse();
+
+                response.setRequiresOtp(true);
+
+                response.setEmail(
+                                authenticated.getEmail());
+
+                return response;
         }
 
-        // Enforce correct portal based on UI login type
-        // Employee portal = EMPLOYEE
-        // Admin portal = ADMIN / HR
-        if ("EMPLOYEE".equalsIgnoreCase(request.getLoginType())) {
+        // ============================================================
+        // VERIFY LOGIN OTP
+        // ============================================================
 
-            if (emp.getRole() != Role.EMPLOYEE) {
-                throw new BadCredentialsException(
-                        "This account belongs to Admin/HR. Please use the Admin/HR login portal.");
-            }
+        public AuthDTOs.AuthResponse verifyLoginOtp(
+                        AuthDTOs.LoginOtpRequest request) {
 
-        } else if ("ADMIN".equalsIgnoreCase(request.getLoginType())) {
+                // ========================================================
+                // VALIDATE OTP
+                // ========================================================
 
-            if (emp.getRole() == Role.EMPLOYEE) {
-                throw new BadCredentialsException(
-                        "This account is an Employee account. Please use the Employee login portal.");
-            }
+                boolean validOtp = otpService.validateOtp(
+                                request.getEmail(),
+                                request.getOtp());
+
+                if (!validOtp) {
+
+                        throw new BadCredentialsException(
+                                        "Invalid or expired OTP");
+                }
+
+                // ========================================================
+                // FIND EMPLOYEE
+                // ========================================================
+
+                Employee employee;
+
+                try {
+
+                        employee = userCacheService.getByEmail(
+                                        request.getEmail());
+
+                } catch (Exception e) {
+
+                        throw new BadCredentialsException(
+                                        "User not found");
+                }
+
+                // ========================================================
+                // START 5-MINUTE SESSION
+                //
+                // THIS MUST HAPPEN ONLY AFTER OTP SUCCESS.
+                // ========================================================
+
+                sessionActivityService.recordActivity(
+                                employee.getEmail());
+
+                // ========================================================
+                // GENERATE JWT
+                // ========================================================
+
+                return buildAuthResponse(employee);
         }
 
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        // ============================================================
+        // RESEND LOGIN OTP
+        // ============================================================
 
-        Employee authenticated = (Employee) auth.getPrincipal();
+        public AuthDTOs.OtpResendResponse resendLoginOtp(
+                        AuthDTOs.ResendLoginOtpRequest request) {
 
-        /*
-         * Start the 5-minute inactivity timer after successful login.
-         *
-         * This applies to:
-         * ADMIN
-         * HR
-         * EMPLOYEE
-         */
-        sessionActivityService.recordActivity(authenticated.getEmail());
+                Employee employee;
 
-        AuthDTOs.AuthResponse response = new AuthDTOs.AuthResponse();
+                try {
 
-        response.setAccessToken(
-                jwtUtil.generateToken(authenticated)
-        );
+                        employee = userCacheService.getByEmail(
+                                        request.getEmail());
 
-        response.setRefreshToken(
-                jwtUtil.generateRefreshToken(authenticated)
-        );
+                } catch (Exception e) {
 
-        response.setRole(
-                authenticated.getRole().name()
-        );
+                        throw new BadCredentialsException(
+                                        "Unable to resend OTP");
+                }
 
-        response.setEmployeeId(
-                authenticated.getId()
-        );
+                // ========================================================
+                // GENERATE NEW OTP
+                // ========================================================
 
-        response.setEmployeeCode(
-                authenticated.getEmployeeId()
-        );
+                String otp = otpService.generateAndSaveOtp(
+                                employee.getEmail());
 
-        response.setName(
-                authenticated.getFirstName() + " " + authenticated.getLastName()
-        );
+                // ========================================================
+                // SEND OTP
+                // ========================================================
 
-        response.setEmail(
-                authenticated.getEmail()
-        );
+                emailService.sendOtpEmail(
+                                employee.getEmail(),
+                                otp,
+                                employee.getFirstName()
+                                                + " "
+                                                + employee.getLastName());
 
-        response.setExpiresIn(
-                jwtUtil.getExpiration()
-        );
-
-        return response;
-    }
-
-    public AuthDTOs.AuthResponse refresh(
-            AuthDTOs.RefreshTokenRequest request) {
-
-        if (!jwtUtil.validateToken(request.getRefreshToken())) {
-            throw new BadCredentialsException(
-                    "Invalid or expired refresh token"
-            );
+                return new AuthDTOs.OtpResendResponse(
+                                true,
+                                employee.getEmail());
         }
 
-        String email = jwtUtil.extractEmail(
-                request.getRefreshToken()
-        );
+        // ============================================================
+        // REFRESH TOKEN
+        // ============================================================
 
-        Employee emp;
+        public AuthDTOs.AuthResponse refresh(
+                        AuthDTOs.RefreshTokenRequest request) {
 
-        try {
-            emp = userCacheService.getByEmail(email);
-        } catch (Exception e) {
-            throw new BadCredentialsException(
-                    "User not found"
-            );
+                if (!jwtUtil.validateToken(
+                                request.getRefreshToken())) {
+
+                        throw new BadCredentialsException(
+                                        "Invalid or expired refresh token");
+                }
+
+                String email = jwtUtil.extractEmail(
+                                request.getRefreshToken());
+
+                Employee emp;
+
+                try {
+
+                        emp = userCacheService.getByEmail(email);
+
+                } catch (Exception e) {
+
+                        throw new BadCredentialsException(
+                                        "User not found");
+                }
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Refreshing JWT does not reset the
+                 * inactivity timer.
+                 */
+
+                return buildAuthResponse(emp);
         }
 
-        /*
-         * Refreshing a JWT should not automatically reset the
-         * inactivity timer.
-         *
-         * The inactivity timer represents actual HRMS usage,
-         * not simply token renewal.
-         */
-        AuthDTOs.AuthResponse response = new AuthDTOs.AuthResponse();
+        // ============================================================
+        // BUILD AUTH RESPONSE
+        // ============================================================
 
-        response.setAccessToken(
-                jwtUtil.generateToken(emp)
-        );
+        private AuthDTOs.AuthResponse buildAuthResponse(
+                        Employee employee) {
 
-        response.setRefreshToken(
-                jwtUtil.generateRefreshToken(emp)
-        );
+                AuthDTOs.AuthResponse response = new AuthDTOs.AuthResponse();
 
-        response.setRole(
-                emp.getRole().name()
-        );
+                response.setRequiresOtp(false);
 
-        response.setEmployeeId(
-                emp.getId()
-        );
+                response.setAccessToken(
+                                jwtUtil.generateToken(employee));
 
-        response.setEmployeeCode(
-                emp.getEmployeeId()
-        );
+                response.setRefreshToken(
+                                jwtUtil.generateRefreshToken(employee));
 
-        response.setName(
-                emp.getFirstName() + " " + emp.getLastName()
-        );
+                response.setRole(
+                                employee.getRole().name());
 
-        response.setEmail(
-                emp.getEmail()
-        );
+                response.setEmployeeId(
+                                employee.getId());
 
-        response.setExpiresIn(
-                jwtUtil.getExpiration()
-        );
+                response.setEmployeeCode(
+                                employee.getEmployeeId());
 
-        return response;
-    }
+                response.setName(
+                                employee.getFirstName()
+                                                + " "
+                                                + employee.getLastName());
+
+                response.setEmail(
+                                employee.getEmail());
+
+                response.setExpiresIn(
+                                jwtUtil.getExpiration());
+
+                return response;
+        }
 }

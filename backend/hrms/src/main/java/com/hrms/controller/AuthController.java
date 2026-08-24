@@ -21,333 +21,244 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(
-        name = "Authentication",
-        description = "Login & token management"
-)
+@Tag(name = "Authentication", description = "Login & token management")
 public class AuthController {
 
-    private final AuthService authService;
-    private final EmailService emailService;
-    private final OtpService otpService;
-    private final EmployeeRepository employeeRepository;
-    private final PasswordEncoder passwordEncoder;
+        private final AuthService authService;
+        private final EmailService emailService;
+        private final OtpService otpService;
+        private final EmployeeRepository employeeRepository;
+        private final PasswordEncoder passwordEncoder;
 
+        // ============================================================
+        // LOGIN
+        // ============================================================
 
-    // ============================================================
-    // LOGIN
-    // ============================================================
+        @PostMapping("/login")
+        @Operation(summary = "Login (Employee or Admin/HR)", description = "Pass loginType as EMPLOYEE or ADMIN")
+        public ResponseEntity<ApiResponse<AuthDTOs.AuthResponse>> login(
+                        @Valid @RequestBody AuthDTOs.LoginRequest request) {
 
-    @PostMapping("/login")
-    @Operation(
-            summary = "Login (Employee or Admin/HR)",
-            description = "Pass loginType as EMPLOYEE or ADMIN"
-    )
-    public ResponseEntity<ApiResponse<AuthDTOs.AuthResponse>> login(
-            @Valid @RequestBody AuthDTOs.LoginRequest request) {
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Login successful",
-                        authService.login(request)
-                )
-        );
-    }
-
-
-    // ============================================================
-    // REFRESH TOKEN
-    // ============================================================
-
-    @PostMapping("/refresh")
-    @Operation(summary = "Refresh access token")
-    public ResponseEntity<ApiResponse<AuthDTOs.AuthResponse>> refresh(
-            @Valid @RequestBody AuthDTOs.RefreshTokenRequest request) {
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Token refreshed",
-                        authService.refresh(request)
-                )
-        );
-    }
-
-
-    // ============================================================
-    // FORGOT PASSWORD - SEND OTP
-    // ============================================================
-
-    @PostMapping("/forgot-password")
-    @Operation(
-            summary = "Send OTP to email for password reset"
-    )
-    public ResponseEntity<?> forgotPassword(
-            @RequestBody ForgotPasswordRequest request) {
-
-        try {
-
-            Employee employee = employeeRepository
-                    .findByEmail(request.getEmail())
-                    .orElseThrow(() ->
-                            new RuntimeException(
-                                    "No account found with email: "
-                                            + request.getEmail()
-                            )
-                    );
-
-
-            // Generate and save OTP
-            String otp = otpService.generateAndSaveOtp(
-                    request.getEmail()
-            );
-
-
-            // Send OTP to employee email
-            emailService.sendOtpEmail(
-                    request.getEmail(),
-                    otp,
-                    employee.getFirstName()
-                            + " "
-                            + employee.getLastName()
-            );
-
-
-            return ResponseEntity.ok(
-                    ApiResponse.success(
-                            "OTP sent successfully to "
-                                    + request.getEmail(),
-                            null
-                    )
-            );
-
-        } catch (Exception e) {
-
-            return ResponseEntity.badRequest()
-                    .body(
-                            ApiResponse.error(
-                                    e.getMessage()
-                            )
-                    );
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "OTP sent successfully",
+                                                authService.login(request)));
         }
-    }
 
+        // ============================================================
+        // VERIFY LOGIN OTP
+        // ============================================================
 
-    // ============================================================
-    // FORGOT PASSWORD - RESET PASSWORD USING OTP
-    // ============================================================
+        @PostMapping("/verify-login-otp")
+        @Operation(summary = "Verify login OTP", description = "Verify OTP and generate JWT access token")
+        public ResponseEntity<ApiResponse<AuthDTOs.AuthResponse>> verifyLoginOtp(
+                        @Valid @RequestBody AuthDTOs.LoginOtpRequest request) {
 
-    @PostMapping("/reset-password")
-    @Operation(
-            summary = "Reset password using OTP",
-            description =
-                    "Forgot Password flow: Email + OTP + New Password"
-    )
-    public ResponseEntity<?> resetPassword(
-            @Valid @RequestBody ResetPasswordRequest request) {
-
-        try {
-
-            // ----------------------------------------------------
-            // 1. OTP IS REQUIRED
-            // ----------------------------------------------------
-
-            if (request.getOtp() == null
-                    || request.getOtp().isBlank()) {
-
-                return ResponseEntity.badRequest()
-                        .body(
-                                ApiResponse.error(
-                                        "OTP is required"
-                                )
-                        );
-            }
-
-
-            // ----------------------------------------------------
-            // 2. VALIDATE PASSWORD
-            // ----------------------------------------------------
-
-            if (!PasswordValidator.isValidPassword(
-                    request.getNewPassword())) {
-
-                return ResponseEntity.badRequest()
-                        .body(
-                                ApiResponse.error(
-                                        PasswordValidator
-                                                .getPasswordRequirements()
-                                )
-                        );
-            }
-
-
-            // ----------------------------------------------------
-            // 3. VALIDATE OTP
-            // ----------------------------------------------------
-
-            boolean validOtp =
-                    otpService.validateOtp(
-                            request.getEmail(),
-                            request.getOtp()
-                    );
-
-            if (!validOtp) {
-
-                return ResponseEntity.badRequest()
-                        .body(
-                                ApiResponse.error(
-                                        "Invalid or expired OTP"
-                                )
-                        );
-            }
-
-
-            // ----------------------------------------------------
-            // 4. FIND EMPLOYEE
-            // ----------------------------------------------------
-
-            Employee employee = employeeRepository
-                    .findByEmail(request.getEmail())
-                    .orElseThrow(() ->
-                            new RuntimeException(
-                                    "Employee not found"
-                            )
-                    );
-
-
-            // ----------------------------------------------------
-            // 5. UPDATE PASSWORD
-            // ----------------------------------------------------
-
-            employee.setPassword(
-                    passwordEncoder.encode(
-                            request.getNewPassword()
-                    )
-            );
-
-            employeeRepository.save(employee);
-
-
-            // ----------------------------------------------------
-            // 6. SUCCESS
-            // ----------------------------------------------------
-
-            return ResponseEntity.ok(
-                    ApiResponse.success(
-                            "Password reset successfully!",
-                            null
-                    )
-            );
-
-        } catch (Exception e) {
-
-            return ResponseEntity.badRequest()
-                    .body(
-                            ApiResponse.error(
-                                    e.getMessage()
-                            )
-                    );
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "OTP verified successfully",
+                                                authService.verifyLoginOtp(request)));
         }
-    }
 
+        // ============================================================
+        // RESEND LOGIN OTP
+        // ============================================================
 
-    // ============================================================
-    // CHANGE PASSWORD - LOGGED-IN USER
-    // ============================================================
+        @PostMapping("/resend-login-otp")
+        @Operation(summary = "Resend login OTP")
+        public ResponseEntity<ApiResponse<AuthDTOs.OtpResendResponse>> resendLoginOtp(
+                        @Valid @RequestBody AuthDTOs.ResendLoginOtpRequest request) {
 
-    @PostMapping("/update-password")
-    @Operation(
-            summary = "Update password for logged-in employee",
-            description =
-                    "Change Password flow: Current Password + New Password"
-    )
-    public ResponseEntity<?> updatePassword(
-            @Valid @RequestBody UpdatePasswordRequest request) {
-
-        try {
-
-            // ----------------------------------------------------
-            // 1. FIND EMPLOYEE
-            // ----------------------------------------------------
-
-            Employee employee = employeeRepository
-                    .findByEmail(request.getEmail())
-                    .orElseThrow(() ->
-                            new RuntimeException(
-                                    "Employee not found"
-                            )
-                    );
-
-
-            // ----------------------------------------------------
-            // 2. VERIFY CURRENT PASSWORD
-            // ----------------------------------------------------
-
-            if (!passwordEncoder.matches(
-                    request.getCurrentPassword(),
-                    employee.getPassword())) {
-
-                return ResponseEntity.badRequest()
-                        .body(
-                                ApiResponse.error(
-                                        "Current password is incorrect"
-                                )
-                        );
-            }
-
-
-            // ----------------------------------------------------
-            // 3. PREVENT SAME PASSWORD
-            // ----------------------------------------------------
-
-            if (request.getCurrentPassword()
-                    .equals(request.getNewPassword())) {
-
-                return ResponseEntity.badRequest()
-                        .body(
-                                ApiResponse.error(
-                                        "New password cannot be same as current password"
-                                )
-                        );
-            }
-
-
-            // ----------------------------------------------------
-            // 4. SAVE NEW PASSWORD
-            // ----------------------------------------------------
-
-            employee.setPassword(
-                    passwordEncoder.encode(
-                            request.getNewPassword()
-                    )
-            );
-
-            employeeRepository.save(employee);
-
-
-            // ----------------------------------------------------
-            // 5. SUCCESS
-            // ----------------------------------------------------
-
-            return ResponseEntity.ok(
-                    ApiResponse.success(
-                            "Password changed successfully!",
-                            null
-                    )
-            );
-
-        } catch (Exception e) {
-
-            return ResponseEntity.badRequest()
-                    .body(
-                            ApiResponse.error(
-                                    e.getMessage()
-                            )
-                    );
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "OTP sent successfully",
+                                                authService.resendLoginOtp(request)));
         }
-    }
+
+        // ============================================================
+        // REFRESH TOKEN
+        // ============================================================
+
+        @PostMapping("/refresh")
+        @Operation(summary = "Refresh access token")
+        public ResponseEntity<ApiResponse<AuthDTOs.AuthResponse>> refresh(
+                        @Valid @RequestBody AuthDTOs.RefreshTokenRequest request) {
+
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "Token refreshed",
+                                                authService.refresh(request)));
+        }
+
+        // ============================================================
+        // FORGOT PASSWORD
+        // ============================================================
+
+        @PostMapping("/forgot-password")
+        @Operation(summary = "Send OTP to email for password reset")
+        public ResponseEntity<?> forgotPassword(
+                        @RequestBody ForgotPasswordRequest request) {
+
+                try {
+
+                        Employee employee = employeeRepository
+                                        .findByEmail(request.getEmail())
+                                        .orElseThrow(() -> new RuntimeException(
+                                                        "No account found with email: "
+                                                                        + request.getEmail()));
+
+                        String otp = otpService.generateAndSaveOtp(
+                                        request.getEmail());
+
+                        emailService.sendOtpEmail(
+                                        request.getEmail(),
+                                        otp,
+                                        employee.getFirstName()
+                                                        + " "
+                                                        + employee.getLastName());
+
+                        return ResponseEntity.ok(
+                                        ApiResponse.success(
+                                                        "OTP sent successfully to "
+                                                                        + request.getEmail(),
+                                                        null));
+
+                } catch (Exception e) {
+
+                        return ResponseEntity.badRequest()
+                                        .body(
+                                                        ApiResponse.error(
+                                                                        e.getMessage()));
+                }
+        }
+
+        // ============================================================
+        // RESET PASSWORD
+        // ============================================================
+
+        @PostMapping("/reset-password")
+        @Operation(summary = "Reset password using OTP")
+        public ResponseEntity<?> resetPassword(
+                        @Valid @RequestBody ResetPasswordRequest request) {
+
+                try {
+
+                        if (request.getOtp() == null
+                                        || request.getOtp().isBlank()) {
+
+                                return ResponseEntity.badRequest()
+                                                .body(
+                                                                ApiResponse.error(
+                                                                                "OTP is required"));
+                        }
+
+                        if (!PasswordValidator.isValidPassword(
+                                        request.getNewPassword())) {
+
+                                return ResponseEntity.badRequest()
+                                                .body(
+                                                                ApiResponse.error(
+                                                                                PasswordValidator
+                                                                                                .getPasswordRequirements()));
+                        }
+
+                        boolean validOtp = otpService.validateOtp(
+                                        request.getEmail(),
+                                        request.getOtp());
+
+                        if (!validOtp) {
+
+                                return ResponseEntity.badRequest()
+                                                .body(
+                                                                ApiResponse.error(
+                                                                                "Invalid or expired OTP"));
+                        }
+
+                        Employee employee = employeeRepository
+                                        .findByEmail(
+                                                        request.getEmail())
+                                        .orElseThrow(() -> new RuntimeException(
+                                                        "Employee not found"));
+
+                        employee.setPassword(
+                                        passwordEncoder.encode(
+                                                        request.getNewPassword()));
+
+                        employeeRepository.save(employee);
+
+                        return ResponseEntity.ok(
+                                        ApiResponse.success(
+                                                        "Password reset successfully!",
+                                                        null));
+
+                } catch (Exception e) {
+
+                        return ResponseEntity.badRequest()
+                                        .body(
+                                                        ApiResponse.error(
+                                                                        e.getMessage()));
+                }
+        }
+
+        // ============================================================
+        // UPDATE PASSWORD
+        // ============================================================
+
+        @PostMapping("/update-password")
+        @Operation(summary = "Update password for logged-in employee")
+        public ResponseEntity<?> updatePassword(
+                        @Valid @RequestBody UpdatePasswordRequest request) {
+
+                try {
+
+                        Employee employee = employeeRepository
+                                        .findByEmail(
+                                                        request.getEmail())
+                                        .orElseThrow(() -> new RuntimeException(
+                                                        "Employee not found"));
+
+                        if (!passwordEncoder.matches(
+                                        request.getCurrentPassword(),
+                                        employee.getPassword())) {
+
+                                return ResponseEntity.badRequest()
+                                                .body(
+                                                                ApiResponse.error(
+                                                                                "Current password is incorrect"));
+                        }
+
+                        if (request.getCurrentPassword()
+                                        .equals(request.getNewPassword())) {
+
+                                return ResponseEntity.badRequest()
+                                                .body(
+                                                                ApiResponse.error(
+                                                                                "New password cannot be same as current password"));
+                        }
+
+                        employee.setPassword(
+                                        passwordEncoder.encode(
+                                                        request.getNewPassword()));
+
+                        employeeRepository.save(employee);
+
+                        return ResponseEntity.ok(
+                                        ApiResponse.success(
+                                                        "Password changed successfully!",
+                                                        null));
+
+                } catch (Exception e) {
+
+                        return ResponseEntity.badRequest()
+                                        .body(
+                                                        ApiResponse.error(
+                                                                        e.getMessage()));
+                }
+        }
 }
