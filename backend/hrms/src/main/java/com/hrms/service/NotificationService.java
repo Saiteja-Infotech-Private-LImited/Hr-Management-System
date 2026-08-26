@@ -25,6 +25,9 @@ public class NotificationService {
     private final JavaMailSender mailSender;
     private final EmployeeRepository employeeRepository;
 
+    /*
+     * Create and send notification to one employee.
+     */
     @Transactional
     public Notification createAndSend(
             Employee recipient,
@@ -46,6 +49,9 @@ public class NotificationService {
 
         Notification saved = notificationRepo.save(notification);
 
+        /*
+         * Send email without blocking the notification creation.
+         */
         java.util.concurrent.CompletableFuture.runAsync(() -> {
             sendEmailSafe(
                     recipient.getEmail(),
@@ -57,7 +63,9 @@ public class NotificationService {
         return saved;
     }
 
-    // Notify all active ADMIN + HR employees
+    /*
+     * Notify all active ADMIN + HR employees.
+     */
     @Transactional
     public void notifyAllAdmins(
             String title,
@@ -72,11 +80,17 @@ public class NotificationService {
                 .filter(e ->
                         e.isActive()
                                 &&
-                        (e.getRole() == Role.ADMIN
-                                || e.getRole() == Role.HR)
+                        (
+                                e.getRole() == Role.ADMIN
+                                        ||
+                                e.getRole() == Role.HR
+                        )
                                 &&
-                        (excludeId == null
-                                || !e.getId().equals(excludeId))
+                        (
+                                excludeId == null
+                                        ||
+                                !e.getId().equals(excludeId)
+                        )
                 )
                 .forEach(admin ->
                         createAndSend(
@@ -90,7 +104,9 @@ public class NotificationService {
                 );
     }
 
-    // Overload without excludeId
+    /*
+     * Overload without excludeId.
+     */
     @Transactional
     public void notifyAllAdmins(
             String title,
@@ -109,12 +125,19 @@ public class NotificationService {
         );
     }
 
+    /*
+     * Send email safely.
+     *
+     * Email failure will not break
+     * notification creation.
+     */
     private void sendEmailSafe(
             String toEmail,
             String subject,
             String body) {
 
         try {
+
             SimpleMailMessage mail =
                     new SimpleMailMessage();
 
@@ -134,6 +157,10 @@ public class NotificationService {
         }
     }
 
+    /*
+     * Get all notifications belonging
+     * to the logged-in employee.
+     */
     @Transactional(readOnly = true)
     public Page<NotificationDTOs.Response> getMyNotifications(
             Employee employee,
@@ -144,6 +171,9 @@ public class NotificationService {
                 .map(this::toResponse);
     }
 
+    /*
+     * Get unread notifications.
+     */
     @Transactional(readOnly = true)
     public Page<NotificationDTOs.Response> getUnread(
             Employee employee,
@@ -157,6 +187,10 @@ public class NotificationService {
                 .map(this::toResponse);
     }
 
+    /*
+     * Get unread notification count.
+     */
+    @Transactional(readOnly = true)
     public long getUnreadCount(Employee employee) {
 
         return notificationRepo
@@ -164,10 +198,10 @@ public class NotificationService {
     }
 
     /*
-     * Mark one notification as read.
+     * Mark ONE notification as read.
      *
-     * Ownership is checked so one user cannot
-     * modify another user's notification.
+     * Ownership is checked so one employee
+     * cannot modify another employee's notification.
      */
     @Transactional
     public void markAsRead(
@@ -182,7 +216,10 @@ public class NotificationService {
                                 )
                         );
 
-        verifyOwnership(notification, employee);
+        verifyOwnership(
+                notification,
+                employee
+        );
 
         notification.setRead(true);
 
@@ -190,68 +227,79 @@ public class NotificationService {
     }
 
     /*
-     * Mark all notifications belonging to the
-     * logged-in employee as read.
+     * Mark ALL notifications as read
+     * for the logged-in employee.
      */
     @Transactional
     public void markAllAsRead(Employee employee) {
 
-        notificationRepo.markAllAsReadByRecipient(employee);
+        notificationRepo.markAllAsReadByRecipient(
+                employee
+        );
     }
 
     /*
      * Delete ONE notification.
      *
-     * Only the owner can delete it.
+     * The database query itself checks that
+     * the notification belongs to the logged-in employee.
      */
     @Transactional
     public void deleteNotification(
             Long notificationId,
             Employee employee) {
 
-        Notification notification =
-                notificationRepo.findById(notificationId)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Notification not found"
-                                )
-                        );
+        int deleted =
+                notificationRepo.deleteByIdAndRecipient(
+                        notificationId,
+                        employee
+                );
 
-        verifyOwnership(notification, employee);
+        if (deleted == 0) {
 
-        notificationRepo.delete(notification);
+            throw new IllegalArgumentException(
+                    "Notification not found or you do not have permission to delete it"
+            );
+        }
     }
 
     /*
-     * Delete ALL notifications belonging to
-     * the currently logged-in user.
+     * Delete ALL notifications belonging
+     * to the currently logged-in employee.
      *
-     * This works for:
+     * Works for:
+     *
      * ADMIN
      * HR
      * EMPLOYEE
      */
     @Transactional
-    public void clearAllNotifications(Employee employee) {
+    public void clearAllNotifications(
+            Employee employee) {
 
-        notificationRepo.deleteByRecipient(employee);
+        notificationRepo.deleteByRecipient(
+                employee
+        );
     }
 
     /*
-     * Security check.
-     *
-     * Prevents Employee A from deleting or modifying
-     * Employee B's notification.
+     * Security check for operations where
+     * the notification object has already
+     * been loaded.
      */
     private void verifyOwnership(
             Notification notification,
             Employee employee) {
 
-        if (notification.getRecipient() == null
-                || employee == null
-                || !notification.getRecipient()
+        if (
+                notification.getRecipient() == null
+                        ||
+                employee == null
+                        ||
+                !notification.getRecipient()
                         .getId()
-                        .equals(employee.getId())) {
+                        .equals(employee.getId())
+        ) {
 
             throw new org.springframework.security.access.AccessDeniedException(
                     "You do not have permission to modify this notification"
@@ -259,6 +307,9 @@ public class NotificationService {
         }
     }
 
+    /*
+     * Convert entity to response DTO.
+     */
     private NotificationDTOs.Response toResponse(
             Notification n) {
 

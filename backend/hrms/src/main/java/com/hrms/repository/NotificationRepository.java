@@ -40,6 +40,21 @@ public interface NotificationRepository
     );
 
     /*
+     * Delete one notification only when
+     * it belongs to the logged-in employee.
+     */
+    @Modifying
+    @Query("""
+            DELETE FROM Notification n
+            WHERE n.id = :id
+            AND n.recipient = :recipient
+            """)
+    int deleteByIdAndRecipient(
+            @Param("id") Long id,
+            @Param("recipient") Employee recipient
+    );
+
+    /*
      * Delete all notifications belonging
      * only to the logged-in employee.
      */
