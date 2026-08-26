@@ -412,14 +412,12 @@ export default function AdminLogin() {
             >
               Terms & Conditions
             </Link>
-
             <Link
               href="/privacy"
               className="hover:text-slate-600 font-bold uppercase tracking-wider"
             >
               Privacy Policy
             </Link>
-
           </div>
 
         </div>
