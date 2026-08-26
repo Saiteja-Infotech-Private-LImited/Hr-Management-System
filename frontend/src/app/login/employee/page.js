@@ -213,11 +213,11 @@ export default function EmployeeLogin() {
           <div className="flex items-center gap-3 mb-6">
 
             {/* Company Logo */}
-            <div className="w-18 h-18 flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-19 h-19 flex items-center justify-center shrink-0 overflow-hidden">
               <img
                 src="/removee.png"
                 alt="Saiteja Infotech"
-                className="w-18 h-18 object-contain"
+                className="w-19 h-19 object-contain"
               />
             </div>
 

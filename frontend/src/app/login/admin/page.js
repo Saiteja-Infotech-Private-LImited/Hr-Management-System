@@ -134,11 +134,11 @@ export default function AdminLogin() {
           <div className="flex items-center gap-3 mb-6">
 
             {/* Company Logo */}
-            <div className="w-[72px] h-[72px] flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-[73px] h-[73px] flex items-center justify-center shrink-0 overflow-hidden">
               <img
                 src="/removee.png"
                 alt="Saiteja Infotech"
-                className="w-[72px] h-[72px] object-contain"
+                className="w-[73px] h-[73px] object-contain"
               />
             </div>
 

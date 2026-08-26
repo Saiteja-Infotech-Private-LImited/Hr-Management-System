@@ -294,8 +294,8 @@ export default function Sidebar({ role }) {
             {/* Saiteja Infotech Logo */}
             <div
               style={{
-                width: '72px',
-                height: '72px',
+                width: '73px',
+                height: '73px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -307,8 +307,8 @@ export default function Sidebar({ role }) {
                 src="/removee.png"
                 alt="Saiteja Infotech"
                 style={{
-                  width: '72px',
-                  height: '72px',
+                  width: '73px',
+                  height: '73px',
                   objectFit: 'contain'
                 }}
               />
