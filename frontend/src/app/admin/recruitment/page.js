@@ -180,16 +180,7 @@ export default function RecruitmentPage() {
   }, [fetchJobs]);
 
   // Auto-select the job pointed at by an admin notification's ?id= parameter.
-  useEffect(() => {
-    const targetId = searchParams.get('id');
-    if (!targetId || jobs.length === 0) return;
 
-    const job = jobs.find((j) => String(j.id) === String(targetId));
-
-    if (job && selectedJob?.id !== job.id) {
-      handleSelectJob(job);
-    }
-  }, [jobs, searchParams, selectedJob]);
 
   const fetchApplications = async (jobId) => {
     setLoadingApps(true);
@@ -204,7 +195,19 @@ export default function RecruitmentPage() {
     setSelectedJob(job);
     setSelectedApp(null);
     fetchApplications(job.id);
+    
   };
+
+  useEffect(() => {
+    const targetId = searchParams.get('id');
+    if (!targetId || jobs.length === 0) return;
+
+    const job = jobs.find((j) => String(j.id) === String(targetId));
+
+    if (job && selectedJob?.id !== job.id) {
+      handleSelectJob(job);
+    }
+  }, [jobs, searchParams, selectedJob]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
