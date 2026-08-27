@@ -1,400 +1,590 @@
 package com.hrms.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamSource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-import java.time.LocalDate;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+        private final JavaMailSender mailSender;
 
-    /**
-     * Email address configured for the application.
-     *
-     * Production should provide this through an environment variable
-     * or external configuration.
-     */
-    @Value("${spring.mail.username}")
-    private String fromEmail;
+        private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-    // ============================================================
-    // LOGIN OTP
-    // ============================================================
+        private static final DateTimeFormatter DEADLINE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /**
-     * Sends OTP specifically for LOGIN verification.
-     *
-     * Used after the configured number of failed password attempts.
-     */
-    public void sendLoginOtpEmail(
-            String email,
-            String otp,
-            String employeeName) {
+        // ============================================================
+        // PASSWORD RESET OTP
+        // ============================================================
 
-        validateEmail(email, "Employee email is required");
-        validateValue(otp, "Login OTP is required");
+        /**
+         * Sends OTP for password reset.
+         */
+        public void sendPasswordResetOtpEmail(String toEmail, String otp, String employeeName) {
+                try {
+                        MimeMessage message = mailSender.createMimeMessage();
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        String name = normalizeName(employeeName);
+                        helper.setTo(toEmail);
+                        helper.setSubject("HRMS — Password Reset OTP");
+                        helper.setText(
+                                        buildOtpEmailHtml(
+                                                        employeeName,
+                                                        otp,
+                                                        "Password Reset",
+                                                        "We received a request to reset your HRMS account password. Use the OTP below:"),
+                                        true);
 
-        SimpleMailMessage message = new SimpleMailMessage();
+                        mailSender.send(message);
 
-        message.setFrom(fromEmail);
-        message.setTo(normalizeEmail(email));
-        message.setSubject("HRMS - Login Verification OTP");
+                        log.info("Password reset OTP email sent to: {}", toEmail);
 
-        message.setText(
-                "Hello " + name + ",\n\n"
-                        + "Your HRMS login requires OTP verification.\n\n"
-                        + "Your login OTP is:\n\n"
-                        + otp + "\n\n"
-                        + "This OTP is valid for 10 minutes.\n\n"
-                        + "If you did not attempt to log in, "
-                        + "please contact your HR/Admin immediately.\n\n"
-                        + "Regards,\n"
-                        + "Saiteja Infotech Private Limited\n"
-                        + "HRMS Team");
-
-        sendSimpleMessage(
-                message,
-                "Failed to send login OTP email.");
-    }
-
-    // ============================================================
-    // PASSWORD RESET OTP
-    // ============================================================
-
-    /**
-     * Sends OTP for password reset.
-     */
-    public void sendPasswordResetOtpEmail(
-            String email,
-            String otp,
-            String employeeName) {
-
-        validateEmail(email, "Employee email is required");
-        validateValue(otp, "Password reset OTP is required");
-
-        String name = normalizeName(employeeName);
-
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        message.setFrom(fromEmail);
-        message.setTo(normalizeEmail(email));
-        message.setSubject("HRMS - Password Reset OTP");
-
-        message.setText(
-                "Hello " + name + ",\n\n"
-                        + "We received a request to reset your HRMS password.\n\n"
-                        + "Your password reset OTP is:\n\n"
-                        + otp + "\n\n"
-                        + "This OTP is valid for 10 minutes.\n\n"
-                        + "Use this OTP only on the HRMS password reset page.\n\n"
-                        + "If you did not request a password reset, "
-                        + "please ignore this email and contact HR/Admin "
-                        + "if you believe your account may be at risk.\n\n"
-                        + "Regards,\n"
-                        + "Saiteja Infotech Private Limited\n"
-                        + "HRMS Team");
-
-        sendSimpleMessage(
-                message,
-                "Failed to send password reset OTP email.");
-    }
-
-    // ============================================================
-    // GENERIC EMAIL
-    // ============================================================
-
-    /**
-     * Sends a normal plain-text email.
-     */
-    public void sendEmail(
-            String to,
-            String subject,
-            String body) {
-
-        validateEmail(to, "Recipient email is required");
-
-        if (subject == null || subject.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Email subject is required");
+                } catch (Exception e) {
+                        log.error("Failed to send OTP email to {}: {}", toEmail, e.getMessage());
+                        throw new RuntimeException("Failed to send email: " + e.getMessage());
+                }
         }
 
-        if (body == null || body.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Email body is required");
+        // ============================================================
+        // LOGIN OTP
+        // ============================================================
+
+        /**
+         * Sends OTP specifically for LOGIN verification.
+         *
+         * Used after the configured number of failed password attempts.
+         */
+        public void sendLoginOtpEmail(String toEmail, String otp, String employeeName) {
+                try {
+                        MimeMessage message = mailSender.createMimeMessage();
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                        helper.setTo(toEmail);
+                        helper.setSubject("HRMS — Login Verification OTP");
+                        helper.setText(
+                                        buildOtpEmailHtml(
+                                                        employeeName,
+                                                        otp,
+                                                        "Login Verification",
+                                                        "Your HRMS login requires OTP verification. Use the code below to continue:"),
+                                        true);
+
+                        mailSender.send(message);
+
+                        log.info("Login OTP email sent to: {}", toEmail);
+
+                } catch (Exception e) {
+                        log.error("Failed to send login OTP email to {}: {}", toEmail, e.getMessage());
+                        throw new RuntimeException("Failed to send email: " + e.getMessage());
+                }
         }
 
-        SimpleMailMessage message = new SimpleMailMessage();
+        // ============================================================
+        // GREETING EMAIL (used by GreetingService)
+        // ============================================================
 
-        message.setFrom(fromEmail);
-        message.setTo(normalizeEmail(to));
-        message.setSubject(subject.trim());
-        message.setText(body);
+        /**
+         * Send greeting email with template
+         */
+        public void sendGreetingEmail(
+                        String toEmail,
+                        String candidateName,
+                        String templateBody,
+                        String templateSubject) {
 
-        sendSimpleMessage(
-                message,
-                "Failed to send email.");
-    }
+                try {
+                        MimeMessage message = mailSender.createMimeMessage();
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-    // ============================================================
-    // EMAIL WITH ATTACHMENT
-    // ============================================================
+                        String emailBody = templateBody.replace("{CANDIDATE_NAME}", candidateName);
+                        String styledHtmlBody = wrapWithHtmlStyling(candidateName, emailBody);
 
-    /**
-     * Sends an email with a MultipartFile attachment.
-     *
-     * Signature preserved because GreetingService already uses it.
-     */
-    public void sendEmailWithAttachment(
-            String from,
-            List<String> recipients,
-            String subject,
-            String body,
-            MultipartFile attachment,
-            String attachmentName) {
+                        helper.setTo(toEmail);
+                        helper.setSubject(templateSubject);
+                        helper.setText(styledHtmlBody, true);
 
-        if (recipients == null || recipients.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "At least one recipient email is required");
+                        mailSender.send(message);
+
+                        log.info("Greeting email sent to: {} for candidate: {}", toEmail, candidateName);
+
+                } catch (Exception e) {
+                        log.error("Failed to send greeting email to {}: {}", toEmail, e.getMessage());
+                        throw new RuntimeException("Failed to send email: " + e.getMessage());
+                }
         }
 
-        if (subject == null || subject.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Email subject is required");
+        // ============================================================
+        // DOCUMENT REQUEST EMAIL — interview flow
+        // ============================================================
+
+        /**
+         * Send document request email
+         */
+        public void sendDocumentRequestEmail(
+                        String toEmail,
+                        String candidateName,
+                        String jobTitle,
+                        LocalDate interviewDate,
+                        LocalDate deadline,
+                        String hrEmail) {
+
+                try {
+                        MimeMessage message = mailSender.createMimeMessage();
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                        helper.setTo(toEmail);
+
+                        helper.setSubject("Submission of Required Documents – SAITEJA INFOTECH PVT LTD");
+
+                        String formattedInterviewDate = interviewDate != null
+                                        ? interviewDate.format(DEADLINE_FORMAT)
+                                        : "N/A";
+
+                        String formattedDeadline = deadline != null
+                                        ? deadline.format(DEADLINE_FORMAT)
+                                        : "N/A";
+
+                        String styledHtml = wrapWithHtmlStyling(
+                                        candidateName,
+                                        buildDocumentRequestBody(
+                                                        candidateName,
+                                                        jobTitle,
+                                                        formattedInterviewDate,
+                                                        formattedDeadline,
+                                                        hrEmail));
+
+                        helper.setText(styledHtml, true);
+
+                        mailSender.send(message);
+
+                        log.info("Document request email sent to {}", toEmail);
+
+                } catch (Exception e) {
+                        log.error("Failed to send document request email : {}", e.getMessage());
+                        throw new RuntimeException("Failed to send document request email", e);
+                }
         }
 
-        if (body == null || body.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Email body is required");
+        // ============================================================
+        // GENERIC EMAIL
+        // ============================================================
+
+        /**
+         * Generic send email method
+         */
+        public void sendEmail(
+                        String toEmail,
+                        String subject,
+                        String emailBody) {
+
+                try {
+                        MimeMessage message = mailSender.createMimeMessage();
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                        helper.setTo(toEmail);
+                        helper.setSubject(subject);
+                        helper.setText(emailBody, true);
+
+                        mailSender.send(message);
+
+                        log.info("Email sent to: {}", toEmail);
+
+                } catch (Exception e) {
+                        log.error("Failed to send email to {}: {}", toEmail, e.getMessage());
+                        throw new RuntimeException("Failed to send email: " + e.getMessage());
+                }
         }
 
-        if (attachment == null || attachment.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Email attachment is required");
+        // ============================================================
+        // EMAIL WITH ATTACHMENT
+        // ============================================================
+
+        /**
+         * Existing method - kept for backward compatibility.
+         *
+         * This method sends the email without CC.
+         */
+        public void sendEmailWithAttachment(
+                        String toEmail,
+                        String subject,
+                        String emailBody,
+                        MultipartFile pdfFile,
+                        String attachmentFileName) {
+
+                sendEmailWithAttachment(
+                                toEmail,
+                                null,
+                                subject,
+                                emailBody,
+                                pdfFile,
+                                attachmentFileName);
         }
 
-        String actualAttachmentName = attachmentName == null || attachmentName.isBlank()
-                ? attachment.getOriginalFilename()
-                : attachmentName.trim();
+        /**
+         * Send email with PDF attachment and CC recipients.
+         *
+         * Used by the Offer Letter flow.
+         */
+        public void sendEmailWithAttachment(
+                        String toEmail,
+                        List<String> ccEmails,
+                        String subject,
+                        String emailBody,
+                        MultipartFile pdfFile,
+                        String attachmentFileName) {
 
-        if (actualAttachmentName == null
-                || actualAttachmentName.isBlank()) {
+                try {
+                        MimeMessage message = mailSender.createMimeMessage();
 
-            actualAttachmentName = "attachment";
+                        MimeMessageHelper helper = new MimeMessageHelper(
+                                        message,
+                                        true,
+                                        "UTF-8");
+
+                        // Primary recipient
+                        helper.setTo(toEmail);
+
+                        // CC recipients
+                        if (ccEmails != null && !ccEmails.isEmpty()) {
+
+                                String[] validCcEmails = ccEmails.stream()
+                                                .filter(email -> email != null)
+                                                .map(String::trim)
+                                                .filter(email -> !email.isBlank())
+                                                .distinct()
+                                                .toArray(String[]::new);
+
+                                if (validCcEmails.length > 0) {
+                                        helper.setCc(validCcEmails);
+
+                                        log.info("CC recipients added: {}", String.join(", ", validCcEmails));
+                                }
+                        }
+
+                        helper.setSubject(subject);
+                        helper.setText(emailBody, true);
+
+                        // Add PDF attachment if file is present
+                        if (pdfFile != null && !pdfFile.isEmpty()) {
+
+                                String fileName = (attachmentFileName != null
+                                                && !attachmentFileName.isBlank())
+                                                                ? attachmentFileName
+                                                                : pdfFile.getOriginalFilename();
+
+                                byte[] fileBytes = pdfFile.getBytes();
+
+                                ByteArrayResource resource = new ByteArrayResource(fileBytes);
+
+                                helper.addAttachment(
+                                                fileName,
+                                                resource);
+
+                                log.info("Attachment added: {} ({} bytes)", fileName, fileBytes.length);
+                        }
+
+                        mailSender.send(message);
+
+                        if (ccEmails != null && !ccEmails.isEmpty()) {
+                                log.info(
+                                                "Email with attachment sent to: {} with {} CC recipient(s)",
+                                                toEmail,
+                                                ccEmails.stream()
+                                                                .filter(email -> email != null)
+                                                                .map(String::trim)
+                                                                .filter(email -> !email.isBlank())
+                                                                .distinct()
+                                                                .count());
+                        } else {
+                                log.info("Email with attachment sent to: {}", toEmail);
+                        }
+
+                } catch (Exception e) {
+
+                        log.error("Failed to send email with attachment to {}: {}", toEmail, e.getMessage());
+
+                        throw new RuntimeException(
+                                        "Failed to send email: " + e.getMessage(),
+                                        e);
+                }
         }
 
-        try {
+        // ============================================================
+        // HTML BUILDERS
+        // ============================================================
 
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
+        /**
+         * Shared OTP HTML template — used for both password-reset OTP
+         * and login-verification OTP, differentiated by title/description.
+         */
+        private String buildOtpEmailHtml(
+                        String name,
+                        String otp,
+                        String purposeTitle,
+                        String description) {
 
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    mimeMessage,
-                    true,
-                    "UTF-8");
+                return """
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <style>
+                                        body {
+                                            font-family: 'Segoe UI', Arial, sans-serif;
+                                            background: #f5f7fa;
+                                            margin: 0;
+                                            padding: 20px;
+                                        }
 
-            /*
-             * Do not blindly trust a caller-supplied "from" address
-             * in production. Use the configured application mailbox.
-             */
-            helper.setFrom(fromEmail);
+                                        .container {
+                                            max-width: 500px;
+                                            margin: 0 auto;
+                                            background: white;
+                                            border-radius: 16px;
+                                            overflow: hidden;
+                                            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                                        }
 
-            String[] recipientArray = recipients.stream()
-                    .filter(email -> email != null
-                            && !email.isBlank())
-                    .map(this::normalizeEmail)
-                    .distinct()
-                    .toArray(String[]::new);
+                                        .header {
+                                            background: linear-gradient(135deg, #1e3a5f, #2563eb);
+                                            padding: 30px;
+                                            text-align: center;
+                                        }
 
-            if (recipientArray.length == 0) {
-                throw new IllegalArgumentException(
-                        "No valid recipient email addresses provided");
-            }
+                                        .header h1 {
+                                            color: white;
+                                            margin: 0;
+                                            font-size: 24px;
+                                        }
 
-            helper.setTo(recipientArray);
-            helper.setSubject(subject.trim());
-            helper.setText(body);
+                                        .header p {
+                                            color: rgba(255,255,255,0.8);
+                                            margin: 8px 0 0;
+                                            font-size: 14px;
+                                        }
 
-            InputStreamSource source = new ByteArrayResource(
-                    attachment.getBytes());
+                                        .body {
+                                            padding: 32px;
+                                        }
 
-            helper.addAttachment(
-                    actualAttachmentName,
-                    source);
+                                        .greeting {
+                                            font-size: 16px;
+                                            color: #1e293b;
+                                            margin-bottom: 16px;
+                                        }
 
-            mailSender.send(mimeMessage);
+                                        .otp-box {
+                                            background: #f0f7ff;
+                                            border: 2px dashed #3b82f6;
+                                            border-radius: 12px;
+                                            padding: 24px;
+                                            text-align: center;
+                                            margin: 24px 0;
+                                        }
 
-        } catch (MessagingException e) {
+                                        .otp-label {
+                                            font-size: 13px;
+                                            color: #64748b;
+                                            margin-bottom: 8px;
+                                        }
 
-            throw new RuntimeException(
-                    "Failed to create email with attachment.",
-                    e);
+                                        .otp-code {
+                                            font-size: 40px;
+                                            font-weight: 900;
+                                            color: #1e3a5f;
+                                            letter-spacing: 8px;
+                                        }
 
-        } catch (Exception e) {
+                                        .expiry {
+                                            font-size: 12px;
+                                            color: #94a3b8;
+                                            margin-top: 8px;
+                                        }
 
-            throw new RuntimeException(
-                    "Failed to send email with attachment.",
-                    e);
-        }
-    }
+                                        .warning {
+                                            background: #fff7ed;
+                                            border-left: 4px solid #f59e0b;
+                                            padding: 12px 16px;
+                                            border-radius: 4px;
+                                            font-size: 13px;
+                                            color: #92400e;
+                                            margin: 16px 0;
+                                        }
 
-    // ============================================================
-    // DOCUMENT REQUEST EMAIL
-    // ============================================================
+                                        .footer {
+                                            background: #f8fafc;
+                                            padding: 20px 32px;
+                                            text-align: center;
+                                            font-size: 12px;
+                                            color: #94a3b8;
+                                        }
+                                    </style>
+                                </head>
 
-    /**
-     * Sends a document request email.
-     *
-     * Signature preserved because DocumentRequestService already
-     * uses this method.
-     */
-    public void sendDocumentRequestEmail(
-            String employeeEmail,
-            String employeeName,
-            String documentName,
-            LocalDate startDate,
-            LocalDate endDate,
-            String messageText) {
+                                <body>
+                                    <div class="container">
 
-        validateEmail(
-                employeeEmail,
-                "Employee email is required");
+                                        <div class="header">
+                                            <h1>🏢 HRMS</h1>
+                                            <p>HR Management System</p>
+                                        </div>
 
-        String name = normalizeName(employeeName);
+                                        <div class="body">
 
-        String document = documentName == null || documentName.isBlank()
-                ? "Requested document"
-                : documentName.trim();
+                                            <div class="greeting">
+                                                Hello <strong>%s</strong>,
+                                            </div>
 
-        StringBuilder body = new StringBuilder();
+                                            <p style="color: #64748b; font-size: 14px;">
+                                                %s
+                                            </p>
 
-        body.append("Hello ")
-                .append(name)
-                .append(",\n\n");
+                                            <div class="otp-box">
 
-        body.append(
-                "A document request has been created for you "
-                        + "in the HRMS system.\n\n");
+                                                <div class="otp-label">
+                                                    Your %s OTP
+                                                </div>
 
-        body.append("Document: ")
-                .append(document)
-                .append("\n");
+                                                <div class="otp-code">
+                                                    %s
+                                                </div>
 
-        if (startDate != null) {
-            body.append("Start Date: ")
-                    .append(startDate)
-                    .append("\n");
-        }
+                                                <div class="expiry">
+                                                    ⏱ Valid for 10 minutes only
+                                                </div>
 
-        if (endDate != null) {
-            body.append("End Date: ")
-                    .append(endDate)
-                    .append("\n");
-        }
+                                            </div>
 
-        if (messageText != null
-                && !messageText.isBlank()) {
+                                            <div class="warning">
+                                                ⚠️ Never share this OTP with anyone.
+                                                HRMS team will never ask for your OTP.
+                                            </div>
 
-            body.append("\nMessage:\n")
-                    .append(messageText.trim())
-                    .append("\n");
-        }
+                                            <p style="color: #94a3b8; font-size: 13px;">
+                                                If you didn't request this, please ignore this email
+                                                or contact your HR Admin immediately.
+                                            </p>
 
-        body.append("\n")
-                .append(
-                        "Please log in to HRMS and complete the "
-                                + "requested action.\n");
+                                        </div>
 
-        body.append("\nRegards,\n")
-                .append("Saiteja Infotech Private Limited\n")
-                .append("HRMS Team");
+                                        <div class="footer">
+                                            © 2025 HR Management System · SAITEJA INFOTECH PVT LTD
+                                        </div>
 
-        sendEmail(
-                employeeEmail,
-                "HRMS - Document Request",
-                body.toString());
-    }
-
-    // ============================================================
-    // INTERNAL SEND METHOD
-    // ============================================================
-
-    private void sendSimpleMessage(
-            SimpleMailMessage message,
-            String errorMessage) {
-
-        try {
-
-            mailSender.send(message);
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(
-                    errorMessage
-                            + " Please check the email server configuration.",
-                    e);
-        }
-    }
-
-    // ============================================================
-    // VALIDATION
-    // ============================================================
-
-    private void validateEmail(
-            String email,
-            String errorMessage) {
-
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException(
-                    errorMessage);
-        }
-    }
-
-    private void validateValue(
-            String value,
-            String errorMessage) {
-
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(
-                    errorMessage);
-        }
-    }
-
-    // ============================================================
-    // NORMALIZE EMAIL
-    // ============================================================
-
-    private String normalizeEmail(String email) {
-
-        return email.trim().toLowerCase();
-    }
-
-    // ============================================================
-    // NORMALIZE EMPLOYEE NAME
-    // ============================================================
-
-    private String normalizeName(String employeeName) {
-
-        if (employeeName == null
-                || employeeName.isBlank()) {
-
-            return "Employee";
+                                    </div>
+                                </body>
+                                </html>
+                                """
+                                .formatted(name, description, purposeTitle, otp);
         }
 
-        return employeeName.trim();
-    }
+        /**
+         * Build document request email body (plain text)
+         */
+        private String buildDocumentRequestBody(
+                        String candidateName,
+                        String jobTitle,
+                        String interviewDate,
+                        String deadline,
+                        String hrEmail) {
+
+                return "Dear " + candidateName + ",\n\n" +
+                                "Greetings from SAITEJA INFOTECH PVT LTD.\n\n" +
+                                "We would like to thank you for attending the interview held on "
+                                + interviewDate + " " +
+                                "for the position of " + jobTitle + ". Following the interview, "
+                                + "we request you to submit the necessary documents for "
+                                + "verification and further processing of your application.\n\n" +
+
+                                "Documents Required:\n" +
+                                "1. Updated Resume / CV\n" +
+                                "2. Educational Certificates (10th, 12th, Graduation, etc.)\n" +
+                                "3. Experience / Relieving Letters from previous employers (if applicable)\n" +
+                                "4. Government-issued ID proof (Aadhar, Passport, Driving License, etc.)\n" +
+                                "5. Any other certificates relevant to the position\n\n" +
+
+                                "Submission Guidelines:\n" +
+                                "• Kindly send scanned copies of all documents in PDF format to "
+                                + hrEmail + "\n" +
+                                "• Ensure that all documents are clear and legible.\n" +
+                                "• Please submit the documents by " + deadline + "\n\n" +
+
+                                "Please note that submission of these documents is mandatory for "
+                                + "the continuation of the selection process. Failure to provide "
+                                + "the required documents within the stipulated timeframe may "
+                                + "affect your application.\n\n" +
+
+                                "Should you have any questions or require assistance in submitting "
+                                + "these documents, please feel free to reach out to us.\n\n" +
+
+                                "We appreciate your prompt cooperation and look forward to receiving "
+                                + "your documents.\n\n" +
+
+                                "Yours faithfully,\n" +
+                                "Human Resources Department\n" +
+                                "SAITEJA INFOTECH PVT LTD";
+        }
+
+        /**
+         * Wrap email body with HTML styling
+         */
+        private String wrapWithHtmlStyling(
+                        String candidateName,
+                        String emailBody) {
+
+                return "<div style=\"font-family: Arial, sans-serif; max-width: 600px; "
+                                + "margin: 0 auto; background-color: #f5f5f5; padding: 20px;\">"
+
+                                + "<div style=\"background: linear-gradient(135deg, #1e3c72 0%, "
+                                + "#2a5298 100%); padding: 30px; text-align: center; "
+                                + "border-radius: 8px 8px 0 0;\">"
+
+                                + "<h1 style=\"color: white; margin: 0; font-size: 28px; "
+                                + "font-weight: bold;\">"
+                                + "🏢 SAITEJA INFOTECH PRIVATE LIMITED"
+                                + "</h1>"
+
+                                + "<p style=\"color: #e0e0e0; margin: 8px 0 0 0; "
+                                + "font-size: 14px;\">"
+                                + "HR Management System"
+                                + "</p>"
+
+                                + "</div>"
+
+                                + "<div style=\"background-color: white; padding: 40px; "
+                                + "border-radius: 0 0 8px 8px; "
+                                + "box-shadow: 0 2px 8px rgba(0,0,0,0.1);\">"
+
+                                + "<div style=\"white-space: pre-wrap; color: #555; "
+                                + "font-size: 14px; line-height: 1.8;\">"
+                                + emailBody
+                                + "</div>"
+
+                                + "<div style=\"margin-top: 30px; padding-top: 20px; "
+                                + "border-top: 1px solid #e0e0e0;\">"
+
+                                + "<p style=\"color: #2a5298; font-size: 13px; margin: 5px 0 0 0;\">"
+                                + "© 2025 SAITEJA INFOTECH PVT LTD. All rights reserved."
+                                + "</p>"
+
+                                + "</div>"
+
+                                + "</div>"
+
+                                + "</div>";
+        }
 }
