@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 
@@ -128,6 +129,8 @@ const EMPTY_JOB = {
 // Local YYYY-MM-DD "today" — used as the floor for the deadline field
 const todayStr = new Date().toLocaleDateString('en-CA');
 export default function RecruitmentPage() {
+  const searchParams = useSearchParams();
+
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [applications, setApplications] = useState([]);
@@ -175,6 +178,18 @@ export default function RecruitmentPage() {
     const timer = setTimeout(() => { fetchJobs(); }, 0);
     return () => clearTimeout(timer);
   }, [fetchJobs]);
+
+  // Auto-select the job pointed at by an admin notification's ?id= parameter.
+  useEffect(() => {
+    const targetId = searchParams.get('id');
+    if (!targetId || jobs.length === 0) return;
+
+    const job = jobs.find((j) => String(j.id) === String(targetId));
+
+    if (job && selectedJob?.id !== job.id) {
+      handleSelectJob(job);
+    }
+  }, [jobs, searchParams, selectedJob]);
 
   const fetchApplications = async (jobId) => {
     setLoadingApps(true);
