@@ -772,16 +772,17 @@ export default function EmployeeLogin() {
 
           <div className="flex items-center gap-3 mb-6">
 
-            <div className="w-10 h-10 rounded-xl bg-white/5 border border-[#10b981]/40 dark:border-[#ccf000]/40 flex items-center justify-center">
-
-              <span className="text-[#10b981] dark:text-[#ccf000] font-bold text-xl">
-                H
-              </span>
-
+              {/* Company Logo */}
+            <div className="w-[73px] h-[73px] flex items-center justify-center shrink-0 overflow-hidden">
+              <img
+                src="/removee.png"
+                alt="Saiteja Infotech"
+                className="w-[73px] h-[73px] object-contain"
+              />
             </div>
 
             <span className="text-white font-bold text-[17px] tracking-tight">
-              Saiteja Infotech Private Limited
+              Saiteja Infotech Private Limited - Employee
             </span>
 
           </div>
