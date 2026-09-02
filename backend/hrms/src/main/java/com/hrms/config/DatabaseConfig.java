@@ -25,9 +25,11 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         String finalUrl = url;
+        
+        // Add serverTimezone if using MySQL and not already present
         if (finalUrl != null && finalUrl.startsWith("jdbc:mysql:")) {
             if (!finalUrl.contains("serverTimezone")) {
-                finalUrl += (finalUrl.contains("?") ? "&" : "?") + "serverTimezone=Asia/Kolkata";
+                finalUrl += (finalUrl.contains("?") ? "&" : "?") + "serverTimezone=UTC";
             }
         }
         
