@@ -48,8 +48,7 @@ public class SecurityConfig {
      *
      * app.frontend.url
      *
-     * The default value allows production if the environment
-     * variable is not explicitly supplied.
+     * The default value is the production frontend URL.
      *
      * IMPORTANT:
      * Do NOT put localhost into the production server environment.
@@ -115,7 +114,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             JwtAuthFilter jwtAuthFilter,
-            AuthenticationProvider authenticationProvider) throws Exception {
+            AuthenticationProvider authenticationProvider)
+            throws Exception {
 
         http
 
@@ -167,11 +167,14 @@ public class SecurityConfig {
                         // ====================================================
 
                         /*
-                         * HR must NOT be allowed to delete jobs.
+                         * Only ADMIN can delete job postings.
                          *
                          * ADMIN -> allowed
-                         * HR -> 403 Forbidden
-                         * EMPLOYEE -> 403 Forbidden
+                         * HR -> forbidden
+                         * EMPLOYEE -> forbidden
+                         *
+                         * This is intentionally placed before
+                         * the general authenticated rule.
                          */
 
                         .requestMatchers(
