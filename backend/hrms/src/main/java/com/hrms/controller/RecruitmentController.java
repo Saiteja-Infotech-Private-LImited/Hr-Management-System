@@ -143,7 +143,7 @@ public class RecruitmentController {
         }
 
         @DeleteMapping("/jobs/{jobId}")
-        @PreAuthorize("hasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN','HR')")
         @Operation(summary = "Delete a job posting")
         public ResponseEntity<ApiResponse<Void>> deleteJob(
                         @PathVariable Long jobId) {
