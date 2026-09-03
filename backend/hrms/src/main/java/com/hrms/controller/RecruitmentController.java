@@ -57,16 +57,17 @@ public class RecruitmentController {
                                                 Sort.by("createdAt").descending()))));
         }
 
-        @GetMapping("/jobs/{id}")
-        @Operation(summary = "Get job posting details by ID")
-        public ResponseEntity<ApiResponse<RecruitmentDTOs.JobResponse>> getJobById(
-                        @PathVariable Long id) {
-
-                return ResponseEntity.ok(
-                                ApiResponse.success(
-                                                "Job details",
-                                                recruitmentService.getJobById(id)));
-        }
+     @GetMapping("/jobs/{id}")
+@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')") // ADD THIS LINE
+@Operation(summary = "Get job posting details by ID")
+public ResponseEntity<ApiResponse<RecruitmentDTOs.JobResponse>> getJobById(
+         @PathVariable Long id) {
+     
+     return ResponseEntity.ok(
+             ApiResponse.success(
+                     "Job details",
+                     recruitmentService.getJobById(id)));
+}
 
         @GetMapping("/jobs/all")
         @PreAuthorize("hasAnyRole('ADMIN','HR')")
