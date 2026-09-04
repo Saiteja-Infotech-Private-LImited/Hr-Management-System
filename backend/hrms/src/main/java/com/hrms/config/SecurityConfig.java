@@ -175,9 +175,9 @@ public class SecurityConfig {
                          */
 
                         .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/recruitment/jobs/**")
-                        .hasRole("ADMIN")
+        HttpMethod.DELETE,
+        "/api/recruitment/jobs/**")
+.hasAnyRole("ADMIN", "HR")
 
                         // ====================================================
                         // ADMIN / HR ENDPOINTS
