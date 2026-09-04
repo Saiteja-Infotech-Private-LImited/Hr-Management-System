@@ -1081,7 +1081,9 @@ export default function AdminLeavePage() {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px'
+                        gap: '10px',
+                        minWidth: 0,
+                        paddingRight: '12px'
                       }}
                     >
                       <div
@@ -1115,13 +1117,15 @@ export default function AdminLeavePage() {
                           .slice(0, 2)}
                       </div>
 
-                      <div>
+                      <div style={{ minWidth: 0, overflow: 'hidden' }}>
                         <div
                           style={{
                             fontSize: '13px',
                             fontWeight: 700,
-                            color:
-                              'var(--text-primary)'
+                            color: 'var(--text-primary)',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
                           }}
                         >
                           {l.employeeName}
@@ -1131,13 +1135,14 @@ export default function AdminLeavePage() {
                           style={{
                             fontSize: '11px',
                             color: 'var(--text-secondary)',
-                            fontStyle: 'italic'
+                            fontStyle: 'italic',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
                           }}
+                          title={l.reason}
                         >
-                          &quot;
-                          {l.reason?.substring(0, 25)}
-                          {l.reason?.length > 25 ? '...' : ''}
-                          &quot;
+                          {l.reason || 'No reason provided'}
                         </div>
                       </div>
                     </div>
