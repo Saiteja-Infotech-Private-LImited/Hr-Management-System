@@ -68,8 +68,8 @@ export const clearAllNotifications = () =>
   api.delete('/api/notifications/clear-all');
 
 //recruitment notifications
-export const getJobById = (id) =>
-  api.get(`/api/recruitment/jobs/${id}`);
+//export const getJobById = (id) =>
+  //api.get(`/api/recruitment/jobs/${id}`);
  
-export const getAllOpenJobs = (page = 0, size = 10) =>
-  api.get(`/api/recruitment/jobs?page=${page}&size=${size}`);
+//export const getAllOpenJobs = (page = 0, size = 10) =>
+  //api.get(`/api/recruitment/jobs?page=${page}&size=${size}`);
