@@ -20,7 +20,10 @@ import {
   Loader2,
   Check,
   X,
-  Trash2
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare
 } from 'lucide-react';
 
 function StatusPill({ status }) {
@@ -137,6 +140,13 @@ export default function AdminLeavePage() {
   // DELETE STATES
   const [deleting, setDeleting] = useState(null);
   const [clearingAll, setClearingAll] = useState(false);
+
+  // EXPANDED ROW STATE
+  const [expandedId, setExpandedId] = useState(null);
+
+  const toggleExpand = (id) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
 
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -1021,25 +1031,15 @@ export default function AdminLeavePage() {
                 String(l.id) ===
                 String(highlightId);
 
+              const isExpanded = expandedId === l.id;
+
               return (
                 <div
-                  id={`leave-${l.id}`}
                   key={l.id}
+                  id={`leave-${l.id}`}
                   style={{
-                    display: 'grid',
-
-                    /*
-                     * Final 55px column is for DELETE.
-                     */
-                    gridTemplateColumns:
-                      '2fr 1.1fr 1fr 1fr 0.5fr 1.3fr 2fr 55px',
-
-                    padding: '14px 22px',
-
                     borderBottom:
                       '1px solid var(--card-border)',
-
-                    alignItems: 'center',
 
                     background:
                       isHighlighted
@@ -1054,81 +1054,93 @@ export default function AdminLeavePage() {
                     transition: 'all 0.25s'
                   }}
                 >
-
-                  {/* ====================================================
-                      EMPLOYEE
-                      ==================================================== */}
-
                   <div
+                    onClick={() => toggleExpand(l.id)}
                     style={{
-                      display: 'flex',
+                      display: 'grid',
+
+                      /*
+                       * Final 55px column is for DELETE.
+                       */
+                      gridTemplateColumns:
+                        '2fr 1.1fr 1fr 1fr 0.5fr 1.3fr 2fr 55px',
+
+                      padding: '14px 22px',
+
                       alignItems: 'center',
-                      gap: '10px'
+
+                      cursor: 'pointer'
                     }}
                   >
+
+                    {/* ====================================================
+                        EMPLOYEE
+                        ==================================================== */}
+
                     <div
                       style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-
-                        background:
-                          `linear-gradient(135deg, ${m.color}, ${m.color}CC)`,
-
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-
-                        fontSize: '12px',
-                        fontWeight: 700,
-
-                        color:
-                          'var(--text-primary)',
-
-                        flexShrink: 0
+                        gap: '10px'
                       }}
                     >
-                      {(l.employeeName || '')
-                        .split(' ')
-                        .map(
-                          (n) => n[0] || ''
-                        )
-                        .join('')
-                        .slice(0, 2)}
-                    </div>
-
-                    <div>
                       <div
                         style={{
-                          fontSize: '13px',
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+
+                          background:
+                            `linear-gradient(135deg, ${m.color}, ${m.color}CC)`,
+
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+
+                          fontSize: '12px',
                           fontWeight: 700,
+
                           color:
-                            'var(--text-primary)'
+                            'var(--text-primary)',
+
+                          flexShrink: 0
                         }}
                       >
-                        {l.employeeName}
+                        {(l.employeeName || '')
+                          .split(' ')
+                          .map(
+                            (n) => n[0] || ''
+                          )
+                          .join('')
+                          .slice(0, 2)}
                       </div>
 
-                      <div
-                        style={{
-                          fontSize: '11px',
-                          color:
-                            'var(--text-secondary)',
-                          fontStyle: 'italic'
-                        }}
-                      >
-                        &quot;
-                        {l.reason?.substring(
-                          0,
-                          25
-                        )}
-                        {l.reason?.length > 25
-                          ? '...'
-                          : ''}
-                        &quot;
+                      <div>
+                        <div
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            color:
+                              'var(--text-primary)'
+                          }}
+                        >
+                          {l.employeeName}
+                        </div>
+
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--text-secondary)',
+                            fontStyle: 'italic'
+                          }}
+                        >
+                          &quot;
+                          {l.reason?.substring(0, 25)}
+                          {l.reason?.length > 25 ? '...' : ''}
+                          &quot;
+                        </div>
                       </div>
                     </div>
-                  </div>
 
                   {/* ====================================================
                       TYPE
@@ -1709,6 +1721,47 @@ export default function AdminLeavePage() {
                       )}
                     </button>
                   </div>
+                </div>
+
+                {/* ====================================================
+                    EXPANDED DETAILS PANEL
+                    ==================================================== */}
+                {isExpanded && (
+                  <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        padding: '18px 24px 22px 24px',
+                        background: 'var(--bg-secondary)',
+                        borderTop: '1px dashed var(--card-border)',
+                        borderLeft: '4px solid #4F46E5',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        <MessageSquare size={16} style={{ color: '#4F46E5' }} />
+                        Leave Reason
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          color: 'var(--text-primary)',
+                          background: 'var(--card-bg)',
+                          padding: '16px 20px',
+                          borderRadius: '12px',
+                          border: '1px solid var(--card-border)',
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-word',
+                          fontStyle: 'italic'
+                        }}
+                      >
+                        &quot;{l.reason || 'No reason specified by employee.'}&quot;
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
