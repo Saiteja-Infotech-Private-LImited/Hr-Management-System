@@ -149,30 +149,47 @@ export default function JobOpenings() {
                             {/* JOB DETAILS */}
 
                             <p className="text-gray-600 dark:text-gray-400 mb-1">
-                                <span className="font-medium dark:text-slate-300">Department:</span> {job.department}
+                                <span className="font-medium dark:text-slate-300">
+                                    Department:
+                                </span>{" "}
+                                {job.department}
                             </p>
 
                             <p className="text-gray-600 dark:text-gray-400 mb-1">
-                                <span className="font-medium dark:text-slate-300">Location:</span> {job.location}
+                                <span className="font-medium dark:text-slate-300">
+                                    Location:
+                                </span>{" "}
+                                {job.location}
                             </p>
 
                             <p className="text-gray-600 dark:text-gray-400 mb-1">
-                                <span className="font-medium dark:text-slate-300">Employment Type:</span> {job.employmentType}
+                                <span className="font-medium dark:text-slate-300">
+                                    Employment Type:
+                                </span>{" "}
+                                {job.employmentType}
                             </p>
 
                             <p className="text-gray-600 dark:text-gray-400 mb-1">
-                                <span className="font-medium dark:text-slate-300">Experience:</span> {job.experienceRequired}
+                                <span className="font-medium dark:text-slate-300">
+                                    Experience:
+                                </span>{" "}
+                                {job.experienceRequired}
                             </p>
 
                             <p className="text-gray-600 dark:text-gray-400 mb-4">
-                                <span className="font-medium dark:text-slate-300">Salary:</span> {job.salaryRange}
+                                <span className="font-medium dark:text-slate-300">
+                                    Salary:
+                                </span>{" "}
+                                {job.salaryRange}
                             </p>
 
                             {/* VIEW DETAILS */}
 
                             <button
                                 onClick={() =>
-                                    router.push(`/employee/jobs/details?id=${job.id}`)
+                                    router.push(
+                                        `/employee/jobs/details/?id=${job.id}`
+                                    )
                                 }
                                 className="text-[#10b981] dark:text-[#ccf000] hover:underline font-semibold"
                             >

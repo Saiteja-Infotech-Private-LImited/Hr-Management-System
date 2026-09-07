@@ -58,7 +58,7 @@ public class RecruitmentController {
         }
 
      @GetMapping("/jobs/{id}")
-@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')") // ADD THIS LINE
+ // ADD THIS LINE
 @Operation(summary = "Get job posting details by ID")
 public ResponseEntity<ApiResponse<RecruitmentDTOs.JobResponse>> getJobById(
          @PathVariable Long id) {
