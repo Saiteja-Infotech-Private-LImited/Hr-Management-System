@@ -195,15 +195,15 @@ export default function EmployeeNotificationsPage() {
           return;
         }
 
-        if (type.includes('JOB_POSTED') || type.includes('JOBPOSTING')) {
+        if (
+          type.includes('JOB_POSTED') ||
+          type.includes('JOBPOSTING') ||
+          type.includes('JOB')
+        ) {
           router.push(`/employee/jobs/details?id=${encodeURIComponent(referenceId)}`);
           return;
         }
 
-        if (type.includes('DOCUMENT') || type.includes('ONBOARDING') || type.includes('DOC')) {
-          router.push(`/employee/onboarding?highlightId=${encodeURIComponent(referenceId)}`);
-          return;
-        }
       }
 
       // General/manual notification: open formal letter details modal
@@ -1511,4 +1511,3 @@ export default function EmployeeNotificationsPage() {
     </div>
   );
 }
-
