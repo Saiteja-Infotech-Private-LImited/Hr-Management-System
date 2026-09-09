@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 
 import {
@@ -197,7 +197,6 @@ const getHolidaysForYear = (year) => {
   return holidays;
 };
 
-
 /* =====================================================
    CONSTANTS
 ===================================================== */
@@ -227,13 +226,11 @@ const dayNames = [
   'Sat',
 ];
 
-
 /* =====================================================
    DATE FORMAT
 ===================================================== */
 
 const formatDate = (date) => {
-
   const year = date.getFullYear();
 
   const month = String(
@@ -247,16 +244,12 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-
 /* =====================================================
    FORMAT FULL DATE
 ===================================================== */
 
 const formatFullDate = (dateString) => {
-
-  const date = new Date(
-    `${dateString}T00:00:00`
-  );
+  const date = new Date(`${dateString}T00:00:00`);
 
   return date.toLocaleDateString(
     'en-IN',
@@ -269,24 +262,20 @@ const formatFullDate = (dateString) => {
   );
 };
 
-
 /* =====================================================
    MAIN COMPONENT
 ===================================================== */
 
 export default function HolidayCalendar() {
-
   const { resolvedTheme } = useTheme();
 
-  const [mounted, setMounted] =
-    useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const [currentDate, setCurrentDate] =
     useState(new Date());
 
   const [selectedHoliday, setSelectedHoliday] =
     useState(null);
-
 
   /* =====================================================
      MOUNT
@@ -296,7 +285,6 @@ export default function HolidayCalendar() {
     setMounted(true);
   }, []);
 
-
   /* =====================================================
      THEME
   ===================================================== */
@@ -304,7 +292,6 @@ export default function HolidayCalendar() {
   const isDark =
     mounted &&
     resolvedTheme === 'dark';
-
 
   /* =====================================================
      CURRENT MONTH / YEAR
@@ -315,18 +302,6 @@ export default function HolidayCalendar() {
 
   const currentMonth =
     currentDate.getMonth();
-
-
-  /* =====================================================
-     HOLIDAYS
-  ===================================================== */
-
-  const holidays = useMemo(() => {
-    return getHolidaysForYear(
-      currentYear
-    );
-  }, [currentYear]);
-
 
   /* =====================================================
      MONTH DETAILS
@@ -339,14 +314,12 @@ export default function HolidayCalendar() {
       0
     ).getDate();
 
-
   const firstDay =
     new Date(
       currentYear,
       currentMonth,
       1
     ).getDay();
-
 
   const previousMonthDays =
     new Date(
@@ -355,13 +328,11 @@ export default function HolidayCalendar() {
       0
     ).getDate();
 
-
   /* =====================================================
      CALENDAR DAYS
   ===================================================== */
 
   const calendarDays = [];
-
 
   /* PREVIOUS MONTH DAYS */
 
@@ -370,7 +341,6 @@ export default function HolidayCalendar() {
     i >= 0;
     i--
   ) {
-
     calendarDays.push({
       day:
         previousMonthDays - i,
@@ -379,9 +349,7 @@ export default function HolidayCalendar() {
 
       monthOffset: -1,
     });
-
   }
-
 
   /* CURRENT MONTH DAYS */
 
@@ -390,7 +358,6 @@ export default function HolidayCalendar() {
     i <= daysInMonth;
     i++
   ) {
-
     calendarDays.push({
       day: i,
 
@@ -398,16 +365,13 @@ export default function HolidayCalendar() {
 
       monthOffset: 0,
     });
-
   }
-
 
   /* NEXT MONTH DAYS */
 
   while (
     calendarDays.length < 42
   ) {
-
     const day =
       calendarDays.length -
       (
@@ -416,19 +380,14 @@ export default function HolidayCalendar() {
       ) +
       1;
 
-
     calendarDays.push({
-
       day,
 
       currentMonth: false,
 
       monthOffset: 1,
-
     });
-
   }
-
 
   /* =====================================================
      GET CELL DATE
@@ -438,15 +397,12 @@ export default function HolidayCalendar() {
     day,
     monthOffset
   ) => {
-
     return new Date(
       currentYear,
       currentMonth + monthOffset,
       day
     );
-
   };
-
 
   /* =====================================================
      GET HOLIDAY
@@ -456,30 +412,24 @@ export default function HolidayCalendar() {
     day,
     monthOffset
   ) => {
-
     const date =
       getCellDate(
         day,
         monthOffset
       );
 
-
     const year =
       date.getFullYear();
 
-
     const yearHolidays =
       getHolidaysForYear(year);
-
 
     return yearHolidays.find(
       (holiday) =>
         holiday.date ===
         formatDate(date)
     );
-
   };
-
 
   /* =====================================================
      TODAY CHECK
@@ -489,10 +439,8 @@ export default function HolidayCalendar() {
     day,
     monthOffset
   ) => {
-
     const today =
       new Date();
-
 
     const cellDate =
       getCellDate(
@@ -500,79 +448,56 @@ export default function HolidayCalendar() {
         monthOffset
       );
 
-
     return (
-
       today.getDate() ===
         cellDate.getDate() &&
-
       today.getMonth() ===
         cellDate.getMonth() &&
-
       today.getFullYear() ===
         cellDate.getFullYear()
-
     );
-
   };
-
 
   /* =====================================================
      NAVIGATION
   ===================================================== */
 
   const previousMonth = () => {
-
     setCurrentDate(
-
       new Date(
         currentYear,
         currentMonth - 1,
         1
       )
-
     );
-
   };
 
-
   const nextMonth = () => {
-
     setCurrentDate(
-
       new Date(
         currentYear,
         currentMonth + 1,
         1
       )
-
     );
-
   };
-
 
   const goToToday = () => {
-
-    setCurrentDate(
-      new Date()
-    );
-
+    setCurrentDate(new Date());
   };
-
 
   /* =====================================================
      GOOGLE CALENDAR
   ===================================================== */
 
   const addToGoogleCalendar = () => {
-
     if (!selectedHoliday) return;
 
-
     const startDate =
-      selectedHoliday.date
-        .replaceAll('-', '');
-
+      selectedHoliday.date.replaceAll(
+        '-',
+        ''
+      );
 
     const googleUrl =
       `https://calendar.google.com/calendar/render?action=TEMPLATE` +
@@ -584,122 +509,93 @@ export default function HolidayCalendar() {
         selectedHoliday.description
       )}` +
       `&location=${encodeURIComponent(
-        selectedHoliday.location
+        selectedHoliday.location || 'India'
       )}`;
-
 
     window.open(
       googleUrl,
       '_blank'
     );
-
   };
-
 
   /* =====================================================
      THEME COLORS
   ===================================================== */
 
   const theme = {
-
     card:
       isDark
         ? '#111827'
         : '#ffffff',
-
 
     calendarCard:
       isDark
         ? '#111827'
         : '#ffffff',
 
-
     secondaryCard:
       isDark
         ? '#182235'
         : '#ffffff',
-
 
     muted:
       isDark
         ? '#1e293b'
         : '#f8fafc',
 
-
     border:
       isDark
         ? '#334155'
         : '#e2e8f0',
-
 
     text:
       isDark
         ? '#f8fafc'
         : '#0f172a',
 
-
     secondaryText:
       isDark
         ? '#94a3b8'
         : '#64748b',
 
-
     accent:
       '#2563eb',
-
 
     accentLight:
       isDark
         ? 'rgba(37, 99, 235, 0.18)'
         : '#eff6ff',
 
-
     holiday:
       '#10b981',
-
 
     holidayLight:
       isDark
         ? 'rgba(16, 185, 129, 0.16)'
         : '#ecfdf5',
 
-
     today:
       '#2563eb',
-
 
     otherMonth:
       isDark
         ? '#0b1220'
         : '#f8fafc',
-
   };
-
 
   if (!mounted) {
     return null;
   }
-
 
   /* =====================================================
      RETURN
   ===================================================== */
 
   return (
-
     <>
-
-
-      {/* =====================================================
-          MAIN CONTAINER
-      ===================================================== */}
-
       <div className="holiday-calendar-container">
 
-
-        {/* =====================================================
-            CALENDAR
-        ===================================================== */}
+        {/* CALENDAR */}
 
         <div
           className="calendar-card"
@@ -717,13 +613,9 @@ export default function HolidayCalendar() {
           }}
         >
 
-
-          {/* =====================================================
-              HEADER
-          ===================================================== */}
+          {/* HEADER */}
 
           <div className="calendar-header">
-
 
             {/* TITLE */}
 
@@ -733,262 +625,169 @@ export default function HolidayCalendar() {
                 style={{
                   width: '42px',
                   height: '42px',
-
                   borderRadius: '12px',
-
                   background:
                     theme.accentLight,
-
                   color:
                     theme.accent,
-
                   display: 'flex',
-
-                  alignItems:
-                    'center',
-
-                  justifyContent:
-                    'center',
-
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-
-                <CalendarDays
-                  size={21}
-                />
-
+                <CalendarDays size={21} />
               </div>
 
-
               <div>
-
                 <h2
                   style={{
                     margin: 0,
-
                     color:
                       theme.text,
-
                     fontSize:
                       '21px',
-
                     fontWeight:
                       '800',
                   }}
                 >
-
                   Holiday Calendar
-
                 </h2>
-
 
                 <p
                   style={{
                     margin:
                       '3px 0 0',
-
                     color:
                       theme.secondaryText,
-
                     fontSize:
                       '12px',
                   }}
                 >
-
                   View company holidays and important dates
-
                 </p>
-
               </div>
-
             </div>
-
 
             {/* CONTROLS */}
 
             <div className="calendar-controls">
 
-
               <button
-                onClick={
-                  goToToday
-                }
+                onClick={goToToday}
                 className="calendar-button"
                 style={{
                   border:
                     `1px solid ${theme.border}`,
-
                   background:
                     theme.muted,
-
                   color:
                     theme.text,
                 }}
               >
-
                 Today
-
               </button>
 
-
               <button
-                onClick={
-                  previousMonth
-                }
+                onClick={previousMonth}
                 className="calendar-icon-button"
                 style={{
                   border:
                     `1px solid ${theme.border}`,
-
                   background:
                     theme.muted,
-
                   color:
                     theme.text,
                 }}
               >
-
-                <ChevronLeft
-                  size={18}
-                />
-
+                <ChevronLeft size={18} />
               </button>
 
-
               <button
-                onClick={
-                  nextMonth
-                }
+                onClick={nextMonth}
                 className="calendar-icon-button"
                 style={{
                   border:
                     `1px solid ${theme.border}`,
-
                   background:
                     theme.muted,
-
                   color:
                     theme.text,
                 }}
               >
-
-                <ChevronRight
-                  size={18}
-                />
-
+                <ChevronRight size={18} />
               </button>
-
 
             </div>
-
           </div>
 
-
-          {/* =====================================================
-              MONTH TITLE
-          ===================================================== */}
+          {/* MONTH TITLE */}
 
           <div
             style={{
               display: 'flex',
-
               alignItems: 'center',
-
-              justifyContent: 'space-between',
-
+              justifyContent:
+                'space-between',
               gap: '10px',
-
               marginBottom:
                 '12px',
-
               paddingBottom:
                 '10px',
-
               borderBottom:
                 `1px solid ${theme.border}`,
             }}
           >
-
-
             <h3
               style={{
                 margin: 0,
-
                 fontSize:
                   '19px',
-
                 fontWeight:
                   '800',
-
                 color:
                   theme.text,
               }}
             >
-
               {monthNames[currentMonth]}{' '}
-
               {currentYear}
-
             </h3>
-
 
             <div
               style={{
                 display: 'flex',
-
-                alignItems: 'center',
-
+                alignItems:
+                  'center',
                 gap: '6px',
-
                 color:
                   theme.secondaryText,
-
                 fontSize:
                   '11px',
-
                 fontWeight:
                   '600',
               }}
             >
-
               <span
                 style={{
                   width: '8px',
-
                   height: '8px',
-
                   borderRadius:
                     '50%',
-
                   background:
                     theme.holiday,
-
                   display:
                     'inline-block',
                 }}
               />
 
               Holiday
-
             </div>
-
           </div>
 
+          {/* CALENDAR */}
 
-          {/* =====================================================
-              CALENDAR
-          ===================================================== */}
-
-          <div
-            className="calendar-scroll"
-          >
-
-
-            <div
-              className="calendar-min-width"
-            >
-
+          <div className="calendar-scroll">
+            <div className="calendar-min-width">
 
               {/* DAYS HEADER */}
 
@@ -996,83 +795,58 @@ export default function HolidayCalendar() {
                 style={{
                   display:
                     'grid',
-
                   gridTemplateColumns:
                     'repeat(7, minmax(0, 1fr))',
-
                   marginBottom:
                     '5px',
                 }}
               >
-
                 {dayNames.map(
                   (day) => (
-
                     <div
                       key={day}
-
                       style={{
                         textAlign:
                           'center',
-
                         padding:
                           '6px 2px',
-
                         fontSize:
                           '10px',
-
                         fontWeight:
                           '800',
-
                         color:
                           theme.secondaryText,
-
                         textTransform:
                           'uppercase',
                       }}
                     >
-
                       {day}
-
                     </div>
-
                   )
                 )}
-
               </div>
 
-
-              {/* =====================================================
-                  CALENDAR GRID
-              ===================================================== */}
+              {/* CALENDAR GRID */}
 
               <div
                 style={{
                   display:
                     'grid',
-
                   gridTemplateColumns:
                     'repeat(7, minmax(0, 1fr))',
-
-                  gap:
-                    '4px',
+                  gap: '4px',
                 }}
               >
-
-
                 {calendarDays.map(
                   (
                     cell,
                     index
                   ) => {
-
-
                     const holiday =
                       getHoliday(
                         cell.day,
                         cell.monthOffset
                       );
-
 
                     const today =
                       isToday(
@@ -1080,27 +854,19 @@ export default function HolidayCalendar() {
                         cell.monthOffset
                       );
 
-
                     return (
-
                       <div
-
                         key={index}
 
                         onClick={() => {
-
                           if (holiday) {
-
                             setSelectedHoliday(
                               holiday
                             );
-
                           }
-
                         }}
 
                         style={{
-
                           minHeight:
                             '70px',
 
@@ -1110,28 +876,23 @@ export default function HolidayCalendar() {
                           borderRadius:
                             '9px',
 
-
                           border:
                             today
                               ? `2px solid ${theme.today}`
                               : `1px solid ${theme.border}`,
-
 
                           background:
                             !cell.currentMonth
                               ? theme.otherMonth
                               : theme.card,
 
-
                           opacity:
                             cell.currentMonth
                               ? 1
                               : 0.55,
 
-
                           boxSizing:
                             'border-box',
-
 
                           display:
                             'flex',
@@ -1139,56 +900,40 @@ export default function HolidayCalendar() {
                           flexDirection:
                             'column',
 
-
                           transition:
                             'all 0.2s ease',
-
 
                           cursor:
                             holiday
                               ? 'pointer'
                               : 'default',
-
                         }}
 
-
                         onMouseEnter={(e) => {
-
                           if (holiday) {
-
                             e.currentTarget.style.transform =
                               'translateY(-2px)';
-
 
                             e.currentTarget.style.boxShadow =
                               isDark
                                 ? '0 8px 20px rgba(0,0,0,0.30)'
                                 : '0 8px 20px rgba(15,23,42,0.10)';
-
                           }
-
                         }}
 
-
                         onMouseLeave={(e) => {
-
                           e.currentTarget.style.transform =
                             'translateY(0)';
 
-
                           e.currentTarget.style.boxShadow =
                             'none';
-
                         }}
-
                       >
-
 
                         {/* DAY NUMBER */}
 
                         <div
                           style={{
-
                             display:
                               'flex',
 
@@ -1197,14 +942,10 @@ export default function HolidayCalendar() {
 
                             alignItems:
                               'center',
-
                           }}
                         >
-
-
                           <span
                             style={{
-
                               width:
                                 '24px',
 
@@ -1216,18 +957,15 @@ export default function HolidayCalendar() {
                                   ? '50%'
                                   : '7px',
 
-
                               background:
                                 today
                                   ? theme.today
                                   : 'transparent',
 
-
                               color:
                                 today
                                   ? '#ffffff'
                                   : theme.text,
-
 
                               display:
                                 'flex',
@@ -1238,27 +976,20 @@ export default function HolidayCalendar() {
                               justifyContent:
                                 'center',
 
-
                               fontSize:
                                 '11px',
 
                               fontWeight:
                                 '800',
-
                             }}
                           >
-
                             {cell.day}
-
                           </span>
 
-
                           {today && (
-
                             <span
                               className="today-text"
                               style={{
-
                                 fontSize:
                                   '7px',
 
@@ -1267,33 +998,19 @@ export default function HolidayCalendar() {
 
                                 color:
                                   theme.today,
-
                               }}
                             >
-
                               TODAY
-
                             </span>
-
                           )}
-
                         </div>
 
-
-                        {/* =====================================================
-                            HOLIDAY
-                        ===================================================== */}
+                        {/* HOLIDAY */}
 
                         {holiday && (
-
                           <div
-
-                            title={
-                              holiday.name
-                            }
-
+                            title={holiday.name}
                             style={{
-
                               marginTop:
                                 'auto',
 
@@ -1303,20 +1020,16 @@ export default function HolidayCalendar() {
                               borderRadius:
                                 '6px',
 
-
                               background:
                                 theme.holidayLight,
 
-
                               borderLeft:
                                 `2px solid ${theme.holiday}`,
-
 
                               color:
                                 isDark
                                   ? '#d1fae5'
                                   : '#047857',
-
 
                               fontSize:
                                 '8px',
@@ -1326,7 +1039,6 @@ export default function HolidayCalendar() {
 
                               lineHeight:
                                 '1.25',
-
 
                               overflow:
                                 'hidden',
@@ -1339,45 +1051,25 @@ export default function HolidayCalendar() {
 
                               WebkitBoxOrient:
                                 'vertical',
-
                             }}
                           >
-
                             {holiday.name}
-
                           </div>
-
                         )}
 
-
                       </div>
-
                     );
-
                   }
                 )}
-
-
               </div>
-
-
             </div>
-
-
           </div>
-
-
         </div>
 
-
-        {/* =====================================================
-            LEGEND
-        ===================================================== */}
+        {/* LEGEND */}
 
         <div
-
           style={{
-
             display:
               'flex',
 
@@ -1404,18 +1096,11 @@ export default function HolidayCalendar() {
 
             borderRadius:
               '12px',
-
           }}
-
         >
 
-
-          {/* TODAY */}
-
           <div
-
             style={{
-
               display:
                 'flex',
 
@@ -1433,42 +1118,24 @@ export default function HolidayCalendar() {
 
               fontWeight:
                 '600',
-
             }}
-
           >
-
             <span
-
               style={{
-
-                width:
-                  '9px',
-
-                height:
-                  '9px',
-
+                width: '9px',
+                height: '9px',
                 borderRadius:
                   '50%',
-
                 background:
                   theme.today,
-
               }}
-
             />
 
             Current Day
-
           </div>
 
-
-          {/* HOLIDAY */}
-
           <div
-
             style={{
-
               display:
                 'flex',
 
@@ -1486,66 +1153,39 @@ export default function HolidayCalendar() {
 
               fontWeight:
                 '600',
-
             }}
-
           >
-
             <span
-
               style={{
-
-                width:
-                  '9px',
-
-                height:
-                  '9px',
-
+                width: '9px',
+                height: '9px',
                 borderRadius:
                   '3px',
-
                 background:
                   theme.holiday,
-
               }}
-
             />
 
             Holiday
-
           </div>
 
-
         </div>
-
-
       </div>
 
-
-      {/* =====================================================
-          HOLIDAY POPUP / MODAL
-      ===================================================== */}
+      {/* HOLIDAY MODAL */}
 
       {selectedHoliday && (
-
         <div
           className="holiday-modal-overlay"
 
           onClick={() => {
-
             setSelectedHoliday(null);
-
           }}
-
         >
-
-
           <div
-
             className="holiday-modal"
 
             style={{
-
               background:
                 isDark
                   ? '#111827'
@@ -1558,53 +1198,34 @@ export default function HolidayCalendar() {
                 isDark
                   ? '0 30px 80px rgba(0,0,0,0.55)'
                   : '0 30px 80px rgba(15,23,42,0.25)',
-
             }}
-
 
             onClick={(e) => {
-
               e.stopPropagation();
-
             }}
-
           >
-
 
             {/* CLOSE */}
 
             <button
-
               onClick={() => {
-
                 setSelectedHoliday(null);
-
               }}
 
               className="modal-close-button"
 
               style={{
-
                 color:
                   theme.secondaryText,
-
               }}
-
             >
-
               <X size={20} />
-
             </button>
 
-
-            {/* =====================================================
-                TOP BANNER
-            ===================================================== */}
+            {/* TOP BANNER */}
 
             <div
-
               style={{
-
                 height:
                   '110px',
 
@@ -1612,13 +1233,9 @@ export default function HolidayCalendar() {
                   '20px',
 
                 background:
-
                   isDark
-
                     ? 'linear-gradient(135deg, #5a2108, #27121a)'
-
                     : 'linear-gradient(135deg, #fff1e8, #fff7ed)',
-
 
                 display:
                   'flex',
@@ -1637,18 +1254,11 @@ export default function HolidayCalendar() {
 
                 overflow:
                   'hidden',
-
               }}
-
             >
-
-
               <Sparkles
-
                 size={18}
-
                 style={{
-
                   position:
                     'absolute',
 
@@ -1660,18 +1270,12 @@ export default function HolidayCalendar() {
 
                   color:
                     '#f97316',
-
                 }}
-
               />
 
-
               <Sparkles
-
                 size={14}
-
                 style={{
-
                   position:
                     'absolute',
 
@@ -1683,16 +1287,11 @@ export default function HolidayCalendar() {
 
                   color:
                     '#f97316',
-
                 }}
-
               />
 
-
               <div
-
                 style={{
-
                   width:
                     '70px',
 
@@ -1702,16 +1301,13 @@ export default function HolidayCalendar() {
                   borderRadius:
                     '50%',
 
-
                   background:
                     isDark
                       ? 'rgba(249,115,22,0.15)'
                       : '#ffffff',
 
-
                   border:
                     '1px solid rgba(249,115,22,0.35)',
-
 
                   display:
                     'flex',
@@ -1722,34 +1318,21 @@ export default function HolidayCalendar() {
                   justifyContent:
                     'center',
 
-
                   color:
                     '#f97316',
 
-
                   boxShadow:
                     '0 10px 25px rgba(249,115,22,0.20)',
-
                 }}
-
               >
-
-                <PartyPopper
-                  size={32}
-                />
-
+                <PartyPopper size={32} />
               </div>
-
-
             </div>
-
 
             {/* TYPE */}
 
             <div
-
               style={{
-
                 display:
                   'inline-flex',
 
@@ -1779,14 +1362,10 @@ export default function HolidayCalendar() {
 
                 textTransform:
                   'uppercase',
-
               }}
-
             >
-
               <span
                 style={{
-
                   width:
                     '6px',
 
@@ -1798,23 +1377,16 @@ export default function HolidayCalendar() {
 
                   background:
                     '#f97316',
-
                 }}
               />
 
-              {
-                selectedHoliday.type
-              }
-
+              {selectedHoliday.type}
             </div>
-
 
             {/* NAME */}
 
             <h2
-
               style={{
-
                 margin:
                   '14px 0 5px',
 
@@ -1829,24 +1401,14 @@ export default function HolidayCalendar() {
 
                 lineHeight:
                   '1.2',
-
               }}
-
             >
-
-              {
-                selectedHoliday.name
-              }
-
+              {selectedHoliday.name}
             </h2>
 
-
             <p
-
               style={{
-
-                margin:
-                  0,
+                margin: 0,
 
                 color:
                   theme.secondaryText,
@@ -1856,26 +1418,17 @@ export default function HolidayCalendar() {
 
                 fontWeight:
                   '600',
-
               }}
-
             >
-
-              {
-                formatFullDate(
-                  selectedHoliday.date
-                )
-              }
-
+              {formatFullDate(
+                selectedHoliday.date
+              )}
             </p>
-
 
             {/* INFORMATION BOX */}
 
             <div
-
               style={{
-
                 marginTop:
                   '20px',
 
@@ -1887,18 +1440,13 @@ export default function HolidayCalendar() {
 
                 overflow:
                   'hidden',
-
               }}
-
             >
-
 
               {/* ALL DAY */}
 
               <div
-
                 style={{
-
                   display:
                     'flex',
 
@@ -1913,16 +1461,10 @@ export default function HolidayCalendar() {
 
                   borderBottom:
                     `1px solid ${theme.border}`,
-
                 }}
-
               >
-
-
                 <div
-
                   style={{
-
                     width:
                       '42px',
 
@@ -1946,24 +1488,14 @@ export default function HolidayCalendar() {
 
                     justifyContent:
                       'center',
-
                   }}
-
                 >
-
-                  <CalendarDays
-                    size={20}
-                  />
-
+                  <CalendarDays size={20} />
                 </div>
 
-
                 <div>
-
                   <div
-
                     style={{
-
                       color:
                         theme.text,
 
@@ -1972,20 +1504,13 @@ export default function HolidayCalendar() {
 
                       fontSize:
                         '14px',
-
                     }}
-
                   >
-
                     All day
-
                   </div>
 
-
                   <div
-
                     style={{
-
                       color:
                         theme.secondaryText,
 
@@ -1994,30 +1519,17 @@ export default function HolidayCalendar() {
 
                       marginTop:
                         '3px',
-
                     }}
-
                   >
-
-                    {
-                      selectedHoliday.type
-                    }
-
+                    {selectedHoliday.type}
                   </div>
-
-
                 </div>
-
-
               </div>
-
 
               {/* LOCATION */}
 
               <div
-
                 style={{
-
                   display:
                     'flex',
 
@@ -2029,16 +1541,10 @@ export default function HolidayCalendar() {
 
                   padding:
                     '15px',
-
                 }}
-
               >
-
-
                 <div
-
                   style={{
-
                     width:
                       '42px',
 
@@ -2062,24 +1568,14 @@ export default function HolidayCalendar() {
 
                     justifyContent:
                       'center',
-
                   }}
-
                 >
-
-                  <MapPin
-                    size={20}
-                  />
-
+                  <MapPin size={20} />
                 </div>
 
-
                 <div>
-
                   <div
-
                     style={{
-
                       color:
                         theme.text,
 
@@ -2088,22 +1584,13 @@ export default function HolidayCalendar() {
 
                       fontSize:
                         '14px',
-
                     }}
-
                   >
-
-                    {
-                      selectedHoliday.location
-                    }
-
+                    {selectedHoliday.location || 'India'}
                   </div>
 
-
                   <div
-
                     style={{
-
                       color:
                         theme.secondaryText,
 
@@ -2112,31 +1599,18 @@ export default function HolidayCalendar() {
 
                       marginTop:
                         '3px',
-
                     }}
-
                   >
-
                     Holiday location
-
                   </div>
-
-
                 </div>
-
-
               </div>
-
-
             </div>
-
 
             {/* ABOUT */}
 
             <div
-
               style={{
-
                 marginTop:
                   '14px',
 
@@ -2153,16 +1627,10 @@ export default function HolidayCalendar() {
 
                 border:
                   '1px solid rgba(249,115,22,0.18)',
-
               }}
-
             >
-
-
               <div
-
                 style={{
-
                   display:
                     'flex',
 
@@ -2183,27 +1651,19 @@ export default function HolidayCalendar() {
 
                   marginBottom:
                     '8px',
-
                 }}
-
               >
-
                 <Sparkles
                   size={15}
                   color="#f97316"
                 />
 
                 About this holiday
-
               </div>
 
-
               <p
-
                 style={{
-
-                  margin:
-                    0,
+                  margin: 0,
 
                   color:
                     theme.secondaryText,
@@ -2213,40 +1673,21 @@ export default function HolidayCalendar() {
 
                   lineHeight:
                     '1.6',
-
                 }}
-
               >
-
-                {
-                  selectedHoliday.description
-                }
-
+                {selectedHoliday.description}
               </p>
-
-
             </div>
-
 
             {/* BUTTONS */}
 
-            <div
-
-              className="modal-actions"
-
-            >
-
+            <div className="modal-actions">
 
               <button
-
-                onClick={
-                  addToGoogleCalendar
-                }
+                onClick={addToGoogleCalendar}
 
                 style={{
-
-                  flex:
-                    1,
+                  flex: 1,
 
                   height:
                     '50px',
@@ -2283,30 +1724,19 @@ export default function HolidayCalendar() {
 
                   gap:
                     '8px',
-
                 }}
-
               >
-
-                <CalendarPlus
-                  size={18}
-                />
+                <CalendarPlus size={18} />
 
                 Add to Google Calendar
-
               </button>
 
-
               <button
-
                 onClick={() => {
-
                   setSelectedHoliday(null);
-
                 }}
 
                 style={{
-
                   height:
                     '50px',
 
@@ -2333,30 +1763,17 @@ export default function HolidayCalendar() {
 
                   cursor:
                     'pointer',
-
                 }}
-
               >
-
                 Close
-
               </button>
 
-
             </div>
-
-
           </div>
-
-
         </div>
-
       )}
 
-
-      {/* =====================================================
-          RESPONSIVE CSS
-      ===================================================== */}
+      {/* RESPONSIVE CSS */}
 
       <style jsx>{`
 
@@ -2367,219 +1784,114 @@ export default function HolidayCalendar() {
           overflow: hidden;
         }
 
-
         .calendar-card {
-
           width: 100%;
           max-width: 100%;
-
           border-radius: 16px;
-
           padding: 14px;
-
           min-width: 0;
-
           box-sizing: border-box;
-
         }
-
 
         .calendar-header {
-
           display: flex;
-
           align-items: center;
-
           justify-content: space-between;
-
           gap: 12px;
-
           flex-wrap: wrap;
-
           margin-bottom: 14px;
-
         }
-
 
         .calendar-title-section {
-
           display: flex;
-
           align-items: center;
-
           gap: 10px;
-
           min-width: 0;
-
         }
-
 
         .calendar-controls {
-
           display: flex;
-
           align-items: center;
-
           gap: 6px;
-
         }
-
 
         .calendar-button {
-
           height: 34px;
-
           padding: 0 11px;
-
           border-radius: 8px;
-
           cursor: pointer;
-
           font-size: 12px;
-
           font-weight: 700;
-
         }
-
 
         .calendar-icon-button {
-
           width: 34px;
-
           height: 34px;
-
           border-radius: 8px;
-
           display: flex;
-
           align-items: center;
-
           justify-content: center;
-
           cursor: pointer;
-
         }
-
 
         .calendar-scroll {
-
           width: 100%;
-
           overflow-x: hidden;
-
         }
-
 
         .calendar-min-width {
-
           width: 100%;
-
           min-width: 0;
-
         }
-
-
-        /* =================================================
-           MODAL
-        ================================================= */
 
         .holiday-modal-overlay {
-
           position: fixed;
-
           inset: 0;
-
           z-index: 9999;
-
           display: flex;
-
           align-items: center;
-
           justify-content: center;
-
           padding: 20px;
-
-          background:
-            rgba(2, 6, 23, 0.72);
-
-          backdrop-filter:
-            blur(8px);
-
-          animation:
-            fadeIn 0.2s ease;
-
+          background: rgba(2, 6, 23, 0.72);
+          backdrop-filter: blur(8px);
+          animation: fadeIn 0.2s ease;
         }
-
 
         .holiday-modal {
-
           position: relative;
-
           width: 100%;
-
           max-width: 450px;
-
           max-height: 92vh;
-
           overflow-y: auto;
-
           border-radius: 24px;
-
           padding: 20px;
-
           box-sizing: border-box;
-
-          animation:
-            modalIn 0.25s ease;
-
+          animation: modalIn 0.25s ease;
         }
-
 
         .modal-close-button {
-
           position: absolute;
-
           top: 14px;
-
           right: 14px;
-
           width: 38px;
-
           height: 38px;
-
           border-radius: 50%;
-
           border: none;
-
-          background:
-            rgba(15,23,42,0.08);
-
+          background: rgba(15,23,42,0.08);
           display: flex;
-
           align-items: center;
-
           justify-content: center;
-
           cursor: pointer;
-
           z-index: 2;
-
         }
-
 
         .modal-actions {
-
           display: flex;
-
           gap: 10px;
-
           margin-top: 18px;
-
         }
 
-
         @keyframes fadeIn {
-
           from {
             opacity: 0;
           }
@@ -2587,179 +1899,94 @@ export default function HolidayCalendar() {
           to {
             opacity: 1;
           }
-
         }
 
-
         @keyframes modalIn {
-
           from {
-
             opacity: 0;
-
             transform:
               translateY(20px)
               scale(0.98);
-
           }
 
           to {
-
             opacity: 1;
-
             transform:
               translateY(0)
               scale(1);
-
           }
-
         }
 
-
-        /* =================================================
-           TABLET
-        ================================================= */
-
-        @media (
-          max-width: 1100px
-        ) {
-
+        @media (max-width: 1100px) {
           .calendar-card {
             padding: 12px;
           }
-
         }
 
-
-        /* =================================================
-           MOBILE
-        ================================================= */
-
-        @media (
-          max-width: 700px
-        ) {
+        @media (max-width: 700px) {
 
           .calendar-card {
-
             padding: 10px;
-
           }
-
 
           .calendar-header {
-
-            align-items:
-              flex-start;
-
+            align-items: flex-start;
           }
-
 
           .calendar-title-section {
-
             width: 100%;
-
           }
-
 
           .calendar-title-section h2 {
-
-            font-size:
-              18px !important;
-
+            font-size: 18px !important;
           }
-
 
           .calendar-title-section p {
-
-            font-size:
-              10px !important;
-
+            font-size: 10px !important;
           }
-
 
           .calendar-controls {
-
             width: 100%;
-
           }
-
 
           .calendar-button {
-
             flex: 1;
-
           }
-
 
           .today-text {
-
             display: none;
-
           }
-
 
           .holiday-modal {
-
-            padding:
-              16px;
-
-            border-radius:
-              20px;
-
+            padding: 16px;
+            border-radius: 20px;
           }
-
 
           .modal-actions {
-
-            flex-direction:
-              column;
-
+            flex-direction: column;
           }
-
 
           .modal-actions button {
-
             width: 100%;
-
           }
-
         }
 
-
-        @media (
-          max-width: 480px
-        ) {
+        @media (max-width: 480px) {
 
           .holiday-modal-overlay {
-
-            padding:
-              10px;
-
+            padding: 10px;
           }
-
 
           .holiday-modal {
-
-            max-height:
-              95vh;
-
+            max-height: 95vh;
           }
-
 
           .calendar-card {
-
-            padding:
-              8px;
-
+            padding: 8px;
           }
-
         }
 
       `}</style>
-
-
     </>
-
   );
-
 }

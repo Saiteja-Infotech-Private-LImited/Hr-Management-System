@@ -835,6 +835,8 @@ export default function EmployeeNotificationsPage() {
 
             >
 
+              
+     feature/employee-notification-navigation
               <button
 
                 onClick={() =>
@@ -857,7 +859,7 @@ export default function EmployeeNotificationsPage() {
                 aria-label="Back"
 
               >
-                ←
+                <X size={18} />
               </button>
 
 
@@ -1035,7 +1037,6 @@ export default function EmployeeNotificationsPage() {
                 </span>
 
               </div>
-
 
               <h1
 
