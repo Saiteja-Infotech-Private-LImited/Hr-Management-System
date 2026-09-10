@@ -321,7 +321,7 @@ export default function AttendancePage() {
 
       toast.error(
         err?.response?.data?.message ||
-        'Check-in failed'
+          'Check-in failed'
       );
     } finally {
       setCheckingIn(false);
@@ -349,7 +349,7 @@ export default function AttendancePage() {
 
       toast.error(
         err?.response?.data?.message ||
-        'Check-out failed'
+          'Check-out failed'
       );
     } finally {
       setCheckingOut(false);
@@ -382,7 +382,7 @@ export default function AttendancePage() {
 
       toast.error(
         err?.response?.data?.message ||
-        'Could not update break'
+          'Could not update break'
       );
     } finally {
       setTogglingBreak(false);
@@ -426,7 +426,7 @@ export default function AttendancePage() {
 
       toast.error(
         err?.response?.data?.message ||
-        'Failed to delete attendance record'
+          'Failed to delete attendance record'
       );
     } finally {
       setDeletingId(null);
@@ -472,7 +472,7 @@ export default function AttendancePage() {
 
       toast.error(
         err?.response?.data?.message ||
-        'Failed to clear attendance records'
+          'Failed to clear attendance records'
       );
     } finally {
       setClearingAll(false);
@@ -1866,8 +1866,8 @@ export default function AttendancePage() {
                       –{' '}
                       {breakItem.breakEnd
                         ? formatTime(
-                          breakItem.breakEnd
-                        )
+                            breakItem.breakEnd
+                          )
                         : 'Ongoing'}
                     </div>
 
@@ -1880,8 +1880,8 @@ export default function AttendancePage() {
                     >
                       {breakItem.breakEnd
                         ? formatDuration(
-                          breakItem.durationMinutes
-                        )
+                            breakItem.durationMinutes
+                          )
                         : 'In progress'}
 
                       {breakItem.flagged &&
@@ -2384,12 +2384,12 @@ export default function AttendancePage() {
                               }
                               disabled={
                                 deletingId ===
-                                record.id ||
+                                  record.id ||
                                 clearingAll
                               }
                             >
                               {deletingId ===
-                                record.id ? (
+                              record.id ? (
                                 <RefreshCw
                                   size={14}
                                   style={{
@@ -2411,18 +2411,15 @@ export default function AttendancePage() {
                   </tbody>
                 </table>
               </div>
-
               {/* =================================================
                   PAGINATION
               ================================================== */}
-
               {totalPages > 1 && (
                 <div className="pagination">
                   <span className="pagination-info">
                     Page {page + 1} of{' '}
                     {totalPages}
                   </span>
-
                   <div className="pagination-controls">
                     <button
                       type="button"
@@ -2440,7 +2437,6 @@ export default function AttendancePage() {
                     >
                       <ChevronLeft size={14} />
                     </button>
-
                     <span className="page-number">
                       {page + 1}
                     </span>
