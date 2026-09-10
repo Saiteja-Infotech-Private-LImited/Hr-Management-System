@@ -1129,58 +1129,7 @@ export default function EmployeeDashboard() {
               {formattedDate}
             </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                router.push(
-                  '/employee/notifications'
-                )
-              }
-              style={{
-                display: 'flex',
-                alignItems:
-                  'center',
-                gap: '7px',
-                border: 'none',
-                background:
-                  'transparent',
-                color:
-                  'var(--text-primary)',
-                cursor: 'pointer',
-                fontSize: '11px',
-                fontWeight: 700,
-                padding: 0,
-              }}
-            >
-              <Bell size={15} />
-
-              Notifications
-
-              {unreadCount > 0 && (
-                <span
-                  style={{
-                    minWidth: '19px',
-                    height: '19px',
-                    padding:
-                      '0 5px',
-                    borderRadius:
-                      '999px',
-                    background:
-                      '#ef4444',
-                    color: '#fff',
-                    fontSize: '9px',
-                    display: 'inline-flex',
-                    alignItems:
-                      'center',
-                    justifyContent:
-                      'center',
-                    fontWeight: 800,
-                  }}
-                >
-                  {unreadCount}
-                </span>
-              )}
-            </button>
+            
           </div>
         </div>
       </div>
