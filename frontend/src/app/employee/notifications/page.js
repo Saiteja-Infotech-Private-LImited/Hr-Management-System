@@ -1,20 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
-import api from "@/lib/axios";
-import toast from "react-hot-toast";
+import api from '@/lib/axios';
+import toast from 'react-hot-toast';
 
-import { Trash2, X, Check } from "lucide-react";
+import { Trash2, X, Check } from 'lucide-react';
 
-
-// ============================================================
-// FORMAT TIME AGO
-// ============================================================
 
 function formatTimeAgo(dateStr, now) {
-  if (!dateStr) return "";
+  if (!dateStr) return '';
 
   const diff = now - new Date(dateStr).getTime();
 
@@ -22,17 +18,13 @@ function formatTimeAgo(dateStr, now) {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (mins < 1) return "Just now";
+  if (mins < 1) return 'Just now';
   if (mins < 60) return `${mins}m ago`;
   if (hours < 24) return `${hours}h ago`;
 
   return `${days}d ago`;
 }
 
-
-// ============================================================
-// EMPLOYEE NOTIFICATIONS PAGE
-// ============================================================
 
 export default function EmployeeNotificationsPage() {
 
@@ -43,7 +35,7 @@ export default function EmployeeNotificationsPage() {
 
   const [loading, setLoading] = useState(true);
 
-  const [filter, setFilter] = useState("ALL");
+  const [filter, setFilter] = useState('ALL');
 
   const [markingAll, setMarkingAll] = useState(false);
 
@@ -61,13 +53,8 @@ export default function EmployeeNotificationsPage() {
 
   const [now, setNow] = useState(() => Date.now());
 
-  // Notification details modal
   const [selectedNotification, setSelectedNotification] = useState(null);
 
-
-  // ============================================================
-  // UPDATE TIME
-  // ============================================================
 
   useEffect(() => {
 
@@ -80,10 +67,6 @@ export default function EmployeeNotificationsPage() {
   }, []);
 
 
-  // ============================================================
-  // FETCH NOTIFICATIONS
-  // ============================================================
-
   const fetchNotifications = useCallback(async () => {
 
     setLoading(true);
@@ -92,16 +75,16 @@ export default function EmployeeNotificationsPage() {
 
       const [notifRes, unreadRes] = await Promise.allSettled([
 
-        filter === "UNREAD"
+        filter === 'UNREAD'
           ? api.get(`/api/notifications/unread?page=${page}&size=10`)
           : api.get(`/api/notifications?page=${page}&size=10`),
 
-        api.get("/api/notifications/unread-count"),
+        api.get('/api/notifications/unread-count'),
 
       ]);
 
 
-      if (notifRes.status === "fulfilled") {
+      if (notifRes.status === 'fulfilled') {
 
         const data = notifRes.value.data?.data;
 
@@ -111,22 +94,17 @@ export default function EmployeeNotificationsPage() {
       }
 
 
-      if (unreadRes.status === "fulfilled") {
+      if (unreadRes.status === 'fulfilled') {
 
-        setUnreadCount(
-          unreadRes.value.data?.data || 0
-        );
+        setUnreadCount(unreadRes.value.data?.data || 0);
 
       }
 
     } catch (error) {
 
-      console.error(
-        "Failed to load notifications:",
-        error
-      );
+      console.error('Failed to load notifications:', error);
 
-      toast.error("Failed to load notifications");
+      toast.error('Failed to load notifications');
 
     } finally {
 
@@ -136,10 +114,6 @@ export default function EmployeeNotificationsPage() {
 
   }, [filter, page]);
 
-
-  // ============================================================
-  // LOAD NOTIFICATIONS
-  // ============================================================
 
   useEffect(() => {
 
@@ -152,21 +126,15 @@ export default function EmployeeNotificationsPage() {
   }, [fetchNotifications]);
 
 
-  // ============================================================
-  // MARK ONE NOTIFICATION AS READ
-  // ============================================================
-
   const handleMarkRead = async (id) => {
 
-    const notification =
-      notifications.find((n) => n.id === id);
+    const notification = notifications.find((n) => n.id === id);
 
     if (!notification || notification.isRead) {
       return;
     }
 
 
-    // Optimistic update
     setNotifications((prev) =>
       prev.map((n) =>
         n.id === id
@@ -176,29 +144,25 @@ export default function EmployeeNotificationsPage() {
     );
 
 
-    setUnreadCount((prev) =>
-      Math.max(0, prev - 1)
-    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
 
 
     try {
 
-      await api.put(
-        `/api/notifications/${id}/read`
-      );
+      await api.put(`/api/notifications/${id}/read`);
 
       window.dispatchEvent(
-        new Event("notificationsUpdated")
+        new Event('notificationsUpdated')
       );
 
     } catch (error) {
 
       console.error(
-        "Failed to mark as read:",
+        'Failed to mark as read:',
         error
       );
 
-      toast.error("Failed to mark as read");
+      toast.error('Failed to mark as read');
 
       fetchNotifications();
 
@@ -207,10 +171,6 @@ export default function EmployeeNotificationsPage() {
   };
 
 
-  // ============================================================
-  // MARK ALL NOTIFICATIONS AS READ
-  // ============================================================
-
   const handleMarkAllRead = async () => {
 
     setMarkingAll(true);
@@ -218,8 +178,9 @@ export default function EmployeeNotificationsPage() {
     try {
 
       await api.put(
-        "/api/notifications/mark-all-read"
+        '/api/notifications/mark-all-read'
       );
+
 
       setNotifications((prev) =>
         prev.map((n) => ({
@@ -228,25 +189,27 @@ export default function EmployeeNotificationsPage() {
         }))
       );
 
+
       setUnreadCount(0);
 
       toast.success(
-        "All notifications marked as read!"
+        'All notifications marked as read!'
       );
 
+
       window.dispatchEvent(
-        new Event("notificationsUpdated")
+        new Event('notificationsUpdated')
       );
 
     } catch (error) {
 
       console.error(
-        "Failed to mark all as read:",
+        'Failed to mark all as read:',
         error
       );
 
       toast.error(
-        "Failed to mark all as read"
+        'Failed to mark all as read'
       );
 
     } finally {
@@ -258,67 +221,51 @@ export default function EmployeeNotificationsPage() {
   };
 
 
-  // ============================================================
-  // NOTIFICATION CLICK
-  // ============================================================
+  /*
+   * Notification Click Navigation
+   *
+   * Leave -> Employee Leave
+   * Job -> Job Details
+   * Document / Onboarding -> Onboarding
+   *
+   * General notifications -> Details Modal
+   */
 
-  const handleNotificationClick = async (notification) => {
+  const handleNotificationClick = async (
+    notification
+  ) => {
 
     try {
 
-      // ----------------------------------------------------
-      // MARK AS READ
-      // ----------------------------------------------------
-
       if (!notification.isRead) {
-        await handleMarkRead(notification.id);
+
+        await handleMarkRead(
+          notification.id
+        );
+
       }
 
-
-      // ----------------------------------------------------
-      // GET REFERENCE TYPE
-      // ----------------------------------------------------
 
       const type = String(
         notification.referenceType ||
         notification.type ||
-        ""
+        ''
       ).toUpperCase();
 
-
-      // ----------------------------------------------------
-      // GET REFERENCE ID
-      // ----------------------------------------------------
 
       const referenceId =
         notification.referenceId ??
         notification.reference_id;
 
 
-      console.log(
-        "Notification clicked:",
-        {
-          id: notification.id,
-          type,
-          referenceType: notification.referenceType,
-          notificationType: notification.type,
-          referenceId,
-        }
-      );
-
-
-      // ----------------------------------------------------
-      // REFERENCE BASED NAVIGATION
-      // ----------------------------------------------------
-
       if (referenceId) {
 
 
-        // =================================================
-        // LEAVE
-        // =================================================
+        /*
+         * LEAVE NAVIGATION
+         */
 
-        if (type.includes("LEAVE")) {
+        if (type.includes('LEAVE')) {
 
           router.push(
             `/employee/leave?highlightId=${encodeURIComponent(
@@ -327,41 +274,47 @@ export default function EmployeeNotificationsPage() {
           );
 
           return;
+
         }
 
 
-        // =================================================
-        // JOB POSTING
-        // =================================================
+        /*
+         * JOB NAVIGATION
+         */
 
         if (
-          type.includes("JOB_POSTED") ||
-          type.includes("JOBPOSTING")
+
+          type.includes('JOB_POSTED') ||
+
+          type.includes('JOBPOSTING') ||
+
+          type.includes('JOB')
+
         ) {
 
-          console.log(
-            "Opening Job Details:",
-            referenceId
-          );
-
           router.push(
-            `/employee/jobs/details/?id=${encodeURIComponent(
+            `/employee/jobs/details?id=${encodeURIComponent(
               referenceId
             )}`
           );
 
           return;
+
         }
 
 
-        // =================================================
-        // DOCUMENT / ONBOARDING
-        // =================================================
+        /*
+         * DOCUMENT / ONBOARDING NAVIGATION
+         */
 
         if (
-          type.includes("DOCUMENT") ||
-          type.includes("ONBOARDING") ||
-          type.includes("DOC")
+
+          type.includes('DOCUMENT') ||
+
+          type.includes('ONBOARDING') ||
+
+          type.includes('DOC')
+
         ) {
 
           router.push(
@@ -371,27 +324,29 @@ export default function EmployeeNotificationsPage() {
           );
 
           return;
+
         }
 
       }
 
 
-      // ----------------------------------------------------
-      // GENERAL / MANUAL NOTIFICATION
-      // ----------------------------------------------------
+      /*
+       * GENERAL NOTIFICATION
+       */
 
-      setSelectedNotification(notification);
-
+      setSelectedNotification(
+        notification
+      );
 
     } catch (error) {
 
       console.error(
-        "Unable to open notification:",
+        'Unable to open notification:',
         error
       );
 
       toast.error(
-        "Unable to open notification"
+        'Unable to open notification'
       );
 
     }
@@ -399,21 +354,18 @@ export default function EmployeeNotificationsPage() {
   };
 
 
-  // ============================================================
-  // DELETE NOTIFICATION MODAL
-  // ============================================================
+  const openDeleteModal = (
+    notification
+  ) => {
 
-  const openDeleteModal = (notification) => {
+    setNotificationToDelete(
+      notification
+    );
 
-    setNotificationToDelete(notification);
     setShowDeleteModal(true);
 
   };
 
-
-  // ============================================================
-  // DELETE ONE NOTIFICATION
-  // ============================================================
 
   const handleDelete = async () => {
 
@@ -421,9 +373,13 @@ export default function EmployeeNotificationsPage() {
       return;
     }
 
-    const id = notificationToDelete.id;
+
+    const id =
+      notificationToDelete.id;
+
 
     setDeletingId(id);
+
 
     try {
 
@@ -442,21 +398,24 @@ export default function EmployeeNotificationsPage() {
 
 
       setNotifications((prev) =>
-        prev.filter((n) => n.id !== id)
+        prev.filter(
+          (n) => n.id !== id
+        )
       );
 
 
       setShowDeleteModal(false);
+
       setNotificationToDelete(null);
 
 
       toast.success(
-        "Notification deleted"
+        'Notification deleted'
       );
 
 
       window.dispatchEvent(
-        new Event("notificationsUpdated")
+        new Event('notificationsUpdated')
       );
 
 
@@ -483,13 +442,17 @@ export default function EmployeeNotificationsPage() {
     } catch (error) {
 
       console.error(
-        "Failed to delete notification:",
+        'Failed to delete notification:',
         error
       );
 
+
       toast.error(
+
         error?.response?.data?.message ||
-        "Failed to delete notification"
+
+        'Failed to delete notification'
+
       );
 
     } finally {
@@ -500,10 +463,6 @@ export default function EmployeeNotificationsPage() {
 
   };
 
-
-  // ============================================================
-  // CLEAR ALL MODAL
-  // ============================================================
 
   const openClearAllModal = () => {
 
@@ -516,24 +475,24 @@ export default function EmployeeNotificationsPage() {
   };
 
 
-  // ============================================================
-  // CLEAR ALL NOTIFICATIONS
-  // ============================================================
-
   const handleClearAll = async () => {
 
     setClearingAll(true);
 
+
     try {
 
       await api.delete(
-        "/api/notifications/clear-all"
+        '/api/notifications/clear-all'
       );
 
 
       setNotifications([]);
+
       setUnreadCount(0);
+
       setTotalPages(0);
+
       setPage(0);
 
 
@@ -541,24 +500,28 @@ export default function EmployeeNotificationsPage() {
 
 
       toast.success(
-        "All notifications cleared"
+        'All notifications cleared'
       );
 
 
       window.dispatchEvent(
-        new Event("notificationsUpdated")
+        new Event('notificationsUpdated')
       );
 
     } catch (error) {
 
       console.error(
-        "Failed to clear notifications:",
+        'Failed to clear notifications:',
         error
       );
 
+
       toast.error(
+
         error?.response?.data?.message ||
-        "Failed to clear notifications"
+
+        'Failed to clear notifications'
+
       );
 
     } finally {
@@ -570,106 +533,258 @@ export default function EmployeeNotificationsPage() {
   };
 
 
-  // ============================================================
-  // NOTIFICATION ICON
-  // ============================================================
-
   const getNotifIcon = (title) => {
 
-    if (!title) {
-      return "🔔";
-    }
+    if (!title) return '🔔';
 
     const t = title.toLowerCase();
 
-    if (t.includes("leave")) {
-      return "🌴";
+
+    if (t.includes('leave')) return '🌴';
+
+    if (
+      t.includes('payroll') ||
+      t.includes('salary')
+    ) {
+      return '💰';
+    }
+
+    if (t.includes('performance')) {
+      return '⭐';
+    }
+
+    if (t.includes('training')) {
+      return '📚';
+    }
+
+    if (t.includes('attendance')) {
+      return '📅';
+    }
+
+    if (t.includes('onboarding')) {
+      return '📋';
     }
 
     if (
-      t.includes("payroll") ||
-      t.includes("salary")
+      t.includes('recruitment') ||
+      t.includes('job')
     ) {
-      return "💰";
+      return '💼';
     }
 
-    if (t.includes("performance")) {
-      return "⭐";
+    if (t.includes('approved')) {
+      return '✅';
     }
 
-    if (t.includes("training")) {
-      return "📚";
+    if (t.includes('rejected')) {
+      return '❌';
     }
 
-    if (t.includes("attendance")) {
-      return "📅";
+    if (t.includes('cancelled')) {
+      return '🚫';
     }
 
-    if (t.includes("onboarding")) {
-      return "📋";
+    if (t.includes('festival')) {
+      return '🎉';
     }
 
     if (
-      t.includes("recruitment") ||
-      t.includes("job")
+      t.includes('circular') ||
+      t.includes('announcement')
     ) {
-      return "💼";
+      return '📢';
     }
 
-    if (t.includes("approved")) {
-      return "✅";
-    }
-
-    if (t.includes("rejected")) {
-      return "❌";
-    }
-
-    if (t.includes("cancelled")) {
-      return "🚫";
-    }
-
-    if (t.includes("festival")) {
-      return "🎉";
-    }
-
-    if (
-      t.includes("circular") ||
-      t.includes("announcement")
-    ) {
-      return "📢";
-    }
-
-    return "🔔";
+    return '🔔';
 
   };
 
-
-  // ============================================================
-  // LOADING
-  // ============================================================
-
-  if (loading) {
-
-    return (
-      <div className="p-6 text-gray-500 dark:text-gray-400">
-        Loading notifications...
-      </div>
-    );
-
-  }
-
-
-  // ============================================================
-  // UI
-  // ============================================================
 
   return (
 
     <div>
 
-      {/* =====================================================
-                NOTIFICATION DETAILS MODAL
-                ===================================================== */}
+
+      <style jsx global>{`
+
+        .emp-notifications-card {
+          background: var(--card-bg) !important;
+          border-color: var(--card-border) !important;
+        }
+
+        .emp-notification-row {
+          border-color: var(--card-border) !important;
+        }
+
+        .emp-notification-row.read {
+          background: var(--card-bg) !important;
+        }
+
+        .emp-notification-row.unread {
+          background: #f8faff !important;
+        }
+
+        .emp-notification-row.unread:hover {
+          background: #f0f4ff !important;
+        }
+
+        .emp-notification-row.read:hover {
+          background: #f8fafc !important;
+        }
+
+        .emp-notification-action {
+          background: var(--card-bg) !important;
+          border-color: var(--card-border) !important;
+        }
+
+        .emp-notification-delete {
+          color: #dc2626;
+          transition: all 0.15s ease;
+        }
+
+        .emp-notification-delete:hover {
+          background: #fef2f2 !important;
+          border-color: #fecaca !important;
+          color: #b91c1c !important;
+        }
+
+        .dark .emp-notifications-card {
+          background: #171c24 !important;
+          border-color: #2d3748 !important;
+        }
+
+        .dark .emp-notification-row {
+          border-color: #2d3748 !important;
+        }
+
+        .dark .emp-notification-row.read {
+          background: #171c24 !important;
+        }
+
+        .dark .emp-notification-row.unread {
+          background: #111827 !important;
+        }
+
+        .dark .emp-notification-row.unread:hover {
+          background: #1e293b !important;
+        }
+
+        .dark .emp-notification-row.read:hover {
+          background: #1b222c !important;
+        }
+
+        .dark .emp-notification-delete {
+          color: #f87171;
+        }
+
+        .dark .emp-notification-delete:hover {
+          background: #450a0a !important;
+          border-color: #7f1d1d !important;
+          color: #fca5a5 !important;
+        }
+
+        .emp-notification-modal-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          background: rgba(0, 0, 0, 0.55);
+          backdrop-filter: blur(4px);
+        }
+
+        .emp-notification-modal {
+          width: 100%;
+          max-width: 430px;
+          background: var(--card-bg);
+          border: 1px solid var(--card-border);
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .emp-notification-modal-title {
+          color: var(--text-primary);
+          font-size: 18px;
+          font-weight: 800;
+          margin: 0;
+        }
+
+        .emp-notification-modal-text {
+          color: var(--text-secondary);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .emp-notification-modal-preview {
+          background: var(--background);
+          border: 1px solid var(--card-border);
+          border-radius: 10px;
+          padding: 12px;
+        }
+
+        .emp-notification-modal-preview-title {
+          color: var(--text-primary);
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .emp-notification-modal-preview-message {
+          color: var(--text-secondary);
+          font-size: 12px;
+          line-height: 1.5;
+          margin-top: 4px;
+        }
+
+        .emp-notification-modal-cancel {
+          padding: 9px 18px;
+          border-radius: 9px;
+          border: 1px solid var(--card-border);
+          background: var(--card-bg);
+          color: var(--text-primary);
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .emp-notification-modal-delete {
+          padding: 9px 18px;
+          border-radius: 9px;
+          border: none;
+          background: #dc2626;
+          color: white;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .emp-notification-modal-delete:disabled,
+        .emp-notification-modal-cancel:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+
+          .emp-notification-row {
+            flex-wrap: wrap !important;
+          }
+
+          .emp-notification-actions {
+            width: 100%;
+            margin-left: 60px;
+          }
+
+        }
+
+      `}</style>
+
+
+      {/* =========================
+          NOTIFICATION DETAILS MODAL
+      ========================== */}
 
       {selectedNotification && (
 
@@ -682,94 +797,107 @@ export default function EmployeeNotificationsPage() {
         >
 
           <div
+
             style={{
-              width: "100%",
-              maxWidth: "620px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              background: "var(--card-bg)",
-              borderRadius: "14px",
+              width: '100%',
+              maxWidth: '620px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              background: 'var(--card-bg)',
+              borderRadius: '14px',
               boxShadow:
-                "0 25px 70px rgba(0,0,0,0.35)",
+                '0 25px 70px rgba(0,0,0,0.35)',
             }}
+
             onClick={(e) =>
               e.stopPropagation()
             }
+
           >
+
 
             {/* HEADER */}
 
             <div
+
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "16px 20px",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px 20px',
                 borderBottom:
-                  "1px solid var(--card-border)",
-                position: "sticky",
+                  '1px solid var(--card-border)',
+                position: 'sticky',
                 top: 0,
-                background: "var(--card-bg)",
+                background: 'var(--card-bg)',
                 zIndex: 2,
               }}
+
             >
 
+              
+     feature/employee-notification-navigation
               <button
+
                 onClick={() =>
                   setSelectedNotification(null)
                 }
+
                 style={{
-                  width: "32px",
-                  height: "32px",
-                  border: "none",
-                  borderRadius: "8px",
-                  background:
-                    "var(--background)",
-                  color:
-                    "var(--text-primary)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  width: '32px',
+                  height: '32px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  background: 'var(--background)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
+
                 aria-label="Back"
+
               >
-                ←
+                <X size={18} />
               </button>
 
 
               <p
+
                 style={{
                   margin: 0,
-                  fontWeight: "700",
-                  fontSize: "14px",
-                  color:
-                    "var(--text-primary)",
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  color: 'var(--text-primary)',
                 }}
+
               >
                 Notification
               </p>
 
 
               <button
+
                 onClick={() =>
                   setSelectedNotification(null)
                 }
+
                 style={{
-                  width: "32px",
-                  height: "32px",
-                  border: "none",
-                  borderRadius: "8px",
-                  background:
-                    "transparent",
-                  color:
-                    "var(--text-secondary)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  width: '32px',
+                  height: '32px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  background: 'transparent',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
+
                 aria-label="Close"
+
               >
                 <X size={18} />
               </button>
@@ -781,45 +909,53 @@ export default function EmployeeNotificationsPage() {
 
             <div
               style={{
-                padding:
-                  "40px 40px 24px",
+                padding: '40px 40px 24px',
               }}
             >
 
+
               <div
+
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  paddingBottom: "20px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  paddingBottom: '20px',
                   borderBottom:
-                    "1.5px solid var(--text-primary)",
-                  marginBottom: "28px",
+                    '1.5px solid var(--text-primary)',
+                  marginBottom: '28px',
                 }}
+
               >
 
                 <div
+
                   style={{
-                    width: "44px",
-                    height: "44px",
-                    borderRadius: "10px",
-                    background: "#eef2ff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '10px',
+                    background: '#eef2ff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
                   }}
+
                 >
 
                   <img
+
                     src="/removee.png"
+
                     alt="Saiteja Infotech Private Limited"
+
                     style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                      padding: "2px",
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      padding: '2px',
                     }}
+
                   />
 
                 </div>
@@ -828,23 +964,25 @@ export default function EmployeeNotificationsPage() {
                 <div>
 
                   <div
+
                     style={{
-                      fontWeight: "700",
-                      fontSize: "15px",
-                      color:
-                        "var(--text-primary)",
+                      fontWeight: '700',
+                      fontSize: '15px',
+                      color: 'var(--text-primary)',
                     }}
+
                   >
                     Saiteja Infotech Private Limited
                   </div>
 
 
                   <div
+
                     style={{
-                      fontSize: "12px",
-                      color:
-                        "var(--text-muted)",
+                      fontSize: '12px',
+                      color: 'var(--text-muted)',
                     }}
+
                   >
                     Office circular
                   </div>
@@ -855,101 +993,105 @@ export default function EmployeeNotificationsPage() {
 
 
               <div
+
                 style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  fontSize: "13px",
-                  color:
-                    "var(--text-secondary)",
-                  marginBottom: "24px",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '24px',
                 }}
+
               >
 
                 <span>
-                  To:{" "}
+
+                  To:{' '}
+
                   <strong
-                    style={{
-                      fontWeight: "700",
-                    }}
+                    style={{ fontWeight: '700' }}
                   >
                     You
                   </strong>
+
                 </span>
 
 
                 <span>
+
                   {selectedNotification.createdAt
+
                     ? new Date(
-                      selectedNotification.createdAt
-                    ).toLocaleDateString(
-                      "en-IN",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      }
-                    )
-                    : ""}
+                        selectedNotification.createdAt
+                      ).toLocaleDateString(
+                        'en-IN',
+                        {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        }
+                      )
+
+                    : ''}
+
                 </span>
 
               </div>
 
-
               <h1
+
                 style={{
-                  fontSize: "20px",
-                  margin:
-                    "0 0 24px",
-                  fontWeight: "800",
-                  color:
-                    "var(--text-primary)",
+                  fontSize: '20px',
+                  margin: '0 0 24px',
+                  fontWeight: '800',
+                  color: 'var(--text-primary)',
                 }}
+
               >
                 {selectedNotification.title}
               </h1>
 
 
               <div
+
                 style={{
-                  fontSize: "15px",
-                  lineHeight: "1.8",
-                  color:
-                    "var(--text-primary)",
-                  whiteSpace: "pre-wrap",
-                  wordBreak:
-                    "break-word",
+                  fontSize: '15px',
+                  lineHeight: '1.8',
+                  color: 'var(--text-primary)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
                 }}
+
               >
                 {selectedNotification.message}
               </div>
 
 
               <div
-                style={{
-                  marginTop: "32px",
-                }}
+                style={{ marginTop: '32px' }}
               >
 
                 <div
+
                   style={{
-                    fontSize: "15px",
-                    color:
-                      "var(--text-primary)",
-                    marginBottom: "4px",
+                    fontSize: '15px',
+                    color: 'var(--text-primary)',
+                    marginBottom: '4px',
                   }}
+
                 >
                   Warm regards,
                 </div>
 
 
                 <div
+
                   style={{
-                    fontSize: "15px",
-                    fontWeight: "700",
-                    color:
-                      "var(--text-primary)",
+                    fontSize: '15px',
+                    fontWeight: '700',
+                    color: 'var(--text-primary)',
                   }}
+
                 >
                   Saiteja Infotech Private Limited
                 </div>
@@ -962,30 +1104,34 @@ export default function EmployeeNotificationsPage() {
             {/* FOOTER */}
 
             <div
+
               style={{
-                padding: "14px 20px",
+                padding: '14px 20px',
                 borderTop:
-                  "1px solid var(--card-border)",
-                display: "flex",
-                justifyContent:
-                  "flex-end",
+                  '1px solid var(--card-border)',
+                display: 'flex',
+                justifyContent: 'flex-end',
               }}
+
             >
 
               <button
+
                 onClick={() =>
                   setSelectedNotification(null)
                 }
+
                 style={{
-                  padding: "9px 20px",
-                  border: "none",
-                  borderRadius: "9px",
-                  background: "#4f46e5",
-                  color: "white",
-                  fontSize: "13px",
-                  fontWeight: "700",
-                  cursor: "pointer",
+                  padding: '9px 20px',
+                  border: 'none',
+                  borderRadius: '9px',
+                  background: '#4f46e5',
+                  color: 'white',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
                 }}
+
               >
                 Close
               </button>
@@ -999,41 +1145,45 @@ export default function EmployeeNotificationsPage() {
       )}
 
 
-      {/* =====================================================
-                HEADER
-                ===================================================== */}
+      {/* =========================
+          PAGE HEADER
+      ========================== */}
 
       <div
+
         style={{
-          display: "flex",
-          justifyContent:
-            "space-between",
-          alignItems: "flex-start",
-          marginBottom: "24px",
-          gap: "20px",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '24px',
+          gap: '20px',
         }}
+
       >
 
         <div>
 
           <div
+
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "4px",
-              flexWrap: "wrap",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '4px',
+              flexWrap: 'wrap',
             }}
+
           >
 
             <h1
+
               style={{
-                fontSize: "24px",
-                fontWeight: "800",
-                color:
-                  "var(--text-primary)",
+                fontSize: '24px',
+                fontWeight: '800',
+                color: 'var(--text-primary)',
                 margin: 0,
               }}
+
             >
               Notifications
             </h1>
@@ -1042,14 +1192,16 @@ export default function EmployeeNotificationsPage() {
             {unreadCount > 0 && (
 
               <span
+
                 style={{
-                  background: "#4f46e5",
-                  color: "white",
-                  borderRadius: "20px",
-                  padding: "3px 12px",
-                  fontSize: "12px",
-                  fontWeight: "700",
+                  background: '#4f46e5',
+                  color: 'white',
+                  borderRadius: '20px',
+                  padding: '3px 12px',
+                  fontSize: '12px',
+                  fontWeight: '700',
                 }}
+
               >
                 {unreadCount} unread
               </span>
@@ -1060,11 +1212,12 @@ export default function EmployeeNotificationsPage() {
 
 
           <p
+
             style={{
-              fontSize: "14px",
-              color:
-                "var(--text-muted)",
+              fontSize: '14px',
+              color: 'var(--text-muted)',
             }}
+
           >
             Stay updated with your latest alerts and activities.
           </p>
@@ -1072,53 +1225,59 @@ export default function EmployeeNotificationsPage() {
         </div>
 
 
-        {/* HEADER BUTTONS */}
+        {/* ACTION BUTTONS */}
 
         <div
+
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flexWrap: "wrap",
-            justifyContent: "flex-end",
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
           }}
+
         >
 
           {unreadCount > 0 && (
 
             <button
+
               className="emp-notification-action"
+
               onClick={handleMarkAllRead}
+
               disabled={markingAll}
+
               style={{
-                padding: "11px 20px",
-                background:
-                  "var(--card-bg)",
-                color:
-                  "var(--text-primary)",
+                padding: '11px 20px',
+                color: 'var(--text-primary)',
                 border:
-                  "1.5px solid var(--card-border)",
-                borderRadius: "10px",
-                fontSize: "13px",
-                fontWeight: "700",
+                  '1.5px solid var(--card-border)',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: '700',
                 cursor: markingAll
-                  ? "not-allowed"
-                  : "pointer",
-                whiteSpace: "nowrap",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
+                  ? 'not-allowed'
+                  : 'pointer',
+                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
+
             >
 
-              {markingAll ? (
-                "Marking..."
-              ) : (
-                <>
-                  <Check size={14} />
-                  Mark all as read
-                </>
-              )}
+              {markingAll
+
+                ? 'Marking...'
+
+                : (
+                  <>
+                    <Check size={14} />
+                    Mark all as read
+                  </>
+                )}
 
             </button>
 
@@ -1128,32 +1287,36 @@ export default function EmployeeNotificationsPage() {
           {notifications.length > 0 && (
 
             <button
+
               onClick={openClearAllModal}
+
               disabled={clearingAll}
+
               style={{
-                padding: "11px 20px",
-                background: "#fff1f2",
-                color: "#dc2626",
+                padding: '11px 20px',
+                background: '#fff1f2',
+                color: '#dc2626',
                 border:
-                  "1.5px solid #fecdd3",
-                borderRadius: "10px",
-                fontSize: "13px",
-                fontWeight: "700",
+                  '1.5px solid #fecdd3',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: '700',
                 cursor: clearingAll
-                  ? "not-allowed"
-                  : "pointer",
-                whiteSpace: "nowrap",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
+                  ? 'not-allowed'
+                  : 'pointer',
+                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
+
             >
 
               <Trash2 size={14} />
 
               {clearingAll
-                ? "Clearing..."
-                : "Clear All"}
+                ? 'Clearing...'
+                : 'Clear All'}
 
             </button>
 
@@ -1164,60 +1327,72 @@ export default function EmployeeNotificationsPage() {
       </div>
 
 
-      {/* =====================================================
-                FILTER
-                ===================================================== */}
+      {/* =========================
+          FILTER
+      ========================== */}
 
       <div
+
         className="emp-notifications-card"
+
         style={{
-          display: "flex",
-          gap: "6px",
-          marginBottom: "20px",
-          background:
-            "var(--card-bg)",
-          borderRadius: "12px",
+          display: 'flex',
+          gap: '6px',
+          marginBottom: '20px',
+          borderRadius: '12px',
           border:
-            "1px solid var(--card-border)",
-          padding: "6px",
-          width: "fit-content",
+            '1px solid var(--card-border)',
+          padding: '6px',
+          width: 'fit-content',
           boxShadow:
-            "0 1px 4px rgba(0,0,0,0.04)",
+            '0 1px 4px rgba(0,0,0,0.04)',
         }}
+
       >
 
-        {["ALL", "UNREAD"].map((f) => (
+        {['ALL', 'UNREAD'].map((f) => (
 
           <button
+
             key={f}
+
             onClick={() => {
+
               setFilter(f);
+
               setPage(0);
+
             }}
+
             style={{
-              padding: "9px 20px",
-              borderRadius: "8px",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "13px",
-              fontWeight: "700",
+              padding: '9px 20px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: '700',
               background:
                 filter === f
-                  ? "#4f46e5"
-                  : "transparent",
+                  ? '#4f46e5'
+                  : 'transparent',
               color:
                 filter === f
-                  ? "white"
-                  : "var(--text-secondary)",
-              transition: "all 0.15s",
+                  ? 'white'
+                  : 'var(--text-secondary)',
             }}
+
           >
-            {f === "ALL"
-              ? "All Notifications"
-              : `Unread${unreadCount
-                ? ` (${unreadCount})`
-                : ""
-              }`}
+
+            {f === 'ALL'
+
+              ? 'All Notifications'
+
+              : `Unread${
+                  unreadCount
+                    ? ` (${unreadCount})`
+                    : ''
+                }`}
+
           </button>
 
         ))}
@@ -1225,104 +1400,182 @@ export default function EmployeeNotificationsPage() {
       </div>
 
 
-      {/* =====================================================
-                NOTIFICATION CARD
-                ===================================================== */}
+      {/* =========================
+          NOTIFICATION LIST
+      ========================== */}
 
       <div
+
         className="emp-notifications-card"
+
         style={{
-          background:
-            "var(--card-bg)",
-          borderRadius: "14px",
+          borderRadius: '14px',
           border:
-            "1px solid var(--card-border)",
+            '1px solid var(--card-border)',
           boxShadow:
-            "0 1px 4px rgba(0,0,0,0.04)",
-          overflow: "hidden",
+            '0 1px 4px rgba(0,0,0,0.04)',
+          overflow: 'hidden',
         }}
+
       >
 
-        {notifications.length === 0 ? (
+
+        {loading ? (
 
           <div
+
             style={{
-              padding: "80px 20px",
-              textAlign: "center",
-              color:
-                "var(--text-muted)",
+              padding: '70px',
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              fontSize: '14px',
             }}
+
+          >
+            Loading notifications...
+          </div>
+
+
+        ) : notifications.length === 0 ? (
+
+
+          <div
+
+            style={{
+              padding: '80px 20px',
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+            }}
+
           >
 
             <div
               style={{
-                fontSize: "44px",
-                marginBottom: "14px",
+                fontSize: '44px',
+                marginBottom: '14px',
               }}
             >
               🔔
             </div>
 
-            <div
-              style={{
-                fontSize: "16px",
-                fontWeight: "700",
-                color:
-                  "var(--text-primary)",
-                marginBottom: "6px",
-              }}
-            >
-              {filter === "UNREAD"
-                ? "You're all caught up!"
-                : "No notifications yet"}
-            </div>
 
             <div
+
               style={{
-                fontSize: "13px",
-                color:
-                  "var(--text-muted)",
+                fontSize: '16px',
+                fontWeight: '700',
+                color: 'var(--text-primary)',
+                marginBottom: '6px',
               }}
+
             >
-              {filter === "UNREAD"
-                ? "No unread notifications right now."
-                : "Updates and alerts will appear here."}
+
+              {filter === 'UNREAD'
+
+                ? "You're all caught up!"
+
+                : 'No notifications yet'}
+
             </div>
+
+
+            <div
+
+              style={{
+                fontSize: '13px',
+                color: 'var(--text-muted)',
+              }}
+
+            >
+
+              {filter === 'UNREAD'
+
+                ? 'No unread notifications right now.'
+
+                : 'Updates and alerts will appear here.'}
+
+            </div>
+
+
+            {filter === 'UNREAD' && (
+
+              <button
+
+                onClick={() => {
+
+                  setFilter('ALL');
+
+                  setPage(0);
+
+                }}
+
+                style={{
+                  marginTop: '18px',
+                  padding: '10px 22px',
+                  background: '#1e3a5f',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                }}
+
+              >
+                View all notifications
+              </button>
+
+            )}
 
           </div>
 
+
         ) : (
+
 
           <>
 
+
             {notifications.map((n) => {
 
+
               const shortMessage =
+
                 n.message?.length > 160
+
                   ? `${n.message.substring(
-                    0,
-                    160
-                  )}...`
+                      0,
+                      160
+                    )}...`
+
                   : n.message;
+
 
               return (
 
                 <div
+
                   key={n.id}
-                  className={`emp-notification-row ${n.isRead
-                    ? "read"
-                    : "unread"
-                    }`}
+
+                  className={`emp-notification-row ${
+                    n.isRead
+                      ? 'read'
+                      : 'unread'
+                  }`}
+
                   role="button"
+
                   tabIndex={0}
+
                   onClick={() =>
                     handleNotificationClick(n)
                   }
+
                   onKeyDown={(e) => {
 
                     if (
-                      e.key === "Enter" ||
-                      e.key === " "
+                      e.key === 'Enter' ||
+                      e.key === ' '
                     ) {
 
                       e.preventDefault();
@@ -1332,57 +1585,66 @@ export default function EmployeeNotificationsPage() {
                     }
 
                   }}
+
                   style={{
-                    display: "flex",
-                    gap: "16px",
-                    alignItems:
-                      "flex-start",
-                    padding:
-                      "18px 20px",
+                    display: 'flex',
+                    gap: '16px',
+                    alignItems: 'flex-start',
+                    padding: '18px 20px',
                     borderBottom:
-                      "1px solid var(--card-border)",
-                    cursor: "pointer",
+                      '1px solid var(--card-border)',
+                    cursor: 'pointer',
                   }}
+
                 >
 
+
+                  {/* UNREAD DOT */}
+
                   <div
+
                     style={{
-                      width: "8px",
-                      minWidth: "8px",
-                      height: "8px",
-                      marginTop: "7px",
-                      borderRadius: "50%",
+                      width: '8px',
+                      minWidth: '8px',
+                      height: '8px',
+                      marginTop: '7px',
+                      borderRadius: '50%',
                       background:
                         n.isRead
-                          ? "transparent"
-                          : "#4f46e5",
+                          ? 'transparent'
+                          : '#4f46e5',
                     }}
+
                   />
 
 
+                  {/* ICON */}
+
                   <div
+
                     style={{
-                      width: "46px",
-                      height: "46px",
-                      minWidth: "46px",
-                      borderRadius: "12px",
+                      width: '46px',
+                      height: '46px',
+                      minWidth: '46px',
+                      borderRadius: '12px',
                       background:
                         n.isRead
-                          ? "#f1f5f9"
-                          : "#eef2ff",
-                      display: "flex",
-                      alignItems:
-                        "center",
-                      justifyContent:
-                        "center",
-                      fontSize: "21px",
+                          ? '#f1f5f9'
+                          : '#eef2ff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '21px',
                     }}
+
                   >
-                    {getNotifIcon(
-                      n.title
-                    )}
+
+                    {getNotifIcon(n.title)}
+
                   </div>
 
+
+                  {/* CONTENT */}
 
                   <div
                     style={{
@@ -1392,17 +1654,18 @@ export default function EmployeeNotificationsPage() {
                   >
 
                     <div
+
                       style={{
-                        fontSize: "14px",
+                        fontSize: '14px',
                         fontWeight:
                           n.isRead
-                            ? "600"
-                            : "800",
+                            ? '600'
+                            : '800',
                         color:
-                          "var(--text-primary)",
-                        marginBottom:
-                          "5px",
+                          'var(--text-primary)',
+                        marginBottom: '5px',
                       }}
+
                     >
                       {n.title}
                     </div>
@@ -1411,15 +1674,15 @@ export default function EmployeeNotificationsPage() {
                     {n.message && (
 
                       <div
+
                         style={{
-                          fontSize: "13px",
+                          fontSize: '13px',
                           color:
-                            "var(--text-secondary)",
-                          lineHeight:
-                            "1.5",
-                          marginBottom:
-                            "6px",
+                            'var(--text-secondary)',
+                          lineHeight: '1.5',
+                          marginBottom: '6px',
                         }}
+
                       >
                         {shortMessage}
                       </div>
@@ -1428,65 +1691,67 @@ export default function EmployeeNotificationsPage() {
 
 
                     <div
+
                       style={{
-                        fontSize: "12px",
+                        fontSize: '12px',
                         color:
-                          "var(--text-muted)",
+                          'var(--text-muted)',
                       }}
+
                     >
+
                       {formatTimeAgo(
                         n.createdAt,
                         now
                       )}
+
                     </div>
 
                   </div>
 
 
+                  {/* ACTIONS */}
+
                   <div
+
                     className="emp-notification-actions"
+
                     style={{
-                      display: "flex",
-                      alignItems:
-                        "center",
-                      gap: "8px",
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
                       flexShrink: 0,
                     }}
+
                   >
+
 
                     {!n.isRead && (
 
                       <button
+
                         className="emp-notification-action"
+
                         onClick={(e) => {
 
                           e.stopPropagation();
 
-                          handleMarkRead(
-                            n.id
-                          );
+                          handleMarkRead(n.id);
 
                         }}
+
                         style={{
-                          padding:
-                            "7px 16px",
-                          background:
-                            "var(--card-bg)",
-                          color:
-                            "#4f46e5",
+                          padding: '7px 16px',
+                          color: '#4f46e5',
                           border:
-                            "1.5px solid var(--card-border)",
-                          borderRadius:
-                            "8px",
-                          fontSize:
-                            "12px",
-                          fontWeight:
-                            "700",
-                          cursor:
-                            "pointer",
-                          whiteSpace:
-                            "nowrap",
+                            '1.5px solid var(--card-border)',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
                         }}
+
                       >
                         Mark read
                       </button>
@@ -1495,7 +1760,9 @@ export default function EmployeeNotificationsPage() {
 
 
                     <button
+
                       className="emp-notification-delete"
+
                       onClick={(e) => {
 
                         e.stopPropagation();
@@ -1503,44 +1770,50 @@ export default function EmployeeNotificationsPage() {
                         openDeleteModal(n);
 
                       }}
+
                       disabled={
                         deletingId === n.id
                       }
+
                       title="Delete notification"
+
                       aria-label="Delete notification"
+
                       style={{
-                        width: "34px",
-                        height: "34px",
-                        display: "flex",
-                        alignItems:
-                          "center",
-                        justifyContent:
-                          "center",
-                        borderRadius:
-                          "8px",
+                        width: '34px',
+                        height: '34px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '8px',
                         border:
-                          "1.5px solid var(--card-border)",
+                          '1.5px solid var(--card-border)',
                         background:
-                          "var(--card-bg)",
+                          'var(--card-bg)',
                         cursor:
                           deletingId === n.id
-                            ? "not-allowed"
-                            : "pointer",
+                            ? 'not-allowed'
+                            : 'pointer',
                         flexShrink: 0,
                       }}
+
                     >
 
-                      {deletingId === n.id ? (
-                        <span
-                          style={{
-                            fontSize: "14px",
-                          }}
-                        >
-                          ⏳
-                        </span>
-                      ) : (
-                        <Trash2 size={16} />
-                      )}
+                      {deletingId === n.id
+
+                        ? (
+                          <span
+                            style={{
+                              fontSize: '14px',
+                            }}
+                          >
+                            ⏳
+                          </span>
+                        )
+
+                        : (
+                          <Trash2 size={16} />
+                        )}
 
                     </button>
 
@@ -1558,74 +1831,71 @@ export default function EmployeeNotificationsPage() {
             {totalPages > 1 && (
 
               <div
+
                 style={{
-                  padding:
-                    "16px 20px",
-                  display: "flex",
-                  justifyContent:
-                    "center",
-                  alignItems:
-                    "center",
-                  gap: "10px",
+                  padding: '16px 20px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
                   borderTop:
-                    "1px solid var(--card-border)",
+                    '1px solid var(--card-border)',
                 }}
+
               >
 
                 <button
+
                   className="emp-notification-action"
+
                   onClick={() =>
                     setPage((p) =>
-                      Math.max(
-                        0,
-                        p - 1
-                      )
+                      Math.max(0, p - 1)
                     )
                   }
+
                   disabled={page === 0}
+
                   style={{
-                    padding:
-                      "7px 16px",
+                    padding: '7px 16px',
                     border:
-                      "1.5px solid var(--card-border)",
-                    borderRadius:
-                      "8px",
-                    fontSize:
-                      "12px",
-                    fontWeight:
-                      "700",
+                      '1.5px solid var(--card-border)',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: '700',
                     color:
                       page === 0
-                        ? "var(--text-muted)"
-                        : "var(--text-primary)",
-                    background:
-                      "var(--card-bg)",
+                        ? 'var(--text-muted)'
+                        : 'var(--text-primary)',
                     cursor:
                       page === 0
-                        ? "not-allowed"
-                        : "pointer",
+                        ? 'not-allowed'
+                        : 'pointer',
                   }}
+
                 >
                   ← Prev
                 </button>
 
 
                 <span
+
                   style={{
-                    fontSize: "12px",
+                    fontSize: '12px',
                     color:
-                      "var(--text-secondary)",
-                    fontWeight:
-                      "600",
+                      'var(--text-secondary)',
+                    fontWeight: '600',
                   }}
+
                 >
-                  Page {page + 1} of{" "}
-                  {totalPages}
+                  Page {page + 1} of {totalPages}
                 </span>
 
 
                 <button
+
                   className="emp-notification-action"
+
                   onClick={() =>
                     setPage((p) =>
                       Math.min(
@@ -1634,34 +1904,28 @@ export default function EmployeeNotificationsPage() {
                       )
                     )
                   }
+
                   disabled={
-                    page >=
-                    totalPages - 1
+                    page >= totalPages - 1
                   }
+
                   style={{
-                    padding:
-                      "7px 16px",
+                    padding: '7px 16px',
                     border:
-                      "1.5px solid var(--card-border)",
-                    borderRadius:
-                      "8px",
-                    fontSize:
-                      "12px",
-                    fontWeight:
-                      "700",
+                      '1.5px solid var(--card-border)',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: '700',
                     color:
-                      page >=
-                        totalPages - 1
-                        ? "var(--text-muted)"
-                        : "var(--text-primary)",
-                    background:
-                      "var(--card-bg)",
+                      page >= totalPages - 1
+                        ? 'var(--text-muted)'
+                        : 'var(--text-primary)',
                     cursor:
-                      page >=
-                        totalPages - 1
-                        ? "not-allowed"
-                        : "pointer",
+                      page >= totalPages - 1
+                        ? 'not-allowed'
+                        : 'pointer',
                   }}
+
                 >
                   Next →
                 </button>
@@ -1670,6 +1934,7 @@ export default function EmployeeNotificationsPage() {
 
             )}
 
+
           </>
 
         )}
@@ -1677,305 +1942,112 @@ export default function EmployeeNotificationsPage() {
       </div>
 
 
-      {/* =====================================================
-                DELETE NOTIFICATION MODAL
-                ===================================================== */}
+      {/* =========================
+          DELETE MODAL
+      ========================== */}
 
       {showDeleteModal &&
         notificationToDelete && (
 
-          <div
-            className="emp-notification-modal-overlay"
-            onClick={() => {
-
-              if (!deletingId) {
-
-                setShowDeleteModal(false);
-
-                setNotificationToDelete(
-                  null
-                );
-
-              }
-
-            }}
-          >
-
-            <div
-              className="emp-notification-modal"
-              onClick={(e) =>
-                e.stopPropagation()
-              }
-            >
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  alignItems:
-                    "center",
-                  marginBottom:
-                    "14px",
-                }}
-              >
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems:
-                      "center",
-                    gap: "10px",
-                  }}
-                >
-
-                  <div
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius:
-                        "10px",
-                      background:
-                        "#fee2e2",
-                      display: "flex",
-                      alignItems:
-                        "center",
-                      justifyContent:
-                        "center",
-                      color:
-                        "#dc2626",
-                    }}
-                  >
-                    <Trash2 size={18} />
-                  </div>
-
-
-                  <h2 className="emp-notification-modal-title">
-                    Delete Notification?
-                  </h2>
-
-                </div>
-
-
-                <button
-                  onClick={() => {
-
-                    setShowDeleteModal(
-                      false
-                    );
-
-                    setNotificationToDelete(
-                      null
-                    );
-
-                  }}
-                  disabled={
-                    deletingId !== null
-                  }
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius:
-                      "8px",
-                    border: "none",
-                    background:
-                      "transparent",
-                    color:
-                      "var(--text-secondary)",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems:
-                      "center",
-                    justifyContent:
-                      "center",
-                  }}
-                  aria-label="Close"
-                >
-                  <X size={18} />
-                </button>
-
-              </div>
-
-
-              <p className="emp-notification-modal-text">
-                Are you sure you want to delete this notification?
-              </p>
-
-
-              <div
-                className="emp-notification-modal-preview"
-                style={{
-                  marginTop: "16px",
-                }}
-              >
-
-                <div className="emp-notification-modal-preview-title">
-                  {notificationToDelete.title}
-                </div>
-
-
-                {notificationToDelete.message && (
-
-                  <div className="emp-notification-modal-preview-message">
-                    {notificationToDelete.message}
-                  </div>
-
-                )}
-
-              </div>
-
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "flex-end",
-                  gap: "10px",
-                  marginTop:
-                    "22px",
-                }}
-              >
-
-                <button
-                  className="emp-notification-modal-cancel"
-                  onClick={() => {
-
-                    setShowDeleteModal(
-                      false
-                    );
-
-                    setNotificationToDelete(
-                      null
-                    );
-
-                  }}
-                  disabled={
-                    deletingId !== null
-                  }
-                >
-                  Cancel
-                </button>
-
-
-                <button
-                  className="emp-notification-modal-delete"
-                  onClick={handleDelete}
-                  disabled={
-                    deletingId !== null
-                  }
-                >
-                  {deletingId !== null
-                    ? "Deleting..."
-                    : "Delete"}
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        )}
-
-
-      {/* =====================================================
-                CLEAR ALL MODAL
-                ===================================================== */}
-
-      {showClearModal && (
-
         <div
+
           className="emp-notification-modal-overlay"
+
           onClick={() => {
 
-            if (!clearingAll) {
-              setShowClearModal(false);
+            if (!deletingId) {
+
+              setShowDeleteModal(false);
+
+              setNotificationToDelete(null);
+
             }
 
           }}
+
         >
 
           <div
+
             className="emp-notification-modal"
+
             onClick={(e) =>
               e.stopPropagation()
             }
+
           >
 
             <div
+
               style={{
-                display: "flex",
-                justifyContent:
-                  "space-between",
-                alignItems:
-                  "center",
-                marginBottom:
-                  "14px",
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '14px',
               }}
+
             >
 
               <div
+
                 style={{
-                  display: "flex",
-                  alignItems:
-                    "center",
-                  gap: "10px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
                 }}
+
               >
 
                 <div
+
                   style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius:
-                      "10px",
-                    background:
-                      "#fee2e2",
-                    display: "flex",
-                    alignItems:
-                      "center",
-                    justifyContent:
-                      "center",
-                    color:
-                      "#dc2626",
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    background: '#fee2e2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#dc2626',
                   }}
+
                 >
                   <Trash2 size={18} />
                 </div>
 
 
-                <h2 className="emp-notification-modal-title">
-                  Clear All Notifications?
+                <h2
+                  className="emp-notification-modal-title"
+                >
+                  Delete Notification?
                 </h2>
 
               </div>
 
 
               <button
-                onClick={() =>
-                  setShowClearModal(
-                    false
-                  )
-                }
-                disabled={clearingAll}
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius:
-                    "8px",
-                  border: "none",
-                  background:
-                    "transparent",
-                  color:
-                    "var(--text-secondary)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems:
-                    "center",
-                  justifyContent:
-                    "center",
+
+                onClick={() => {
+
+                  setShowDeleteModal(false);
+
+                  setNotificationToDelete(null);
+
                 }}
-                aria-label="Close"
+
+                disabled={deletingId !== null}
+
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'transparent',
+                  color:
+                    'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+
               >
                 <X size={18} />
               </button>
@@ -1983,47 +2055,258 @@ export default function EmployeeNotificationsPage() {
             </div>
 
 
-            <p className="emp-notification-modal-text">
-              Are you sure you want to clear all notifications? This action cannot be undone.
+            <p
+              className="emp-notification-modal-text"
+            >
+              Are you sure you want to delete this
+              notification?
             </p>
 
 
             <div
+
+              className="emp-notification-modal-preview"
+
               style={{
-                display: "flex",
-                justifyContent:
-                  "flex-end",
-                gap: "10px",
-                marginTop:
-                  "22px",
+                marginTop: '16px',
               }}
+
+            >
+
+              <div
+                className="emp-notification-modal-preview-title"
+              >
+                {notificationToDelete.title}
+              </div>
+
+
+              {notificationToDelete.message && (
+
+                <div
+                  className="emp-notification-modal-preview-message"
+                >
+                  {notificationToDelete.message}
+                </div>
+
+              )}
+
+            </div>
+
+
+            <div
+
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                marginTop: '22px',
+              }}
+
             >
 
               <button
+
                 className="emp-notification-modal-cancel"
-                onClick={() =>
-                  setShowClearModal(
-                    false
-                  )
-                }
-                disabled={
-                  clearingAll
-                }
+
+                onClick={() => {
+
+                  setShowDeleteModal(false);
+
+                  setNotificationToDelete(null);
+
+                }}
+
+                disabled={deletingId !== null}
+
               >
                 Cancel
               </button>
 
 
               <button
+
                 className="emp-notification-modal-delete"
-                onClick={handleClearAll}
-                disabled={
-                  clearingAll
-                }
+
+                onClick={handleDelete}
+
+                disabled={deletingId !== null}
+
               >
+
+                {deletingId !== null
+
+                  ? 'Deleting...'
+
+                  : 'Delete'}
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =========================
+          CLEAR ALL MODAL
+      ========================== */}
+
+      {showClearModal && (
+
+        <div
+
+          className="emp-notification-modal-overlay"
+
+          onClick={() => {
+
+            if (!clearingAll) {
+
+              setShowClearModal(false);
+
+            }
+
+          }}
+
+        >
+
+          <div
+
+            className="emp-notification-modal"
+
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+
+          >
+
+            <div
+
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '14px',
+              }}
+
+            >
+
+              <div
+
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+
+              >
+
+                <div
+
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    background: '#fee2e2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#dc2626',
+                  }}
+
+                >
+                  <Trash2 size={18} />
+                </div>
+
+
+                <h2
+                  className="emp-notification-modal-title"
+                >
+                  Clear All Notifications?
+                </h2>
+
+              </div>
+
+
+              <button
+
+                onClick={() =>
+                  setShowClearModal(false)
+                }
+
+                disabled={clearingAll}
+
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'transparent',
+                  color:
+                    'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+
+              >
+                <X size={18} />
+              </button>
+
+            </div>
+
+
+            <p
+              className="emp-notification-modal-text"
+            >
+              Are you sure you want to clear all
+              notifications? This action cannot be
+              undone.
+            </p>
+
+
+            <div
+
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                marginTop: '22px',
+              }}
+
+            >
+
+              <button
+
+                className="emp-notification-modal-cancel"
+
+                onClick={() =>
+                  setShowClearModal(false)
+                }
+
+                disabled={clearingAll}
+
+              >
+                Cancel
+              </button>
+
+
+              <button
+
+                className="emp-notification-modal-delete"
+
+                onClick={handleClearAll}
+
+                disabled={clearingAll}
+
+              >
+
                 {clearingAll
-                  ? "Clearing..."
-                  : "Clear All"}
+
+                  ? 'Clearing...'
+
+                  : 'Clear All'}
+
               </button>
 
             </div>
@@ -2035,5 +2318,7 @@ export default function EmployeeNotificationsPage() {
       )}
 
     </div>
+
   );
+
 }
