@@ -233,6 +233,7 @@ function TodayMetric({
 
 export default function AttendancePage() {
   const [records, setRecords] = useState([]);
+  const [allRecords, setAllRecords] = useState([]);
   const [todayAtt, setTodayAtt] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -264,6 +265,10 @@ export default function AttendancePage() {
 
       setRecords(content);
       setTotalPages(data?.totalPages || 0);
+
+      // Fetch all records for accurate global stats (Present, Absent, etc.)
+      const allRes = await getMyAttendance(0, 10000);
+      setAllRecords(allRes.data?.data?.content || []);
 
       const today = new Date()
         .toISOString()
@@ -483,19 +488,19 @@ export default function AttendancePage() {
      CALCULATIONS
   ========================================================= */
 
-  const presentCount = records.filter(
+  const presentCount = allRecords.filter(
     (record) => record.status === 'PRESENT'
   ).length;
 
-  const halfDayCount = records.filter(
+  const halfDayCount = allRecords.filter(
     (record) => record.status === 'HALF_DAY'
   ).length;
 
-  const absentCount = records.filter(
+  const absentCount = allRecords.filter(
     (record) => record.status === 'ABSENT'
   ).length;
 
-  const lateCount = records.filter(
+  const lateCount = allRecords.filter(
     (record) => record.status === 'LATE'
   ).length;
 
