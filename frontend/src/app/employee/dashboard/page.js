@@ -68,31 +68,28 @@ const dashboardCSS = `
   border - color: rgba(59, 130, 246, 0.25)!important;
 }
 
-  .quick - action - button {
-  border: 1px solid var(--card - border);
-  background: var(--bg - primary);
-  color: var(--text - primary);
-  border - radius: 13px;
-  padding: 12px;
-  cursor: pointer;
-  display: flex;
-  align - items: center;
-  gap: 10px;
-  font - size: 11px;
-  font - weight: 700;
-  transition:
-      transform 0.2s ease,
-    background 0.2s ease,
-      border - color 0.2s ease;
-  width: 100 %;
-  text - align: left;
-}
+  .quick-action-button {
+    border: 1px solid var(--card-border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 13px;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    width: 100%;
+    text-align: left;
+  }
 
-  .quick - action - button:hover {
-  transform: translateY(-2px);
-  border - color: rgba(59, 130, 246, 0.30);
-  background: rgba(59, 130, 246, 0.05);
-}
+  .quick-action-button:hover {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.30);
+    background: rgba(59, 130, 246, 0.05);
+  }
 
 @media(max - width: 1100px) {
     .employee - dashboard - grid {
@@ -1766,7 +1763,7 @@ export default function EmployeeDashboard() {
           <div
             className="employee-card"
             style={{
-              padding: '18px',
+              padding: '22px',
               marginBottom: '18px',
               background:
                 'var(--card-bg)',
@@ -1777,30 +1774,11 @@ export default function EmployeeDashboard() {
                 'var(--card-shadow)',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems:
-                  'center',
-                gap: '9px',
-                marginBottom:
-                  '13px',
-              }}
-            >
-              <BriefcaseBusiness
-                size={16}
-                color="#3b82f6"
-              />
-
-              <span
-                style={{
-                  fontSize: '13px',
-                  fontWeight: 800,
-                }}
-              >
-                Quick Actions
-              </span>
-            </div>
+            <SectionHeader
+              icon={BriefcaseBusiness}
+              title="Quick Actions"
+              subtitle="Fast track your tasks"
+            />
 
             <div
               className="quick-action-grid"
