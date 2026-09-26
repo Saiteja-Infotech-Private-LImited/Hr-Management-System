@@ -36,810 +36,120 @@ import {
   TrendingUp,
 } from 'lucide-react';
 
-const dashboardCSS = `
 /* =========================================================
-   EMPLOYEE DASHBOARD — RESPONSIVE SYSTEM
-   All responsive styling is kept inside this JSX file.
+   CSS
    ========================================================= */
 
+const dashboardCSS = `
 @keyframes employeeDashboardSpin {
-  from {
+    from {
     transform: rotate(0deg);
   }
 
-  to {
+    to {
     transform: rotate(360deg);
   }
 }
 
-/* ---------- GLOBAL ---------- */
+  .employee - dashboard * {
+  box- sizing: border - box;
+  }
 
-.employee-dashboard,
-.employee-dashboard * {
-  box-sizing: border-box;
-}
-
-.employee-dashboard {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.employee-dashboard .employee-card,
-.employee-dashboard .employee-kpi {
-  min-width: 0;
-}
-
-/* ---------- KPI ---------- */
-
-.employee-kpi {
+  .employee - kpi {
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+      transform 0.2s ease,
+    box - shadow 0.2s ease,
+      border - color 0.2s ease;
 }
 
-.employee-kpi.clickable:hover {
+  .employee - kpi.clickable:hover {
   transform: translateY(-3px);
-  box-shadow:
-    0 14px 35px rgba(15, 23, 42, 0.09) !important;
-  border-color:
-    rgba(59, 130, 246, 0.25) !important;
+  box - shadow: 0 14px 35px rgba(15, 23, 42, 0.09)!important;
+  border - color: rgba(59, 130, 246, 0.25)!important;
 }
 
-/* ---------- QUICK ACTION ---------- */
-
-.quick-action-button {
-  border:
-    1px solid var(--card-border);
-
-  background:
-    var(--bg-primary);
-
-  color:
-    var(--text-primary);
-
-  border-radius:
-    13px;
-
-  padding:
-    12px;
-
-  cursor:
-    pointer;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  gap:
-    10px;
-
-  font-size:
-    11px;
-
-  font-weight:
-    700;
-
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-
-  width:
-    100%;
-
-  min-width:
-    0;
-
-  text-align:
-    left;
-}
-
-.quick-action-button:hover {
-  transform:
-    translateY(-2px);
-
-  border-color:
-    rgba(59, 130, 246, 0.30);
-
-  background:
-    rgba(59, 130, 246, 0.05);
-}
-
-/* =========================================================
-   LARGE TABLETS / SMALL LAPTOPS
-   ========================================================= */
-
-@media (max-width: 1100px) {
-
-  .employee-dashboard-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  .employee-two-column {
-    grid-template-columns:
-      1fr !important;
-  }
-
-  .employee-bottom-grid {
-    grid-template-columns:
-      1fr !important;
-  }
-
-  .employee-dashboard {
-    max-width: 100%;
-  }
-}
-
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  .employee-dashboard {
+  .quick-action-button {
+    border: 1px solid var(--card-border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 13px;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
     width: 100%;
-    max-width: 100%;
-    margin: -16px !important;
-    padding: 16px !important;
-    overflow-x: hidden;
+    text-align: left;
   }
 
-  /* Header */
-
-  .header-content {
-    flex-direction:
-      column !important;
-
-    align-items:
-      stretch !important;
-
-    gap:
-      16px !important;
+  .quick-action-button:hover {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.30);
+    background: rgba(59, 130, 246, 0.05);
   }
 
-  .header-date {
-    width:
-      100% !important;
-
-    align-items:
-      flex-start !important;
-
-    text-align:
-      left !important;
-
-    padding-top:
-      2px;
+@media(max - width: 1100px) {
+    .employee - dashboard - grid {
+    grid - template - columns: repeat(2, 1fr)!important;
   }
 
-  /* KPI */
-
-  .employee-dashboard-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap:
-      12px !important;
+    .employee - two - column {
+    grid - template - columns: 1fr!important;
   }
 
-  /* Main sections */
-
-  .employee-two-column {
-    grid-template-columns:
-      1fr !important;
-
-    gap:
-      14px !important;
-  }
-
-  /* Cards */
-
-  .employee-card {
-    width:
-      100% !important;
-
-    max-width:
-      100% !important;
-
-    min-width:
-      0 !important;
-  }
-
-  /* Attendance */
-
-  .attendance-time-grid {
-    grid-template-columns:
-      1fr 1px 1fr !important;
-
-    gap:
-      12px !important;
-
-    padding:
-      15px !important;
-  }
-
-  /* Leave */
-
-  .leave-balance-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  /* Quick actions */
-
-  .quick-action-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap:
-      10px !important;
+    .employee - bottom - grid {
+    grid - template - columns: 1fr!important;
   }
 }
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-  .employee-dashboard {
-    margin:
-      -10px !important;
-
-    padding:
-      10px !important;
-
-    width:
-      calc(100% + 20px) !important;
-
-    max-width:
-      calc(100% + 20px) !important;
-
-    overflow-x:
-      hidden !important;
+@media(max - width: 750px) {
+    .employee - dashboard {
+    margin: -16px!important;
+    padding: 16px!important;
   }
 
-  /* -------------------------------------------------------
-     HEADER
-     ------------------------------------------------------- */
-
-  .employee-dashboard > .employee-card {
-    padding:
-      18px !important;
-
-    margin-bottom:
-      12px !important;
-
-    border-radius:
-      16px !important;
+    .quick - action - grid {
+    grid - template - columns: 1fr 1fr!important;
   }
 
-  .header-content {
-    gap:
-      14px !important;
+    .header - content {
+    align - items: flex - start!important;
+    flex - direction: column!important;
   }
 
-  .header-content > div:first-child {
-    width:
-      100% !important;
-
-    min-width:
-      0 !important;
-
-    gap:
-      12px !important;
-  }
-
-  .header-content > div:first-child > div:first-child {
-    width:
-      48px !important;
-
-    height:
-      48px !important;
-
-    min-width:
-      48px !important;
-
-    border-radius:
-      14px !important;
-
-    font-size:
-      15px !important;
-  }
-
-  .header-content > div:first-child > div:nth-child(2) {
-    min-width:
-      0 !important;
-
-    flex:
-      1;
-  }
-
-  .header-content span {
-    font-size:
-      19px !important;
-
-    line-height:
-      1.25 !important;
-  }
-
-  .header-content svg {
-    flex-shrink:
-      0;
-  }
-
-  .header-date {
-    padding-top:
-      10px !important;
-
-    border-top:
-      1px solid var(--card-border);
-
-    width:
-      100% !important;
-  }
-
-  /* -------------------------------------------------------
-     KPI CARDS
-     ------------------------------------------------------- */
-
-  .employee-dashboard-grid {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap:
-      10px !important;
-
-    margin-bottom:
-      12px !important;
-  }
-
-  .employee-kpi {
-    min-height:
-      118px !important;
-
-    padding:
-      14px !important;
-
-    border-radius:
-      15px !important;
-  }
-
-  .employee-kpi > div:nth-child(2) {
-    margin-bottom:
-      10px !important;
-  }
-
-  .employee-kpi > div:nth-child(2) > span {
-    font-size:
-      10.5px !important;
-
-    line-height:
-      1.25 !important;
-
-    max-width:
-      70px !important;
-  }
-
-  .employee-kpi > div:nth-child(2) > div {
-    width:
-      32px !important;
-
-    height:
-      32px !important;
-
-    border-radius:
-      9px !important;
-  }
-
-  .employee-kpi > div:nth-child(2) svg {
-    width:
-      15px !important;
-
-    height:
-      15px !important;
-  }
-
-  .employee-kpi > div:nth-child(3) {
-    font-size:
-      23px !important;
-
-    line-height:
-      1.05 !important;
-
-    margin-bottom:
-      5px !important;
-
-    word-break:
-      break-word;
-  }
-
-  .employee-kpi > div:nth-child(4) {
-    font-size:
-      9px !important;
-
-    line-height:
-      1.35 !important;
-  }
-
-  /* -------------------------------------------------------
-     TWO COLUMN SECTIONS
-     ------------------------------------------------------- */
-
-  .employee-two-column {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      1fr !important;
-
-    gap:
-      12px !important;
-
-    margin-bottom:
-      12px !important;
-  }
-
-  .employee-two-column .employee-card {
-    padding:
-      16px !important;
-
-    border-radius:
-      16px !important;
-  }
-
-  /* -------------------------------------------------------
-     SECTION HEADERS
-     ------------------------------------------------------- */
-
-  .employee-dashboard .employee-card > div > div {
-    min-width:
-      0;
-  }
-
-  /* -------------------------------------------------------
-     ATTENDANCE
-     ------------------------------------------------------- */
-
-  .attendance-time-grid {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      minmax(0, 1fr) 1px minmax(0, 1fr) !important;
-
-    gap:
-      8px !important;
-
-    padding:
-      14px 8px !important;
-
-    border-radius:
-      13px !important;
-
-    margin-bottom:
-      14px !important;
-  }
-
-  .attendance-time-grid > div {
-    min-width:
-      0 !important;
-  }
-
-  .attendance-time-grid > div:nth-child(1),
-  .attendance-time-grid > div:nth-child(3) {
-    width:
-      100% !important;
-
-    min-width:
-      0 !important;
-
-    overflow:
-      hidden;
-  }
-
-  .attendance-time-grid > div:nth-child(1) > div:nth-child(2),
-  .attendance-time-grid > div:nth-child(3) > div:nth-child(2) {
-    font-size:
-      22px !important;
-
-    letter-spacing:
-      -0.5px;
-  }
-
-  .attendance-time-grid > div:nth-child(1) > div:first-child,
-  .attendance-time-grid > div:nth-child(3) > div:first-child {
-    font-size:
-      9px !important;
-
-    margin-bottom:
-      6px !important;
-  }
-
-  .attendance-time-grid > div:nth-child(1) > div:last-child,
-  .attendance-time-grid > div:nth-child(3) > div:last-child {
-    font-size:
-      8px !important;
-  }
-
-  /* Attendance status */
-
-  .employee-dashboard .employee-card > div {
-    min-width:
-      0;
-  }
-
-  /* Check in/out */
-
-  .employee-dashboard button {
-    min-width:
-      0;
-  }
-
-  /* -------------------------------------------------------
-     LEAVE BALANCE
-     ------------------------------------------------------- */
-
-  .leave-balance-grid {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      1fr !important;
-
-    gap:
-      9px !important;
-  }
-
-  .leave-balance-grid > div {
-    min-width:
-      0 !important;
-
-    padding:
-      11px !important;
-  }
-
-  /* -------------------------------------------------------
-     QUICK ACTIONS
-     ------------------------------------------------------- */
-
-  .quick-action-grid {
-    display:
-      grid !important;
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap:
-      8px !important;
-  }
-
-  .quick-action-button {
-    padding:
-      10px !important;
-
-    font-size:
-      10px !important;
-
-    gap:
-      7px !important;
-
-    min-width:
-      0 !important;
-  }
-
-  /* -------------------------------------------------------
-     TEXT SAFETY
-     ------------------------------------------------------- */
-
-  .employee-dashboard h1,
-  .employee-dashboard h2,
-  .employee-dashboard h3,
-  .employee-dashboard p,
-  .employee-dashboard span,
-  .employee-dashboard strong {
-    max-width:
-      100%;
-  }
-
-  /* Prevent long content from creating horizontal scroll */
-
-  .employee-dashboard * {
-    max-width:
-      100%;
+    .header - date {
+    align - items: flex - start!important;
+    text - align: left!important;
   }
 }
 
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 420px) {
-
-  .employee-dashboard {
-    margin:
-      -8px !important;
-
-    padding:
-      8px !important;
-
-    width:
-      calc(100% + 16px) !important;
-
-    max-width:
-      calc(100% + 16px) !important;
+@media(max - width: 520px) {
+    .employee - dashboard - grid {
+    grid - template - columns: 1fr!important;
   }
 
-  .employee-dashboard > .employee-card {
-    padding:
-      14px !important;
-
-    border-radius:
-      14px !important;
+    .quick - action - grid {
+    grid - template - columns: 1fr!important;
   }
 
-  /* Greeting */
-
-  .header-content span {
-    font-size:
-      18px !important;
+    .attendance - time - grid {
+    gap: 10px!important;
   }
 
-  .header-content > div:first-child > div:first-child {
-    width:
-      44px !important;
-
-    height:
-      44px !important;
-
-    min-width:
-      44px !important;
+    .leave - balance - grid {
+    grid - template - columns: 1fr!important;
   }
 
-  /* KPI */
-
-  .employee-dashboard-grid {
-    gap:
-      8px !important;
+    .leave - request - row {
+    align - items: flex - start!important;
+    flex - direction: column!important;
   }
 
-  .employee-kpi {
-    min-height:
-      112px !important;
-
-    padding:
-      12px !important;
-
-    border-radius:
-      14px !important;
-  }
-
-  .employee-kpi > div:nth-child(3) {
-    font-size:
-      21px !important;
-  }
-
-  /* Cards */
-
-  .employee-two-column .employee-card {
-    padding:
-      14px !important;
-
-    border-radius:
-      14px !important;
-  }
-
-  /* Attendance */
-
-  .attendance-time-grid {
-    padding:
-      12px 5px !important;
-
-    gap:
-      5px !important;
-  }
-
-  .attendance-time-grid > div:nth-child(1) > div:nth-child(2),
-  .attendance-time-grid > div:nth-child(3) > div:nth-child(2) {
-    font-size:
-      20px !important;
-  }
-
-  /* Buttons */
-
-  .employee-dashboard button {
-    font-size:
-      10px !important;
-  }
-
-  /* Quick actions */
-
-  .quick-action-grid {
-    gap:
-      7px !important;
-  }
-
-  .quick-action-button {
-    padding:
-      9px 8px !important;
-  }
-}
-
-/* =========================================================
-   VERY SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 360px) {
-
-  .employee-dashboard {
-    padding:
-      6px !important;
-
-    margin:
-      -6px !important;
-
-    width:
-      calc(100% + 12px) !important;
-
-    max-width:
-      calc(100% + 12px) !important;
-  }
-
-  .employee-dashboard-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr)) !important;
-
-    gap:
-      7px !important;
-  }
-
-  .employee-kpi {
-    padding:
-      10px !important;
-
-    min-height:
-      105px !important;
-  }
-
-  .employee-kpi > div:nth-child(3) {
-    font-size:
-      19px !important;
-  }
-
-  .employee-kpi > div:nth-child(4) {
-    font-size:
-      8px !important;
-  }
-
-  .attendance-time-grid > div:nth-child(1) > div:nth-child(2),
-  .attendance-time-grid > div:nth-child(3) > div:nth-child(2) {
-    font-size:
-      18px !important;
-  }
-
-  .quick-action-grid {
-    grid-template-columns:
-      1fr !important;
-  }
-}
-
-/* =========================================================
-   ACCESSIBILITY
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .employee-kpi,
-  .quick-action-button {
-    transition:
-      none !important;
+    .notification - row {
+    align - items: flex - start!important;
   }
 }
 `;
@@ -1816,7 +1126,7 @@ export default function EmployeeDashboard() {
               {formattedDate}
             </div>
 
-
+            
           </div>
         </div>
       </div>
@@ -3024,5 +2334,5 @@ export default function EmployeeDashboard() {
         </>
       )}
     </div>
-  )
+  )  
 }

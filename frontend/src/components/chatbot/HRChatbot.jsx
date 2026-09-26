@@ -34,6 +34,26 @@ import {
 } from "lucide-react";
 import api from "@/lib/axios";
 
+/* ============================================================
+   HR ASSISTANT — CHAT WIDGET (single file, role-aware)
+   Renders against the hr-chatbot-* stylesheet supplied by the
+   HRMS design system. Reads the logged-in user from the Redux
+   auth slice itself (same shape as Navbar.jsx: state.auth.user),
+   and picks its quick-action shortcuts based on role — Admin/HR
+   get org-wide shortcuts (employee count, the shared pending
+   leave/cancellation queue, recruitment overview), everyone else
+   gets personal shortcuts (leave balance, attendance, payslip,
+   training, open jobs). This mirrors the isHrOrAdmin() gates in
+   ChatbotService on the backend.
+
+   Talks to the backend through the shared axios instance at
+   '@/lib/axios' (same one employeeApi/adminApi use), so auth +
+   base URL + session-expiry handling are already wired up:
+     POST /api/chatbot/message
+     POST /api/chatbot/actions/leave/apply
+
+   Usage:  <HRChatbot />   (no props needed — drop it in Navbar)
+   ============================================================ */
 
 const EMPLOYEE_QUICK_ACTIONS = [
   { icon: Calendar, label: "Leave balance", prompt: "What is my leave balance?" },
@@ -64,6 +84,8 @@ function formatClock(date) {
   }
 }
 
+/** Turns **bold** markdown-lite text (as produced by the backend) into
+ *  React nodes, preserving line breaks and simple bullet lines. */
 function RichText({ text }) {
   if (!text) return null;
   const lines = String(text).split("\n");
