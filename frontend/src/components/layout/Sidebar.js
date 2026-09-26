@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTheme } from 'next-themes';
 import { logout } from '@/store/authSlice';
 
@@ -26,11 +26,6 @@ import {
   FileText,
   ChevronDown
 } from 'lucide-react';
-
-
-/* =========================================================
-   EMPLOYEE MENU
-========================================================= */
 
 const EMP_MENU = [
   {
@@ -84,14 +79,12 @@ const EMP_MENU = [
     icon: <Bell size={18} strokeWidth={2} />
   },
 
-  /* Holiday Calendar stays available for Employee */
-  
+  {
+    key: '/employee/leave/holiday-calendar',
+    label: 'Holiday Calendar',
+    icon: <Calendar size={18} strokeWidth={2} />
+  },
 ];
-
-
-/* =========================================================
-   ADMIN / HR MENU
-========================================================= */
 
 const ADMIN_MENU = [
   {
@@ -109,15 +102,6 @@ const ADMIN_MENU = [
     label: 'Leave Management',
     icon: <ClipboardList size={18} strokeWidth={2} />
   },
-
-  /*
-    IMPORTANT:
-    Holiday Management and Holiday Calendar are NOT placed
-    directly in the normal menu.
-
-    They will be displayed ONLY inside Leave Management.
-  */
-
   {
     key: '/admin/payroll',
     label: 'Payroll',
@@ -143,7 +127,6 @@ const ADMIN_MENU = [
     label: 'Onboarding',
     icon: <BadgeCheck size={18} strokeWidth={2} />
   },
-
   {
     key: '/admin/onboarding/greetings',
     label: 'Send Greeting',
@@ -164,24 +147,25 @@ const ADMIN_MENU = [
     label: 'Document Request',
     icon: <FileText size={18} strokeWidth={2} />
   },
-
   {
     key: '/admin/notifications',
     label: 'Notifications',
     icon: <Bell size={18} strokeWidth={2} />
-  }
+  },
+
+  {
+    key: '/admin/leave/holiday-calendar',
+    label: 'Holiday Calendar',
+    icon: <Calendar size={18} strokeWidth={2} />
+  },
 ];
 
-
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
 export default function Sidebar({ role }) {
-
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
+
+  const { user } = useSelector((s) => s.auth);
 
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
@@ -190,183 +174,91 @@ export default function Sidebar({ role }) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
-
-  /* =========================================================
-     MOBILE SIDEBAR
-  ========================================================= */
-
   useEffect(() => {
-
-    const handleToggle = () => {
+    const handleToggle = () =>
       setIsMobileOpen((prev) => !prev);
-    };
 
     window.addEventListener(
       'toggleMobileSidebar',
       handleToggle
     );
 
-    return () => {
+    return () =>
       window.removeEventListener(
         'toggleMobileSidebar',
         handleToggle
       );
-    };
-
   }, []);
 
+const isOnboardingChildPage =
+  pathname.startsWith('/admin/onboarding/');
 
-  /* =========================================================
-     MENU
-  ========================================================= */
+useEffect(() => {
+  if (isOnboardingChildPage) {
+    setIsOnboardingOpen(true);
+  }
+}, [isOnboardingChildPage]);
 
-  const isAdminOrHR =
-    role === 'ADMIN' || role === 'HR';
+const isLeaveChildPage =
+  pathname.startsWith('/admin/leave') ||
+  pathname.startsWith('/employee/leave');
 
-  const menu = isAdminOrHR
-    ? ADMIN_MENU
-    : EMP_MENU;
+useEffect(() => {
+  setIsLeaveOpen(isLeaveChildPage);
+}, [isLeaveChildPage]);
 
+  const menu =
+    role === 'ADMIN' || role === 'HR'
+      ? ADMIN_MENU
+      : EMP_MENU;
 
-  /* =========================================================
-     ONBOARDING
-  ========================================================= */
-
-  const isOnboardingChildPage =
-    pathname.startsWith('/admin/onboarding/');
-
-  useEffect(() => {
-
-    if (isOnboardingChildPage) {
-      setIsOnboardingOpen(true);
-    }
-
-  }, [isOnboardingChildPage]);
-
-
-  /* =========================================================
-     LEAVE / HOLIDAY PAGES
-  ========================================================= */
-
-  const isLeaveChildPage =
-    pathname.startsWith('/admin/leave/') ||
-    pathname.startsWith('/admin/holiday') ||
-    pathname.startsWith('/employee/leave/');
-
-
-  useEffect(() => {
-
-    if (isLeaveChildPage) {
-      setIsLeaveOpen(true);
-    }
-
-  }, [isLeaveChildPage]);
-
-
-  /* =========================================================
-     SETTINGS
-  ========================================================= */
-
-  const settingsRoute = isAdminOrHR
-    ? '/admin/settings'
-    : '/employee/settings';
-
-
-  /* =========================================================
-     LOGOUT
-  ========================================================= */
+  const settingsRoute =
+    role === 'ADMIN' || role === 'HR'
+      ? '/admin/settings'
+      : '/employee/settings';
 
   const handleLogout = () => {
-
     dispatch(logout());
-
     router.push('/');
-
   };
 
-
-  /* =========================================================
-     ACTIVE ITEM
-  ========================================================= */
-
   const isItemActive = (key) => {
+    if (pathname === key) return true;
 
-    if (pathname === key) {
-      return true;
-    }
-
-    /* Leave parent */
-    if (
-      key === '/admin/leave' &&
-      (
-        pathname.startsWith('/admin/leave/') ||
-        pathname.startsWith('/admin/holiday')
-      )
-    ) {
-      return true;
-    }
-
-    if (
-      key === '/employee/leave' &&
-      pathname.startsWith('/employee/leave/')
-    ) {
-      return true;
-    }
+    if (key === '/admin/leave' && pathname.startsWith('/admin/leave/')) return true;
+    if (key === '/employee/leave' && pathname.startsWith('/employee/leave/')) return true;
 
     const allKeys = [
       ...menu.map((m) => m.key),
-      settingsRoute,
-      '/admin/holiday',
-      '/admin/leave/holiday-calendar',
-      '/employee/leave/holiday-calendar'
+      settingsRoute
     ];
 
-    const bestMatch = allKeys.reduce(
-      (best, k) => {
-
-        if (
-          pathname === k ||
-          pathname.startsWith(k + '/')
-        ) {
-
-          if (!best || k.length > best.length) {
-            return k;
-          }
-
+    const bestMatch = allKeys.reduce((best, k) => {
+      if (
+        pathname === k ||
+        pathname.startsWith(k + '/')
+      ) {
+        if (!best || k.length > best.length) {
+          return k;
         }
+      }
 
-        return best;
-
-      },
-      null
-    );
+      return best;
+    }, null);
 
     return key === bestMatch;
   };
 
-
-  /* =========================================================
-     NAV ITEM STYLE
-  ========================================================= */
-
   const navItemStyle = (key) => {
-
     const active = isItemActive(key);
 
     return {
-
       display: 'flex',
-
       alignItems: 'center',
-
       gap: '14px',
-
       padding: '12px 16px',
-
       borderRadius: '10px',
-
       cursor: 'pointer',
-
       marginBottom: '8px',
 
       background: active
@@ -382,23 +274,11 @@ export default function Sidebar({ role }) {
         : '1px solid transparent',
 
       fontSize: '13.5px',
-
-      fontWeight: active
-        ? '600'
-        : '500',
-
+      fontWeight: active ? '600' : '500',
       transition: 'all 0.2s ease',
-
-      letterSpacing: '0.2px',
-
-      textDecoration: 'none'
+      letterSpacing: '0.2px'
     };
   };
-
-
-  /* =========================================================
-     COLORS
-  ========================================================= */
 
   const sidebarBg = isDark
     ? '#0A0E17'
@@ -408,210 +288,76 @@ export default function Sidebar({ role }) {
     ? 'rgba(255,255,255,0.05)'
     : '#e2e8f0';
 
-
-  /* =========================================================
-     SUB MENU ITEM
-  ========================================================= */
-
-  const renderSubMenuItem = (
-    sub,
-    key
-  ) => {
-
-    const active = isItemActive(key);
-
-    return (
-
-      <Link
-        key={key}
-        href={key}
-        onClick={() => {
-          setIsMobileOpen(false);
-        }}
-        style={{
-          ...navItemStyle(key),
-
-          paddingLeft: '32px',
-
-          position: 'relative',
-
-          marginBottom: '6px'
-        }}
-
-        onMouseEnter={(e) => {
-
-          if (!active) {
-
-            e.currentTarget.style.background =
-              isDark
-                ? 'rgba(255,255,255,0.03)'
-                : '#f8fafc';
-
-          }
-
-        }}
-
-        onMouseLeave={(e) => {
-
-          if (!active) {
-
-            e.currentTarget.style.background =
-              'transparent';
-
-          }
-
-        }}
-      >
-
-        <div
-          style={{
-            color: active
-              ? '#34d399'
-              : isDark
-                ? '#cbd5e1'
-                : '#64748b',
-
-            display: 'flex'
-          }}
-        >
-          {sub.icon}
-        </div>
-
-        <span
-          style={{
-            color: active
-              ? isDark
-                ? '#ffffff'
-                : '#0f172a'
-              : isDark
-                ? '#cbd5e1'
-                : '#475569'
-          }}
-        >
-          {sub.label}
-        </span>
-
-      </Link>
-
-    );
-  };
-
-
-  /* =========================================================
-     RETURN
-  ========================================================= */
-
   return (
-
     <>
-
-      {/* Mobile Overlay */}
-
       {isMobileOpen && (
-
         <div
           className="mobile-overlay"
-          onClick={() =>
-            setIsMobileOpen(false)
-          }
+          onClick={() => setIsMobileOpen(false)}
         />
-
       )}
 
-
-      {/* Sidebar */}
-
       <div
-        className={`app-sidebar ${isMobileOpen
-            ? 'mobile-open'
-            : ''
-          }`}
-
+        className={`app-sidebar ${
+          isMobileOpen ? 'mobile-open' : ''
+        }`}
         style={{
           backgroundColor: sidebarBg,
-
-          borderRight:
-            `1px solid ${borderColor}`,
-
+          borderRight: `1px solid ${borderColor}`,
           display: 'flex',
-
           flexDirection: 'column',
-
           height: '100vh'
         }}
       >
 
-
-        {/* =================================================
-            LOGO
-        ================================================= */}
-
+        {/* Fixed Logo */}
         <div
           style={{
-            padding:
-              '28px 24px 20px',
-
+            padding: '28px 24px 20px',
+            borderBottom: '1px solid transparent',
             flexShrink: 0
           }}
         >
-
           <div
             style={{
               display: 'flex',
-
               alignItems: 'center',
-
               gap: '14px'
             }}
           >
 
+            {/* Saiteja Infotech Logo */}
             <div
               style={{
                 width: '73px',
-
                 height: '73px',
-
                 display: 'flex',
-
                 alignItems: 'center',
-
                 justifyContent: 'center',
-
                 flexShrink: 0,
-
                 overflow: 'hidden'
               }}
             >
-
               <img
                 src="/removee.png"
                 alt="Saiteja Infotech"
                 style={{
                   width: '73px',
-
                   height: '73px',
-
                   objectFit: 'contain'
                 }}
               />
-
             </div>
 
-
             <div>
-
               <div
                 style={{
                   color: isDark
                     ? '#ffffff'
                     : '#0f172a',
-
                   fontSize: '18px',
-
                   fontWeight: '800',
-
                   lineHeight: 1.1,
-
                   letterSpacing: '0.5px'
                 }}
               >
@@ -621,745 +367,619 @@ export default function Sidebar({ role }) {
               <div
                 style={{
                   color: '#64748b',
-
                   fontSize: '10px',
-
                   letterSpacing: '1px',
-
                   marginTop: '3px',
-
                   fontWeight: '700'
                 }}
               >
                 HR MANAGEMENT
               </div>
-
             </div>
 
           </div>
-
         </div>
 
-
-        {/* =================================================
-            SCROLLABLE MENU
-        ================================================= */}
-
+        {/* Scrollable Middle Container */}
         <div
           className="hide-scrollbar"
-
           style={{
             flex: 1,
-
             overflowY: 'auto',
-
             overflowX: 'hidden',
-
+            display: 'flex',
+            flexDirection: 'column',
             minHeight: 0
           }}
         >
 
+          {/* Main Menu */}
           <div
             style={{
-              padding:
-                '16px 16px 0'
+              padding: '16px 16px 0',
+              flexShrink: 0
             }}
           >
-
-
-            {/* =================================================
-                MAIN MENU
-            ================================================= */}
-
             {menu.map((item) => {
-
-
-              /* =================================================
-                 ONBOARDING DROPDOWN
-              ================================================= */
-
               const isAdminOnboarding =
-                isAdminOrHR &&
-                item.key ===
-                '/admin/onboarding';
+                (role === 'ADMIN' || role === 'HR') &&
+                item.key === '/admin/onboarding';
 
-
-              if (
-                isAdminOnboarding
-              ) {
-
-                const isActive =
-                  pathname ===
-                  '/admin/onboarding' ||
-                  pathname.startsWith(
-                    '/admin/onboarding/'
-                  );
+              if (isAdminOnboarding) {
+                const isOnboardingActive =
+                       pathname === '/admin/onboarding' ||
+                           pathname.startsWith('/admin/onboarding/');
 
                 return (
-
-                  <div
-                    key={item.key}
-                  >
-
-                    <div
-                      onClick={() => {
-
-                        setIsOnboardingOpen(
-                          (prev) => !prev
-                        );
-
-                        setIsMobileOpen(
-                          false
-                        );
-
-                        router.push(
-                          '/admin/onboarding'
-                        );
-
-                      }}
-
+                  <div key={item.key}>
+                    <Link
+                      href={item.key}
+                     onClick={() => {
+                               setIsOnboardingOpen((prev) => !prev);
+                                 setIsMobileOpen(false);
+                                  router.push('/admin/onboarding');
+                            } }
                       style={{
-                        ...navItemStyle(
-                          item.key
-                        ),
-
-                        position:
-                          'relative'
+                        ...navItemStyle(item.key),
+                        position: 'relative',
+                        textDecoration: 'none',
+                        ...(isOnboardingActive && {
+                          background:
+                            'linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.02) 100%)',
+                          color: '#ffffff',
+                          border: '1px solid rgba(16, 185, 129, 0.2)',
+                          fontWeight: '600'
+                        })
                       }}
-
                       onMouseEnter={(e) => {
-
-                        if (!isActive) {
-
+                        if (!isOnboardingActive) {
                           e.currentTarget.style.background =
                             isDark
                               ? 'rgba(255,255,255,0.03)'
                               : '#f8fafc';
-
                         }
-
                       }}
-
                       onMouseLeave={(e) => {
-
-                        if (!isActive) {
-
+                        if (!isOnboardingActive) {
                           e.currentTarget.style.background =
                             'transparent';
-
                         }
-
                       }}
                     >
-
                       <div
                         style={{
-                          color:
-                            isActive
-                              ? '#34d399'
-                              : isDark
-                                ? '#cbd5e1'
-                                : '#64748b',
-
+                          color: isOnboardingActive
+                            ? '#34d399'
+                            : isDark
+                              ? '#cbd5e1'
+                              : '#64748b',
                           display: 'flex'
                         }}
                       >
                         {item.icon}
                       </div>
-
-                      <span>
-                        {item.label}
-                      </span>
-
-                      <ChevronDown
-                        size={14}
-                        style={{
-                          marginLeft:
-                            'auto',
-
-                          color:
-                            isActive
-                              ? '#34d399'
-                              : '#94a3b8',
-
-                          transform:
-                            isOnboardingOpen
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-
-                          transition:
-                            'transform 0.2s'
-                        }}
-                      />
-
-                    </div>
-
-
-                    {/* ONBOARDING CHILDREN */}
-
-                    {isOnboardingOpen &&
-
-                      menu
-                        .filter((m) =>
-                          m.key.startsWith(
-                            '/admin/onboarding/'
-                          )
-                        )
-                        .map((sub) =>
-                          renderSubMenuItem(
-                            sub,
-                            sub.key
-                          )
-                        )
-
-                    }
-
-                  </div>
-
-                );
-
-              }
-
-
-              /* =================================================
-                 LEAVE MANAGEMENT DROPDOWN
-              ================================================= */
-
-              const isLeaveMenu =
-                item.key ===
-                '/admin/leave' ||
-                item.key ===
-                '/employee/leave';
-
-
-              if (isLeaveMenu) {
-
-                const isLeaveActive =
-                  isItemActive(
-                    item.key
-                  );
-
-
-                return (
-
-                  <div
-                    key={item.key}
-                  >
-
-                    {/* LEAVE MANAGEMENT */}
-
-                    <div
-                      onClick={() => {
-
-                        setIsLeaveOpen(
-                          (prev) => !prev
-                        );
-
-                        setIsMobileOpen(
-                          false
-                        );
-
-                        const targetRoute =
-                          isAdminOrHR
-                            ? '/admin/leave'
-                            : '/employee/leave';
-
-                        router.push(
-                          targetRoute
-                        );
-
-                      }}
-
-                      style={{
-                        ...navItemStyle(
-                          item.key
-                        ),
-
-                        position:
-                          'relative'
-                      }}
-
-                      onMouseEnter={(e) => {
-
-                        if (!isLeaveActive) {
-
-                          e.currentTarget.style.background =
-                            isDark
-                              ? 'rgba(255,255,255,0.03)'
-                              : '#f8fafc';
-
-                        }
-
-                      }}
-
-                      onMouseLeave={(e) => {
-
-                        if (!isLeaveActive) {
-
-                          e.currentTarget.style.background =
-                            'transparent';
-
-                        }
-
-                      }}
-                    >
-
-                      <div
-                        style={{
-                          color:
-                            isLeaveActive
-                              ? '#34d399'
-                              : isDark
-                                ? '#cbd5e1'
-                                : '#64748b',
-
-                          display: 'flex'
-                        }}
-                      >
-                        {item.icon}
-                      </div>
-
 
                       <span
                         style={{
-                          color:
-                            isLeaveActive
-                              ? isDark
-                                ? '#ffffff'
-                                : '#0f172a'
-                              : isDark
-                                ? '#cbd5e1'
-                                : '#475569'
+                          color: isOnboardingActive
+                            ? isDark
+                              ? '#ffffff'
+                              : '#0f172a'
+                            : isDark
+                              ? '#cbd5e1'
+                              : '#475569'
                         }}
                       >
                         {item.label}
                       </span>
 
-
-                      <ChevronDown
-                        size={14}
+                      <div
                         style={{
-                          marginLeft:
-                            'auto',
-
-                          color:
-                            isLeaveActive
-                              ? '#34d399'
-                              : '#94a3b8',
-
-                          transform:
-                            isLeaveOpen
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-
-                          transition:
-                            'transform 0.2s'
+                          marginLeft: 'auto',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          color: isOnboardingActive
+                            ? '#34d399'
+                            : '#94a3b8',
+                          transition: 'all 0.2s',
+                          flexShrink: 0
                         }}
-                      />
+                      >
+                        <ChevronDown
+                          size={14}
+                          style={{
+                            transition: 'transform 0.2s',
+                            transform: isOnboardingOpen
+                              ? 'rotate(180deg)'
+                              : 'rotate(0deg)'
+                          }}
+                        />
+                      </div>
+                    </Link>
 
+                    {isOnboardingOpen &&
+                      menu
+                        .filter((m) =>
+                          m.key.startsWith('/admin/onboarding/') &&
+                          m.key !== '/admin/onboarding'
+                        )
+                        .map((sub) => (
+                          <Link
+                            key={sub.key}
+                            href={sub.key}
+                            onClick={() =>
+                              setIsMobileOpen(false)
+                            }
+                            style={{
+                              ...navItemStyle(sub.key),
+                              position: 'relative',
+                              textDecoration: 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isItemActive(sub.key)) {
+                                e.currentTarget.style.background =
+                                  isDark
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : '#f8fafc';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isItemActive(sub.key)) {
+                                e.currentTarget.style.background =
+                                  'transparent';
+                              }
+                            }}
+                          >
+                            <div
+                              style={{
+                                color: isItemActive(sub.key)
+                                  ? '#34d399'
+                                  : isDark
+                                    ? '#cbd5e1'
+                                    : '#64748b',
+                                display: 'flex'
+                              }}
+                            >
+                              {sub.icon}
+                            </div>
+
+                            <span
+                              style={{
+                                color: isItemActive(sub.key)
+                                  ? isDark
+                                    ? '#ffffff'
+                                    : '#0f172a'
+                                  : isDark
+                                    ? '#cbd5e1'
+                                    : '#475569'
+                              }}
+                            >
+                              {sub.label}
+                            </span>
+                          </Link>
+                        ))}
+                  </div>
+                );
+              }
+
+              const isLeaveMenu =
+                item.key === '/admin/leave' || item.key === '/employee/leave';
+
+              if (isLeaveMenu) {
+                return (
+                  <div key={item.key}>
+                    <div
+                      onClick={() => {
+                        setIsLeaveOpen((prev) => !prev);
+                        setIsMobileOpen(false);
+                        const targetRoute = role === 'ADMIN' || role === 'HR' 
+                          ? '/admin/leave' 
+                          : '/employee/leave';
+                        router.push(targetRoute);
+                      }}
+                      style={{
+                        ...navItemStyle(item.key),
+                        position: 'relative',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isItemActive(item.key)) {
+                          e.currentTarget.style.background =
+                            isDark
+                              ? 'rgba(255,255,255,0.03)'
+                              : '#f8fafc';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isItemActive(item.key)) {
+                          e.currentTarget.style.background =
+                            'transparent';
+                        }
+                      }}
+                    >
+                      <div
+                        style={{
+                          color: isItemActive(item.key)
+                            ? '#34d399'
+                            : isDark
+                              ? '#cbd5e1'
+                              : '#64748b',
+                          display: 'flex'
+                        }}
+                      >
+                        {item.icon}
+                      </div>
+
+                      <span
+                        style={{
+                          color: isItemActive(item.key)
+                            ? isDark
+                              ? '#ffffff'
+                              : '#0f172a'
+                            : isDark
+                              ? '#cbd5e1'
+                              : '#475569'
+                        }}
+                      >
+                        {item.label}
+                      </span>
+
+                      <div
+                        style={{
+                          marginLeft: 'auto',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          color: isItemActive(item.key)
+                            ? '#34d399'
+                            : '#94a3b8',
+                          transition: 'all 0.2s',
+                          flexShrink: 0
+                        }}
+                      >
+                        <ChevronDown
+                          size={14}
+                          style={{
+                            transition: 'transform 0.2s',
+                            transform: isLeaveOpen
+                              ? 'rotate(180deg)'
+                              : 'rotate(0deg)'
+                          }}
+                        />
+                      </div>
                     </div>
 
+                    {isLeaveOpen &&
+                      menu
+                        .filter((m) =>
+                          m.key === '/admin/leave/holiday-calendar' ||
+                          m.key === '/employee/leave/holiday-calendar'
+                        )
+                        .map((sub) => (
+                          <Link
+                            key={sub.key}
+                            href={sub.key}
+                            onClick={() =>
+                              setIsMobileOpen(false)
+                            }
+                            style={{
+                              ...navItemStyle(sub.key),
+                              position: 'relative',
+                              textDecoration: 'none'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isItemActive(sub.key)) {
+                                e.currentTarget.style.background =
+                                  isDark
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : '#f8fafc';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isItemActive(sub.key)) {
+                                e.currentTarget.style.background =
+                                  'transparent';
+                              }
+                            }}
+                          >
+                            <div
+                              style={{
+                                color: isItemActive(sub.key)
+                                  ? '#34d399'
+                                  : isDark
+                                    ? '#cbd5e1'
+                                    : '#64748b',
+                                display: 'flex'
+                              }}
+                            >
+                              {sub.icon}
+                            </div>
 
-                    {/* =================================================
-                        LEAVE SUB MENU
-                    ================================================= */}
-
-                    {isLeaveOpen && (
-
-                      <>
-
-                        {/* ADMIN / HR */}
-
-                        {isAdminOrHR && (
-
-                          <>
-
-                            {/* Holiday Management */}
-
-                            {renderSubMenuItem(
-                              {
-                                key:
-                                  '/admin/holiday',
-
-                                label:
-                                  'Holiday Management',
-
-                                icon:
-                                  <Calendar
-                                    size={18}
-                                    strokeWidth={2}
-                                  />
-                              },
-
-                              '/admin/holiday'
-                            )}
-
-
-                            {/* Holiday Calendar */}
-
-                            {renderSubMenuItem(
-                              {
-                                key:
-                                  '/admin/leave/holiday-calendar',
-
-                                label:
-                                  'Holiday Calendar',
-
-                                icon:
-                                  <Calendar
-                                    size={18}
-                                    strokeWidth={2}
-                                  />
-                              },
-
-                              '/admin/leave/holiday-calendar'
-                            )}
-
-                          </>
-
-                        )}
-
-
-                        {/* EMPLOYEE */}
-
-                        {!isAdminOrHR && (
-
-                          renderSubMenuItem(
-                            {
-                              key:
-                                '/employee/leave/holiday-calendar',
-
-                              label:
-                                'Holiday Calendar',
-
-                              icon:
-                                <Calendar
-                                  size={18}
-                                  strokeWidth={2}
-                                />
-                            },
-
-                            '/employee/leave/holiday-calendar'
-                          )
-
-                        )}
-
-                      </>
-
-                    )}
-
+                            <span
+                              style={{
+                                color: isItemActive(sub.key)
+                                  ? isDark
+                                    ? '#ffffff'
+                                    : '#0f172a'
+                                  : isDark
+                                    ? '#cbd5e1'
+                                    : '#475569'
+                              }}
+                            >
+                              {sub.label}
+                            </span>
+                          </Link>
+                        ))}
                   </div>
-
                 );
-
               }
-
-
-              /* =================================================
-                 HIDE ONBOARDING CHILDREN FROM MAIN MENU
-              ================================================= */
 
               if (
-                isAdminOrHR &&
-                (
-                  item.key ===
-                  '/admin/onboarding/greetings' ||
-
-                  item.key ===
-                  '/admin/onboarding/offerletter' ||
-
-                  item.key ===
-                  '/admin/onboarding/interview' ||
-
-                  item.key ===
-                  '/admin/onboarding/document-request'
-                )
+                (role === 'ADMIN' || role === 'HR') &&
+                (item.key === '/admin/onboarding/greetings' ||
+                  item.key === '/admin/onboarding/offerletter' ||
+                  item.key === '/admin/onboarding/interview' ||
+                  item.key === '/admin/onboarding/document-request')
               ) {
-
                 return null;
-
               }
 
-
-              /* =================================================
-                 NORMAL MENU ITEM
-              ================================================= */
+              if (
+                item.key === '/admin/leave/holiday-calendar' ||
+                item.key === '/employee/leave/holiday-calendar'
+              ) {
+                return null;
+              }
 
               return (
-
                 <Link
                   key={item.key}
                   href={item.key}
-
                   onClick={() =>
-                    setIsMobileOpen(
-                      false
-                    )
+                    setIsMobileOpen(false)
                   }
-
                   style={{
-                    ...navItemStyle(
-                      item.key
-                    ),
-
-                    position:
-                      'relative'
+                    ...navItemStyle(item.key),
+                    position: 'relative',
+                    textDecoration: 'none'
                   }}
-
                   onMouseEnter={(e) => {
-
-                    if (
-                      !isItemActive(
-                        item.key
-                      )
-                    ) {
-
+                    if (!isItemActive(item.key)) {
                       e.currentTarget.style.background =
                         isDark
                           ? 'rgba(255,255,255,0.03)'
                           : '#f8fafc';
-
                     }
-
                   }}
-
                   onMouseLeave={(e) => {
-
-                    if (
-                      !isItemActive(
-                        item.key
-                      )
-                    ) {
-
+                    if (!isItemActive(item.key)) {
                       e.currentTarget.style.background =
                         'transparent';
-
                     }
-
                   }}
                 >
 
                   <div
                     style={{
-                      color:
-                        isItemActive(
-                          item.key
-                        )
-                          ? '#34d399'
-                          : isDark
-                            ? '#cbd5e1'
-                            : '#64748b',
-
+                      color: isItemActive(item.key)
+                        ? '#34d399'
+                        : isDark
+                          ? '#cbd5e1'
+                          : '#64748b',
                       display: 'flex'
                     }}
                   >
                     {item.icon}
                   </div>
 
-
                   <span
                     style={{
-                      color:
-                        isItemActive(
-                          item.key
-                        )
-                          ? isDark
-                            ? '#ffffff'
-                            : '#0f172a'
-                          : isDark
-                            ? '#cbd5e1'
-                            : '#475569'
+                      color: isItemActive(item.key)
+                        ? isDark
+                          ? '#ffffff'
+                          : '#0f172a'
+                        : isDark
+                          ? '#cbd5e1'
+                          : '#475569'
                     }}
                   >
                     {item.label}
                   </span>
 
-
                   {item.badge && (
-
                     <div
                       style={{
-                        position:
-                          'absolute',
-
+                        position: 'absolute',
                         right: '12px',
-
-                        background:
-                          '#8b5cf6',
-
-                        color:
-                          'white',
-
-                        fontSize:
-                          '11px',
-
-                        fontWeight:
-                          '700',
-
+                        background: '#8b5cf6',
+                        color: 'white',
+                        fontSize: '11px',
+                        fontWeight: '700',
                         width: '20px',
-
                         height: '20px',
-
-                        borderRadius:
-                          '50%',
-
+                        borderRadius: '50%',
                         display: 'flex',
-
-                        alignItems:
-                          'center',
-
-                        justifyContent:
-                          'center'
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow:
+                          '0 2px 8px rgba(139, 92, 246, 0.4)'
                       }}
                     >
                       {item.badge}
                     </div>
-
                   )}
 
                 </Link>
-
               );
-
             })}
-
           </div>
 
-
           {/* Spacer */}
-
           <div
             style={{
-              minHeight:
-                '20px'
+              flex: 1,
+              minHeight: '20px'
             }}
           />
 
+          {/* Decorative Mountain Vector */}
+          {isDark && (
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                flexShrink: 0,
+                overflow: 'hidden'
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '40px',
+                  background:
+                    'linear-gradient(to bottom, #0A0E17, transparent)',
+                  zIndex: 1
+                }}
+              />
+            </div>
+          )}
+
         </div>
 
-
-        {/* =================================================
-            SETTINGS + LOGOUT
-        ================================================= */}
-
+        {/* Fixed Bottom — Settings + Logout */}
         <div
           style={{
-            padding:
-              '16px 16px 20px',
-
-            borderTop:
-              `1px solid ${borderColor}`,
-
-            background:
-              sidebarBg,
-
+            padding: '16px 16px 20px',
+            borderTop: `1px solid ${borderColor}`,
+            background: sidebarBg,
+            zIndex: 2,
             flexShrink: 0
           }}
         >
 
-          {/* SETTINGS */}
-
+          {/* Settings */}
           <Link
-            href={
-              settingsRoute
-            }
-
+            href={settingsRoute}
             onClick={() =>
-              setIsMobileOpen(
-                false
-              )
+              setIsMobileOpen(false)
             }
-
             style={{
-              ...navItemStyle(
-                settingsRoute
-              ),
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              marginBottom: '8px',
+              textDecoration: 'none',
 
-              marginBottom:
-                '8px'
+              color: isItemActive(settingsRoute)
+                ? isDark
+                  ? '#ffffff'
+                  : '#0f172a'
+                : isDark
+                  ? '#cbd5e1'
+                  : '#475569',
+
+              background: isItemActive(settingsRoute)
+                ? isDark
+                  ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.02) 100%)'
+                  : '#f8fafc'
+                : 'transparent',
+
+              border: isItemActive(settingsRoute)
+                ? '1px solid rgba(16, 185, 129, 0.2)'
+                : '1px solid transparent',
+
+              fontSize: '13.5px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              if (!isItemActive(settingsRoute)) {
+                e.currentTarget.style.background =
+                  isDark
+                    ? 'rgba(255,255,255,0.03)'
+                    : '#f8fafc';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isItemActive(settingsRoute)) {
+                e.currentTarget.style.background =
+                  'transparent';
+              }
             }}
           >
 
             <div
               style={{
-                color:
-                  isItemActive(
-                    settingsRoute
-                  )
-                    ? '#34d399'
-                    : isDark
-                      ? '#cbd5e1'
-                      : '#64748b',
-
+                color: isItemActive(settingsRoute)
+                  ? '#34d399'
+                  : isDark
+                    ? '#cbd5e1'
+                    : '#64748b',
                 display: 'flex'
               }}
             >
-
               <Settings
                 size={18}
                 strokeWidth={2}
               />
-
             </div>
 
             Settings
 
           </Link>
 
-
-          {/* LOGOUT */}
-
+          {/* Logout */}
           <div
-            onClick={
-              handleLogout
-            }
-
+            onClick={handleLogout}
             style={{
               display: 'flex',
-
-              alignItems:
-                'center',
-
+              alignItems: 'center',
               gap: '14px',
-
-              padding:
-                '12px 16px',
-
-              borderRadius:
-                '10px',
-
-              cursor:
-                'pointer',
-
-              color:
-                '#ef4444',
-
-              fontSize:
-                '13.5px',
-
-              fontWeight:
-                '600'
+              padding: '12px 16px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              color: '#ef4444',
+              border: '1px solid transparent',
+              fontSize: '13.5px',
+              fontWeight: '600',
+              transition: 'all 0.2s'
             }}
-
-            onMouseEnter={(e) => {
-
+            onMouseEnter={(e) =>
               e.currentTarget.style.background =
-                'rgba(239,68,68,0.1)';
-
-            }}
-
-            onMouseLeave={(e) => {
-
+                'rgba(239,68,68,0.1)'
+            }
+            onMouseLeave={(e) =>
               e.currentTarget.style.background =
-                'transparent';
-
-            }}
+                'transparent'
+            }
           >
 
-            <LogOut
-              size={18}
-              strokeWidth={2}
-            />
+            <div
+              style={{
+                display: 'flex',
+                color: '#ef4444'
+              }}
+            >
+              <LogOut
+                size={18}
+                strokeWidth={2}
+              />
+            </div>
 
             Logout
 
@@ -1368,7 +988,6 @@ export default function Sidebar({ role }) {
         </div>
 
       </div>
-
     </>
   );
 }

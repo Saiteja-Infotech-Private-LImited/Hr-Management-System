@@ -129,26 +129,3 @@ export const updateJobPosting = (jobId, data) =>
 
 export const sendAdminNotification = (data) =>
   api.post('/api/notifications/send', data);
-
-
-// ============================================================
-// HOLIDAY MANAGEMENT
-// ============================================================
-
-export const getAllHolidays = () =>
-  api.get('/api/holidays');
-
-export const getHolidayById = (id) =>
-  api.get(`/api/holidays/${id}`);
-
-export const createHoliday = (data) =>
-  api.post('/api/holidays', data);
-
-export const updateHoliday = (id, data) =>
-  api.put(`/api/holidays/${id}`, data);
-
-export const deleteHoliday = (id) =>
-  api.delete(`/api/holidays/${id}`);
-
-export const checkHoliday = (date) =>
-  api.get(`/api/holidays/check/${date}`);
