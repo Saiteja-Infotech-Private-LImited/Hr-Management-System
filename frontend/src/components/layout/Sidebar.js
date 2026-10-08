@@ -170,6 +170,7 @@ export default function Sidebar({ role }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isLeaveOpen, setIsLeaveOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -218,8 +219,16 @@ useEffect(() => {
       : '/employee/settings';
 
   const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     dispatch(logout());
     router.push('/');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
   };
 
   const isItemActive = (key) => {
@@ -988,6 +997,128 @@ useEffect(() => {
         </div>
 
       </div>
+
+      {showLogoutConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            background: 'rgba(15, 23, 42, 0.48)',
+            backdropFilter: 'blur(4px)',
+          }}
+          onClick={cancelLogout}
+        >
+          <div
+            style={{
+              width: 'min(420px, 100%)',
+              padding: '24px',
+              borderRadius: '18px',
+              background: isDark ? '#111827' : '#ffffff',
+              border: isDark
+                ? '1px solid rgba(255,255,255,0.08)'
+                : '1px solid #e2e8f0',
+              boxShadow: '0 24px 70px rgba(15, 23, 42, 0.22)',
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            {/* Logout Icon */}
+            <div
+              style={{
+                width: '46px',
+                height: '46px',
+                marginBottom: '14px',
+                borderRadius: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(239, 68, 68, 0.12)',
+                color: '#ef4444',
+              }}
+            >
+              <LogOut size={21} />
+            </div>
+
+            {/* Title */}
+            <div
+              style={{
+                marginBottom: '7px',
+                fontSize: '17px',
+                fontWeight: '800',
+                color: isDark ? '#ffffff' : '#0f172a',
+              }}
+            >
+              Confirm Logout
+            </div>
+
+            {/* Message */}
+            <div
+              style={{
+                marginBottom: '22px',
+                fontSize: '13px',
+                lineHeight: '1.55',
+                color: isDark ? '#94a3b8' : '#64748b',
+              }}
+            >
+              Are you sure you want to logout?
+              You will need to login again to access your account.
+            </div>
+
+            {/* Buttons */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '10px',
+              }}
+            >
+              {/* Cancel Button */}
+              <button
+                type="button"
+                onClick={cancelLogout}
+                style={{
+                  minHeight: '44px',
+                  padding: '11px 14px',
+                  borderRadius: '11px',
+                  border: isDark
+                    ? '1px solid rgba(255,255,255,0.08)'
+                    : '1px solid #e2e8f0',
+                  background: isDark ? '#0f172a' : '#f8fafc',
+                  color: isDark ? '#ffffff' : '#0f172a',
+                  fontSize: '13px',
+                  fontWeight: '800',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+
+              {/* Confirm Logout Button */}
+              <button
+                type="button"
+                onClick={confirmLogout}
+                style={{
+                  minHeight: '44px',
+                  padding: '11px 14px',
+                  borderRadius: '11px',
+                  border: '1px solid #ef4444',
+                  background: '#ef4444',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: '800',
+                  cursor: 'pointer',
+                }}
+              >
+                Confirm Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

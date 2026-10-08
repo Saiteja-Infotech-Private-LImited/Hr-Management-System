@@ -220,10 +220,163 @@ const dashboardCSS = `
    SMALL PHONE  (<= 380px)
    ========================================================= */
 @media (max-width: 380px) {
-  .ed-leaves { grid-template-columns: minmax(0,1fr); }
-  .ed-kpi-value { font-size: 22px; }
-  .ed-time-value { font-size: 21px; }
-  .ed-btn { font-size: 12px; padding: 12px 8px; }
+
+  .ed-leaves {
+    grid-template-columns: minmax(0,1fr);
+  }
+
+  .ed-kpi-value {
+    font-size: 22px;
+  }
+
+  .ed-time-value {
+    font-size: 21px;
+  }
+
+  .ed-btn {
+    font-size: 12px;
+    padding: 12px 8px;
+  }
+
+}
+
+
+/* =========================================================
+   CHECKOUT CONFIRMATION MODAL
+   ========================================================= */
+
+.ed-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(4px);
+}
+
+
+.ed-modal {
+  width: min(420px, 100%);
+
+  padding: 24px;
+
+  border-radius: 18px;
+
+  background: var(--card-bg);
+
+  border: 1px solid var(--card-border);
+
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+
+.ed-modal-icon {
+  width: 46px;
+  height: 46px;
+
+  margin-bottom: 14px;
+
+  border-radius: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(245, 158, 11, 0.12);
+
+  color: #f59e0b;
+}
+
+
+.ed-modal-title {
+  margin-bottom: 7px;
+
+  font-size: 17px;
+
+  font-weight: 800;
+
+  color: var(--text-primary);
+}
+
+
+.ed-modal-text {
+  margin-bottom: 22px;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+
+  color: var(--text-secondary);
+}
+
+
+.ed-modal-actions {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 10px;
+}
+
+
+.ed-modal-btn {
+  min-height: 44px;
+
+  padding: 11px 14px;
+
+  border-radius: 11px;
+
+  border: 1px solid var(--card-border);
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.ed-modal-cancel {
+  background: var(--bg-primary);
+
+  color: var(--text-primary);
+}
+
+
+.ed-modal-confirm {
+  border-color: #f59e0b;
+
+  background: #f59e0b;
+
+  color: #fff;
+}
+
+
+.ed-modal-btn:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.7;
+}
+
+
+/* ---------- mobile modal ---------- */
+
+@media (max-width: 600px) {
+
+  .ed-modal {
+    padding: 20px;
+  }
+
+  .ed-modal-actions {
+    grid-template-columns: 1fr;
+  }
+
 }
 `;
 
@@ -454,7 +607,7 @@ export default function EmployeeDashboard() {
   const [loading, setLoading] = useState(true);
   const [checkingIn, setCheckingIn] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
-
+  const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
   /* ---------- fetch ---------- */
 
   const fetchAll = useCallback(async () => {
@@ -538,20 +691,41 @@ export default function EmployeeDashboard() {
     }
   };
 
-  const handleCheckOut = async () => {
-    if (!todayAtt?.checkIn || todayAtt?.checkOut || checkingOut) return;
-    setCheckingOut(true);
-    try {
-      await checkOut();
-      toast.success('You are checked out successfully');
-      await fetchAll();
-    } catch (error) {
-      console.error('Check-out error:', error);
-      toast.error(error?.response?.data?.message || 'Check-out failed');
-    } finally {
-      setCheckingOut(false);
-    }
-  };
+const handleCheckOut = () => {
+  if (!todayAtt?.checkIn || todayAtt?.checkOut || checkingOut) return;
+
+  setShowCheckoutConfirm(true);
+};
+
+const confirmCheckOut = async () => {
+  if (!todayAtt?.checkIn || todayAtt?.checkOut || checkingOut) return;
+
+  setCheckingOut(true);
+
+  try {
+    await checkOut();
+
+    setShowCheckoutConfirm(false);
+
+    toast.success('You are checked out successfully');
+
+    await fetchAll();
+  } catch (error) {
+    console.error('Check-out error:', error);
+
+    toast.error(
+      error?.response?.data?.message || 'Check-out failed'
+    );
+  } finally {
+    setCheckingOut(false);
+  }
+};
+
+const cancelCheckOut = () => {
+  if (checkingOut) return;
+
+  setShowCheckoutConfirm(false);
+};
 
   /* ---------- derived ---------- */
 
@@ -600,7 +774,60 @@ export default function EmployeeDashboard() {
   return (
     <div className="ed-root">
       <style dangerouslySetInnerHTML={{ __html: dashboardCSS }} />
+      {showCheckoutConfirm && (
+        <div
+          className="ed-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="checkout-confirm-title"
+          onClick={cancelCheckOut}
+        >
+          <div
+            className="ed-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="ed-modal-icon">
+              <LogOut size={21} />
+            </div>
 
+            <div
+              id="checkout-confirm-title"
+              className="ed-modal-title"
+            >
+              Confirm Check Out
+            </div>
+
+            <div className="ed-modal-text">
+              Are you sure you want to check out?
+              Your workday will be marked as completed.
+            </div>
+
+            <div className="ed-modal-actions">
+
+              <button
+                type="button"
+                className="ed-modal-btn ed-modal-cancel"
+                onClick={cancelCheckOut}
+                disabled={checkingOut}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="ed-modal-btn ed-modal-confirm"
+                onClick={confirmCheckOut}
+                disabled={checkingOut}
+              >
+                {checkingOut
+                  ? 'Checking Out...'
+                  : 'Confirm Check Out'}
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
       {/* HEADER */}
       <div className="ed-card ed-header ed-mb">
         <div className="ed-header-glow" />
