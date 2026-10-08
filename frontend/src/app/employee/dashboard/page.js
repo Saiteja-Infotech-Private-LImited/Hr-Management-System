@@ -616,7 +616,7 @@ export default function EmployeeDashboard() {
     try {
       const [attRes, leavesRes, balRes, notifRes, unreadRes] =
         await Promise.allSettled([
-          getMyAttendance(0, 35),
+          getMyAttendance(0, 1000),
           getMyLeaves(0, 5),
           getLeaveBalance(),
           getMyNotifications(0, 5),
