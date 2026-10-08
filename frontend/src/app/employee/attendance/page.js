@@ -378,7 +378,7 @@ export default function AttendancePage() {
       } else {
         await startBreak();
 
-        toast.success('Break started');
+        toast.success('Enjoy your lunch break! 😊');
       }
 
       await fetchAttendance();
@@ -504,15 +504,23 @@ export default function AttendancePage() {
     (record) => record.status === 'LATE'
   ).length;
 
+  const MAX_BREAK_MINUTES = 60;
+
   const totalBreakMinutes = Number(
     todayAtt?.totalBreakMinutes || 0
   );
 
+  const remainingBreakMinutes = Math.max(
+    0,
+    MAX_BREAK_MINUTES - totalBreakMinutes
+  );
+
   const canBreak =
     !!todayAtt?.checkIn &&
-    !todayAtt?.checkOut;
+    !todayAtt?.checkOut &&
+    (todayAtt?.onBreak || remainingBreakMinutes > 0);
 
-  const onBreak = !!todayAtt?.onBreak;
+  const onBreak = !!todayAtt?.onBreak;  
 
   const hasCheckedIn = !!todayAtt?.checkIn;
   const hasCheckedOut = !!todayAtt?.checkOut;
@@ -1857,6 +1865,117 @@ export default function AttendancePage() {
                       ? 'break'
                       : 'breaks'}
                   </span>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '10px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: '10px',
+                      borderRadius: '8px',
+                      background: 'var(--att-surface)',
+                      border: '1px solid var(--att-border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '9px',
+                        color: 'var(--att-muted)',
+                        textTransform: 'uppercase',
+                        fontWeight: 700,
+                        marginBottom: '3px',
+                      }}
+                    >
+                      Total Break
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        color: 'var(--att-text)',
+                        fontWeight: 750,
+                      }}
+                    >
+                      1h
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: '10px',
+                      borderRadius: '8px',
+                      background: 'var(--att-surface)',
+                      border: '1px solid var(--att-border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '9px',
+                        color: 'var(--att-muted)',
+                        textTransform: 'uppercase',
+                        fontWeight: 700,
+                        marginBottom: '3px',
+                      }}
+                    >
+                      Used
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        color: 'var(--att-text)',
+                        fontWeight: 750,
+                      }}
+                    >
+                      {formatDuration(totalBreakMinutes)}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: '10px',
+                      borderRadius: '8px',
+                      background:
+                        remainingBreakMinutes > 0
+                          ? 'var(--att-green-soft)'
+                          : 'var(--att-red-soft)',
+                      border:
+                        remainingBreakMinutes > 0
+                          ? '1px solid rgba(22, 163, 74, 0.2)'
+                          : '1px solid rgba(220, 38, 38, 0.2)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '9px',
+                        color: 'var(--att-muted)',
+                        textTransform: 'uppercase',
+                        fontWeight: 700,
+                        marginBottom: '3px',
+                      }}
+                    >
+                      Remaining
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        color:
+                          remainingBreakMinutes > 0
+                            ? 'var(--att-green)'
+                            : 'var(--att-red)',
+                        fontWeight: 750,
+                      }}
+                    >
+                      {formatDuration(remainingBreakMinutes)}
+                    </div>
+                  </div>
                 </div>
 
                 {todayAtt.breaks.map((breakItem) => (
