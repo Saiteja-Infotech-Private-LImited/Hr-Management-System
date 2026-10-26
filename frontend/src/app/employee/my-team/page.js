@@ -4,16 +4,17 @@
 import { useEffect, useMemo, useState } from "react";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://hrms.saitejainfotechprivatelimited.com";
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://hrms.saitejainfotechprivatelimited.com";
 
 /* Reusable employee card */
 function PersonCard({
   person,
   isYou,
   title,
-  children = [],
+  membersContent = [],
   expandable = false,
-  expanded,
+  expanded = {},
   onToggle,
 }) {
   const you = isYou(person);
@@ -65,16 +66,19 @@ function PersonCard({
           className="mt-4 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 text-left font-medium text-gray-800 hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-900 dark:text-gray-100 dark:hover:bg-slate-700"
         >
           <span>
-            {title} ({children.length})
+            {title} ({membersContent.length})
           </span>
-          <span>{isOpen ? "▲" : "▼"}</span>
+
+          <span aria-hidden="true">
+            {isOpen ? "▲" : "▼"}
+          </span>
         </button>
       )}
 
       {expandable && isOpen && (
         <div className="ml-2 mt-4 space-y-4 border-l-2 border-gray-200 pl-4 dark:border-slate-600">
-          {children.length > 0 ? (
-            children
+          {membersContent.length > 0 ? (
+            membersContent
           ) : (
             <p className="py-2 text-sm text-gray-500 dark:text-gray-400">
               No assigned members.
@@ -88,7 +92,7 @@ function PersonCard({
 
 function LoadingView() {
   return (
-    <main className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-50 p-8 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       Loading your team...
     </main>
   );
@@ -96,12 +100,17 @@ function LoadingView() {
 
 function ErrorView({ error }) {
   return (
-    <main className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-50 p-8 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <h1 className="text-2xl font-bold">My Team</h1>
-      <p className="mt-4 text-red-600">{error}</p>
+
+      <p className="mt-4 text-red-600 dark:text-red-400">
+        {error}
+      </p>
+
       <button
+        type="button"
         onClick={() => window.location.reload()}
-        className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white"
+        className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
       >
         Try again
       </button>
@@ -141,7 +150,9 @@ export default function MyTeamPage() {
         });
 
         if (response.status === 401) {
-          throw new Error("Your session has expired. Please log in again.");
+          throw new Error(
+            "Your session has expired. Please log in again."
+          );
         }
 
         if (!response.ok) {
@@ -230,8 +241,9 @@ export default function MyTeamPage() {
 
   function fullName(person) {
     return (
-      [person?.firstName, person?.lastName].filter(Boolean).join(" ") ||
-      "Unknown"
+      [person?.firstName, person?.lastName]
+        .filter(Boolean)
+        .join(" ") || "Unknown"
     );
   }
 
@@ -242,14 +254,16 @@ export default function MyTeamPage() {
     }));
   }
 
-  function card(person, title, children = [], expandable = false) {
+  function card(person, title, membersContent = [], expandable = false) {
+    if (!person) return null;
+
     return (
       <PersonCard
         key={person.id}
         person={person}
         isYou={isYou}
         title={title}
-        children={children}
+        membersContent={membersContent}
         expandable={expandable}
         expanded={expanded}
         onToggle={toggle}
@@ -257,7 +271,6 @@ export default function MyTeamPage() {
     );
   }
 
-  
   function getEmployees(leader) {
     return members
       .filter(
@@ -267,24 +280,23 @@ export default function MyTeamPage() {
           String(person.teamLeaderId) === String(leader.id)
       )
       .sort((a, b) => {
-        // Logged-in employee always appears first
+        // Logged-in employee appears first.
         const aIsYou = isYou(a);
         const bIsYou = isYou(b);
 
         if (aIsYou && !bIsYou) return -1;
         if (!aIsYou && bIsYou) return 1;
 
-        // Sort remaining employees alphabetically
         return fullName(a).localeCompare(fullName(b));
       });
   }
-
 
   function getLeaders(manager) {
     return members
       .filter(
         (person) =>
-          person.role === "TEAM_LEADER" &&
+          String(person.role || "").replace(/^ROLE_/, "").toUpperCase() ===
+            "TEAM_LEADER" &&
           String(person.managerId) === String(manager.id)
       )
       .sort((a, b) => fullName(a).localeCompare(fullName(b)));
@@ -294,7 +306,8 @@ export default function MyTeamPage() {
     return members
       .filter(
         (person) =>
-          person.role === "MANAGER" &&
+          String(person.role || "").replace(/^ROLE_/, "").toUpperCase() ===
+            "MANAGER" &&
           String(person.hrId) === String(hr.id)
       )
       .sort((a, b) => fullName(a).localeCompare(fullName(b)));
@@ -336,7 +349,7 @@ export default function MyTeamPage() {
 
   if (!me) {
     return (
-      <main className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+      <main className="min-h-screen bg-gray-50 p-8 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
         <h1 className="text-2xl font-bold">My Team</h1>
         <p className="mt-4 text-amber-700 dark:text-amber-300">
           Your logged-in account could not be matched with the team response.
@@ -350,9 +363,11 @@ export default function MyTeamPage() {
   const teamLeader = getTeamLeader(me);
   const hr = getHR(me);
 
-  let hierarchy;
+  let hierarchy = null;
 
-  if (role === "MANAGER") {
+  if (role === "HR") {
+    hierarchy = renderHR(me);
+  } else if (role === "MANAGER") {
     hierarchy = hr ? renderHR(hr) : renderManager(me);
   } else if (role === "TEAM_LEADER") {
     hierarchy = manager
@@ -369,7 +384,12 @@ export default function MyTeamPage() {
           ],
           true
         )
-      : null;
+      : card(
+          me,
+          "Employees",
+          getEmployees(me).map(renderEmployee),
+          true
+        );
   } else if (role === "EMPLOYEE") {
     const employeeManager = teamLeader
       ? getManager(teamLeader)
@@ -395,7 +415,6 @@ export default function MyTeamPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-6 text-gray-900 dark:bg-gray-900 dark:text-gray-100 md:p-8">
       <div className="mx-auto max-w-7xl">
-
         <h1 className="mt-2 text-3xl font-bold">
           Organization Hierarchy
         </h1>
