@@ -51,7 +51,7 @@ public class SecurityConfig {
      * Multiple origins can be supplied as comma-separated values.
      */
 
-    @Value("${app.frontend.url:http://localhost:3000/}")
+    @Value("${app.frontend.url:https://hrms.saitejainfotechprivatelimited.com}")
     private String frontendUrl;
 
     // ============================================================
