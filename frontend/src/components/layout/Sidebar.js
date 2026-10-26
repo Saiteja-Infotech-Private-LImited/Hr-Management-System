@@ -64,6 +64,11 @@ const EMP_MENU = [
     icon: <GraduationCap size={18} strokeWidth={2} />
   },
   {
+    key: '/employee/my-team',
+    label: 'My Team',
+    icon: <Users size={18} strokeWidth={2} />
+  },
+  {
     key: '/employee/jobs',
     label: 'Job Openings',
     icon: <Briefcase size={18} strokeWidth={2} />
@@ -106,6 +111,11 @@ const ADMIN_MENU = [
     key: '/admin/payroll',
     label: 'Payroll',
     icon: <Wallet size={18} strokeWidth={2} />
+  },
+  {
+    key: '/admin/my-team',
+    label: 'My Team',
+    icon: <Users size={18} strokeWidth={2} />
   },
   {
     key: '/admin/performance',

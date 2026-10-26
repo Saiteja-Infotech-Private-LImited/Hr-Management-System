@@ -7,6 +7,17 @@ export const getAllEmployees = (page = 0, size = 10, department = 'All Departmen
   }
   return api.get(url);
 };
+// Get Team Leaders
+export const getTeamLeaders = () =>
+  api.get('/api/employees/team-leaders');
+
+// Get Managers
+export const getManagers = () =>
+  api.get('/api/employees/managers');
+
+// Get HR employees
+export const getHrEmployees = () =>
+  api.get('/api/employees/hr');
 
 export const getEmployeeById = (id) =>
   api.get(`/api/employees/${id}`);

@@ -9,6 +9,9 @@ import {
     createEmployee,
     updateEmployee,
     deleteEmployee,
+    getTeamLeaders,
+    getManagers,
+    getHrEmployees,
 } from '@/lib/adminApi';
 
 import toast from 'react-hot-toast';
@@ -214,6 +217,9 @@ const EMPTY_FORM = {
     dateOfJoining: '',
     dateOfBirth: '',
     role: 'EMPLOYEE',
+    teamLeaderId: '',
+    managerId: '',
+    hrId: '',
 };
 
 
@@ -253,6 +259,13 @@ export default function EmployeeManagementPage() {
     const [editId, setEditId] = useState(null);
 
     const [form, setForm] = useState(EMPTY_FORM);
+
+    const [teamLeaders, setTeamLeaders] = useState([]);
+    const [loadingTeamLeaders, setLoadingTeamLeaders] = useState(false);
+
+    const [managers, setManagers] = useState([]);
+    const [hrEmployees, setHrEmployees] = useState([]);
+    const [loadingReporting, setLoadingReporting] = useState(false);
 
     const [submitting, setSubmitting] = useState(false);
 
@@ -400,6 +413,35 @@ export default function EmployeeManagementPage() {
         sortEmployees,
     ]);
 
+    const fetchReportingEmployees = useCallback(async () => {
+        setLoadingTeamLeaders(true);
+        setLoadingReporting(true);
+
+        try {
+            const [leadersResponse, managersResponse, hrResponse] =
+                await Promise.all([
+                    getTeamLeaders(),
+                    getManagers(),
+                    getHrEmployees(),
+                ]);
+
+            const getList = (response) => {
+                const data = response?.data?.data ?? response?.data;
+                return Array.isArray(data) ? data : data?.content ?? [];
+            };
+
+            setTeamLeaders(getList(leadersResponse));
+            setManagers(getList(managersResponse));
+            setHrEmployees(getList(hrResponse));
+        } catch (error) {
+            console.error('Failed to load reporting employees:', error);
+            toast.error('Failed to load reporting employees');
+        } finally {
+            setLoadingTeamLeaders(false);
+            setLoadingReporting(false);
+        }
+    }, []);
+
 
     /* =====================================================
        SEARCH EMPLOYEES
@@ -487,14 +529,23 @@ export default function EmployeeManagementPage() {
        FORM CHANGE
     ===================================================== */
 
-    const handleFieldChange = (
-        name,
-        value
-    ) => {
-        setForm((previous) => ({
-            ...previous,
-            [name]: value,
-        }));
+    const handleFieldChange = (name, value) => {
+        setForm((previous) => {
+            if (name === 'role') {
+                return {
+                    ...previous,
+                    role: value,
+                    teamLeaderId: '',
+                    managerId: '',
+                    hrId: '',
+                };
+            }
+
+            return {
+                ...previous,
+                [name]: value,
+            };
+        });
     };
 
 
@@ -506,9 +557,10 @@ export default function EmployeeManagementPage() {
         setEditMode(false);
 
         setEditId(null);
-
+        fetchReportingEmployees();
         setForm({
             ...EMPTY_FORM,
+            teamLeaderId: '',
         });
 
         setShowPassword(false);
@@ -526,6 +578,8 @@ export default function EmployeeManagementPage() {
         setEditMode(true);
 
         setEditId(employee.id);
+
+        fetchReportingEmployees();
 
         setForm({
             employeeId:
@@ -564,6 +618,16 @@ export default function EmployeeManagementPage() {
                 String(employee.role || 'EMPLOYEE')
                     .replace(/^ROLE_/i, '')
                     .toUpperCase(),
+            teamLeaderId: employee.teamLeaderId
+                ? String(employee.teamLeaderId)
+                : '',
+            managerId: employee.managerId
+                ? String(employee.managerId)
+                : '',
+
+            hrId: employee.hrId
+                ? String(employee.hrId)
+                : '',
         });
 
         setShowPassword(false);
@@ -633,14 +697,26 @@ export default function EmployeeManagementPage() {
             const payload = {
                 ...form,
 
+                teamLeaderId:
+                    form.role === 'EMPLOYEE' && form.teamLeaderId
+                        ? Number(form.teamLeaderId)
+                        : null,
+
+                managerId:
+                    form.role === 'TEAM_LEADER' && form.managerId
+                        ? Number(form.managerId)
+                        : null,
+
+                hrId:
+                    form.role === 'MANAGER' && form.hrId
+                        ? Number(form.hrId)
+                        : null,
+
                 basicSalary:
                     form.basicSalary !== ''
-                        ? parseFloat(
-                            form.basicSalary
-                        )
+                        ? parseFloat(form.basicSalary)
                         : 0,
             };
-
 
             if (editMode) {
 
@@ -3009,6 +3085,9 @@ export default function EmployeeManagementPage() {
                                             EMPLOYEE
                                         </option>
 
+                                        <option value="TEAM_LEADER">TEAM_LEADER</option>
+                                        <option value="MANAGER">MANAGER</option>
+
                                         <option value="HR">
                                             HR
                                         </option>
@@ -3022,6 +3101,90 @@ export default function EmployeeManagementPage() {
                                 </div>
 
                             </div>
+
+                            {/* EMPLOYEE → TEAM LEADER */}
+                            {form.role === 'EMPLOYEE' && (
+                                <div className="mt-4">
+                                    <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-[#B5D4F4]">
+                                        Team Leader *
+                                    </label>
+
+                                    <select
+                                        value={form.teamLeaderId}
+                                        onChange={(event) =>
+                                            handleFieldChange('teamLeaderId', event.target.value)
+                                        }
+                                        required
+                                        disabled={loadingTeamLeaders}
+                                        className={INPUT_CLASS}
+                                    >
+                                        <option value="">Select Team Leader</option>
+
+                                        {teamLeaders.map((person) => (
+                                            <option key={person.id} value={person.id}>
+                                                {person.fullName ||
+                                                    `${person.firstName} ${person.lastName}`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* TEAM LEADER → MANAGER */}
+                            {form.role === 'TEAM_LEADER' && (
+                                <div className="mt-4">
+                                    <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-[#B5D4F4]">
+                                        Manager *
+                                    </label>
+
+                                    <select
+                                        value={form.managerId}
+                                        onChange={(event) =>
+                                            handleFieldChange('managerId', event.target.value)
+                                        }
+                                        required
+                                        disabled={loadingReporting}
+                                        className={INPUT_CLASS}
+                                    >
+                                        <option value="">Select Manager</option>
+
+                                        {managers.map((person) => (
+                                            <option key={person.id} value={person.id}>
+                                                {person.fullName ||
+                                                    `${person.firstName} ${person.lastName}`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* MANAGER → HR */}
+                            {form.role === 'MANAGER' && (
+                                <div className="mt-4">
+                                    <label className="block mb-1.5 text-xs font-semibold text-slate-700 dark:text-[#B5D4F4]">
+                                        HR *
+                                    </label>
+
+                                    <select
+                                        value={form.hrId}
+                                        onChange={(event) =>
+                                            handleFieldChange('hrId', event.target.value)
+                                        }
+                                        required
+                                        disabled={loadingReporting}
+                                        className={INPUT_CLASS}
+                                    >
+                                        <option value="">Select HR</option>
+
+                                        {hrEmployees.map((person) => (
+                                            <option key={person.id} value={person.id}>
+                                                {person.fullName ||
+                                                    `${person.firstName} ${person.lastName}`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
 
 
                             {/* BUTTONS */}

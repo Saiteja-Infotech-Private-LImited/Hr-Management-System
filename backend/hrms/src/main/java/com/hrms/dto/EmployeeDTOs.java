@@ -1,3 +1,4 @@
+
 package com.hrms.dto;
 
 import com.hrms.enums.Role;
@@ -51,6 +52,11 @@ public class EmployeeDTOs {
 
         @NotNull
         private Role role;
+
+        // Reporting hierarchy IDs
+        private Long teamLeaderId;
+        private Long managerId;
+        private Long hrId;
     }
 
     // ============================================================
@@ -86,6 +92,11 @@ public class EmployeeDTOs {
         private Boolean active;
 
         private String password;
+
+        // Reporting hierarchy IDs
+        private Long teamLeaderId;
+        private Long managerId;
+        private Long hrId;
     }
 
     // ============================================================
@@ -124,5 +135,17 @@ public class EmployeeDTOs {
         private boolean active;
 
         private LocalDateTime createdAt;
+
+        // Assigned Team Leader
+        private Long teamLeaderId;
+        private String teamLeaderName;
+
+        // Assigned Manager
+        private Long managerId;
+        private String managerName;
+
+        // Assigned HR
+        private Long hrId;
+        private String hrName;
     }
 }

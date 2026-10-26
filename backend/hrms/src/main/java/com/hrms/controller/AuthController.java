@@ -690,32 +690,26 @@ public class AuthController {
                         String loginType,
                         Employee employee) {
 
-                /*
-                 * If frontend does not send loginType,
-                 * allow the account's normal authentication flow.
-                 */
-                if (loginType == null
-                                || loginType.isBlank()) {
+                if (loginType == null || loginType.isBlank()) {
+                        return false;
+                }
 
-                        return true;
+                if (employee.getRole() == null) {
+                        return false;
                 }
 
                 String type = loginType.trim().toUpperCase();
+                String role = employee.getRole().name();
 
                 if ("EMPLOYEE".equals(type)) {
-
-                        return employee.getRole() != null
-                                        && "EMPLOYEE".equals(
-                                                        employee.getRole().name());
+                        return "EMPLOYEE".equals(role)
+                                || "TEAM_LEADER".equals(role)
+                                || "MANAGER".equals(role);
                 }
 
                 if ("ADMIN".equals(type)) {
-
-                        return employee.getRole() != null
-                                        && ("ADMIN".equals(
-                                                        employee.getRole().name())
-                                                        || "HR".equals(
-                                                                        employee.getRole().name()));
+                        return "ADMIN".equals(role)
+                                || "HR".equals(role);
                 }
 
                 return false;

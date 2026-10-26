@@ -87,10 +87,25 @@ public class EmployeeController {
         }
 
         // ============================================================
+        // GET ACTIVE TEAM LEADERS
+        // ============================================================
+
+        @GetMapping("/team-leaders")
+        @PreAuthorize("hasAnyRole('ADMIN','HR')")
+        @Operation(summary = "Get active Team Leaders")
+        public ResponseEntity<ApiResponse<java.util.List<EmployeeDTOs.Response>>> getTeamLeaders() {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Team Leaders fetched successfully",
+                        employeeService.getTeamLeaders()));
+        }
+
+        // ============================================================
         // GET EMPLOYEE BY ID
         // ============================================================
 
-        @GetMapping("/{id}")
+        @GetMapping("/{id:\\d+}")
         @Operation(summary = "Get employee by ID")
         public ResponseEntity<ApiResponse<EmployeeDTOs.Response>> getById(
                         @PathVariable Long id) {
@@ -181,5 +196,21 @@ public class EmployeeController {
                                 ApiResponse.success(
                                                 "Managers fetched",
                                                 employeeService.getManagers()));
+        }
+
+        
+        // ============================================================
+        // GET HR EMPLOYEES
+        // ============================================================
+
+        @GetMapping("/hr")
+        @PreAuthorize("hasAnyRole('ADMIN','HR')")
+        @Operation(summary = "Get active HR employees")
+        public ResponseEntity<ApiResponse<java.util.List<EmployeeDTOs.Response>>> getHrEmployees() {
+
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "HR employees fetched successfully",
+                                                employeeService.getHrEmployees()));
         }
 }

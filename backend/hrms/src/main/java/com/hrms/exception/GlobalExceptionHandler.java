@@ -331,26 +331,22 @@ public class GlobalExceptionHandler {
 
         String exceptionMessage =
                 ex.getMostSpecificCause() != null
-                        ? ex.getMostSpecificCause()
-                        .getMessage()
+                        ? ex.getMostSpecificCause().getMessage()
                         : null;
 
+        log.error("Database constraint details: {}", exceptionMessage);
+
         if (exceptionMessage != null) {
+                String lowerCaseMessage = exceptionMessage.toLowerCase();
 
-            String lowerCaseMessage =
-                    exceptionMessage.toLowerCase();
-
-            if (lowerCaseMessage.contains("email")) {
-
-                message =
-                        "An employee with this email already exists.";
-
-            } else if (lowerCaseMessage.contains("employeeid")
-                    || lowerCaseMessage.contains("employee_id")) {
-
-                message =
-                        "An employee with this employee ID already exists.";
-            }
+                if (lowerCaseMessage.contains("email")
+                        && lowerCaseMessage.contains("duplicate")) {
+                        message = "An employee with this email already exists.";
+                } else if ((lowerCaseMessage.contains("employeeid")
+                        || lowerCaseMessage.contains("employee_id"))
+                        && lowerCaseMessage.contains("duplicate")) {
+                        message = "An employee with this employee ID already exists.";
+                }
         }
 
         return ResponseEntity

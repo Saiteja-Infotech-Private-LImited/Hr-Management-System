@@ -50,4 +50,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByActive(boolean active);
 
     long countByDepartment(String department);
+
+    List<Employee> findByRoleAndActiveTrue(Role role);
+
+    List<Employee> findByRoleAndActiveTrueOrderByFirstNameAsc(Role role);
+
+    Optional<Employee> findByIdAndRole(Long id, Role role);
+
+    List<Employee> findByTeamLeader_IdAndActiveTrueOrderByFirstNameAsc(Long teamLeaderId);
+    
+    List<Employee> findByActiveTrueOrderByFirstNameAsc();
+
 }

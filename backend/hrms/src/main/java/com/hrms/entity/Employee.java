@@ -80,6 +80,19 @@ public class Employee implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_leader_id")
+    private Employee teamLeader;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id")
+    private Employee manager;
+
+    // Manager → HR
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hr_id")
+    private Employee hr;
+
     // ============================================================
     // ACCOUNT STATUS
     // ============================================================

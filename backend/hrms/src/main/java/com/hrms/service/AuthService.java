@@ -508,60 +508,57 @@ public class AuthService {
         // LOGIN TYPE VALIDATION
         // ============================================================
 
+        
         private void validateLoginType(
-                        Employee employee,
-                        String loginType) {
+                 Employee employee,
+                  String loginType) {
 
-                if (employee == null
-                                || employee.getRole() == null) {
-
+                if (employee == null || employee.getRole() == null) {
                         throw new BadCredentialsException(
-                                        "Invalid employee account");
+                                "Invalid employee account");
                 }
 
-                if (loginType == null
-                                || loginType.isBlank()) {
-
-                        return;
+                if (loginType == null || loginType.isBlank()) {
+                        throw new BadCredentialsException(
+                                "Login type is required");
                 }
 
-                String normalizedLoginType = loginType.trim().toUpperCase();
+                String normalizedLoginType =
+                        loginType.trim().toUpperCase();
 
-                // --------------------------------------------------------
-                // EMPLOYEE LOGIN
-                // --------------------------------------------------------
+                Role role = employee.getRole();
 
+                // EMPLOYEE PORTAL
                 if ("EMPLOYEE".equals(normalizedLoginType)) {
 
-                        if (employee.getRole() != Role.EMPLOYEE) {
+                        if (role != Role.EMPLOYEE
+                                && role != Role.TEAM_LEADER
+                                && role != Role.MANAGER) {
 
-                                throw new BadCredentialsException(
-                                                "This account belongs to Admin/HR. " +
-                                                                "Please use the Admin/HR login portal.");
+                        throw new BadCredentialsException(
+                                "This account belongs to Admin/HR. " +
+                                "Please use the Admin/HR login portal.");
                         }
 
                         return;
                 }
 
-                // --------------------------------------------------------
-                // ADMIN / HR LOGIN
-                // --------------------------------------------------------
-
+                // ADMIN / HR PORTAL
                 if ("ADMIN".equals(normalizedLoginType)) {
 
-                        if (employee.getRole() == Role.EMPLOYEE) {
+                        if (role != Role.ADMIN && role != Role.HR) {
 
-                                throw new BadCredentialsException(
-                                                "This account is an Employee account. " +
-                                                                "Please use the Employee login portal.");
+                        throw new BadCredentialsException(
+                                "Please use the correct login portal for your role.");
                         }
 
                         return;
                 }
 
                 throw new BadCredentialsException(
-                                "Invalid login type");
+                        "Invalid login type");
         }
+
 
         // ============================================================
         // BUILD LOCKED EXCEPTION

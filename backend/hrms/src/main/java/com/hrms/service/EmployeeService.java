@@ -84,6 +84,16 @@ public class EmployeeService {
 
         Optional<Employee> existingOpt = employeeRepository.findByEmail(email);
 
+        System.out.println("========== EMAIL DEBUG ==========");
+        System.out.println("Email received: [" + email + "]");
+        System.out.println("Existing email found: " + existingOpt.isPresent());
+        existingOpt.ifPresent(e -> {
+            System.out.println("Existing employee ID: " + e.getId());
+            System.out.println("Existing employee email: [" + e.getEmail() + "]");
+            System.out.println("Existing employee active: " + e.isActive());
+        });
+        System.out.println("=================================");
+
         if (existingOpt.isPresent()) {
 
             Employee existing = existingOpt.get();
@@ -158,6 +168,27 @@ public class EmployeeService {
                         req.getRole());
             }
 
+            if (existing.getRole() == Role.EMPLOYEE) {
+                existing.setTeamLeader(
+                        resolveTeamLeader(req.getTeamLeaderId()));
+            } else {
+                existing.setTeamLeader(null);
+            }
+
+            if (existing.getRole() == Role.TEAM_LEADER) {
+                existing.setManager(
+                        resolveManager(req.getManagerId()));
+            } else {
+                existing.setManager(null);
+            }
+
+            if (existing.getRole() == Role.MANAGER) {
+                existing.setHr(
+                        resolveHr(req.getHrId()));
+            } else {
+                existing.setHr(null);
+            }
+
             existing.setActive(true);
 
             if (userCacheService != null) {
@@ -218,15 +249,41 @@ public class EmployeeService {
                 .role(
                         req.getRole() != null
                                 ? req.getRole()
-                                : Role.EMPLOYEE)
-
+                                : Role.EMPLOYEE
+                )
+                .teamLeader(
+                        (req.getRole() != null ? req.getRole() : Role.EMPLOYEE)
+                                == Role.EMPLOYEE
+                                ? resolveTeamLeader(req.getTeamLeaderId())
+                                : null
+                )
+                .manager(
+                        req.getRole() == Role.TEAM_LEADER
+                                ? resolveManager(req.getManagerId())
+                                : null
+                )
+                .hr(
+                        req.getRole() == Role.MANAGER
+                                ? resolveHr(req.getHrId())
+                                : null
+                )
                 .active(true)
-
                 .build();
 
         return toResponse(
                 employeeRepository.save(emp));
     }
+
+    // GET ACTIVE TEAM LEADERS
+        @Transactional(readOnly = true)
+        public List<EmployeeDTOs.Response> getTeamLeaders() {
+        return employeeRepository
+                .findByRoleAndActiveTrueOrderByFirstNameAsc(
+                        Role.TEAM_LEADER)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+        }
 
     // ============================================================
     // GET ALL EMPLOYEES
@@ -427,6 +484,30 @@ public class EmployeeService {
 
             emp.setRole(
                     req.getRole());
+        }
+
+        // EMPLOYEE → TEAM LEADER
+        if (emp.getRole() == Role.EMPLOYEE) {
+                emp.setTeamLeader(
+                        resolveTeamLeader(req.getTeamLeaderId()));
+        } else {
+                emp.setTeamLeader(null);
+        }
+
+        // TEAM LEADER → MANAGER
+        if (emp.getRole() == Role.TEAM_LEADER) {
+                emp.setManager(
+                        resolveManager(req.getManagerId()));
+        } else {
+                emp.setManager(null);
+        }
+
+        // MANAGER → HR
+        if (emp.getRole() == Role.MANAGER) {
+                emp.setHr(
+                        resolveHr(req.getHrId()));
+        } else {
+                emp.setHr(null);
         }
 
         // --------------------------------------------------------
@@ -670,19 +751,72 @@ public class EmployeeService {
     // ============================================================
 
     @Transactional(readOnly = true)
-    public List<EmployeeDTOs.Response> getManagers() {
+        public List<EmployeeDTOs.Response> getManagers() {
+
+        return employeeRepository
+                .findByRoleAndActiveTrueOrderByFirstNameAsc(
+                        Role.MANAGER)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+        }
+
+        @Transactional(readOnly = true)
+        public List<EmployeeDTOs.Response> getHrEmployees() {
 
         return employeeRepository
                 .findAll()
                 .stream()
                 .filter(e -> e.isActive()
-                        &&
-                        (e.getRole() == Role.ADMIN
-                                ||
-                                e.getRole() == Role.HR))
+                        && e.getRole() == Role.HR)
                 .map(this::toResponse)
                 .collect(Collectors.toList());
-    }
+        }
+
+    private Employee resolveTeamLeader(Long teamLeaderId) {
+        return resolveReportingEmployee(
+                teamLeaderId,
+                Role.TEAM_LEADER,
+                "Team Leader");
+        }
+
+        private Employee resolveManager(Long managerId) {
+        return resolveReportingEmployee(
+                managerId,
+                Role.MANAGER,
+                "Manager");
+        }
+
+        private Employee resolveHr(Long hrId) {
+        return resolveReportingEmployee(
+                hrId,
+                Role.HR,
+                "HR");
+        }
+
+        private Employee resolveReportingEmployee(
+                Long employeeId,
+                Role expectedRole,
+                String roleName) {
+
+        if (employeeId == null) {
+                throw new IllegalArgumentException(
+                        roleName + " selection is required");
+        }
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                roleName + " not found"));
+
+        if (!employee.isActive()
+                || employee.getRole() != expectedRole) {
+                throw new IllegalArgumentException(
+                        "Selected employee is not an active " + roleName);
+        }
+
+        return employee;
+        }
 
     // ============================================================
     // FIND EMPLOYEE BY ID
@@ -749,8 +883,34 @@ public class EmployeeService {
         r.setActive(
                 e.isActive());
 
-        r.setCreatedAt(
-                e.getCreatedAt());
+        r.setCreatedAt(e.getCreatedAt());
+
+        // Assigned Team Leader
+        if (e.getTeamLeader() != null) {
+                r.setTeamLeaderId(e.getTeamLeader().getId());
+                r.setTeamLeaderName(
+                        buildFullName(
+                                e.getTeamLeader().getFirstName(),
+                                e.getTeamLeader().getLastName()));
+        }
+
+        // Assigned Manager
+        if (e.getManager() != null) {
+                r.setManagerId(e.getManager().getId());
+                r.setManagerName(
+                        buildFullName(
+                                e.getManager().getFirstName(),
+                                e.getManager().getLastName()));
+        }
+
+        // Assigned HR
+        if (e.getHr() != null) {
+                r.setHrId(e.getHr().getId());
+                r.setHrName(
+                        buildFullName(
+                                e.getHr().getFirstName(),
+                                e.getHr().getLastName()));
+        }
 
         return r;
     }
