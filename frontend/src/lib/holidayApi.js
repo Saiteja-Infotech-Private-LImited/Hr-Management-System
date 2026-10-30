@@ -1,11 +1,14 @@
+
 import axios from "axios";
 
 // ============================================================
-// BASE URL
+// BASE URL CONFIGURATION
 // ============================================================
 
-const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "https://hrms.saitejainfotechprivatelimited.com/";
+const API_BASE_URL = (
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    "https://hrms.saitejainfotechprivatelimited.com"
+).replace(/\/+$/, "");
 
 // ============================================================
 // AXIOS INSTANCE
@@ -15,7 +18,9 @@ const holidayApi = axios.create({
     baseURL: `${API_BASE_URL}/api/holidays`,
     headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
     },
+    timeout: 30000,
 });
 
 // ============================================================
@@ -24,19 +29,38 @@ const holidayApi = axios.create({
 
 holidayApi.interceptors.request.use(
     (config) => {
-        const token =
-            localStorage.getItem("token") ||
-            localStorage.getItem("accessToken") ||
-            sessionStorage.getItem("token") ||
-            sessionStorage.getItem("accessToken");
+        if (typeof window !== "undefined") {
+            const token =
+                localStorage.getItem("token") ||
+                localStorage.getItem("accessToken") ||
+                sessionStorage.getItem("token") ||
+                sessionStorage.getItem("accessToken");
 
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            if (token && token !== "undefined" && token !== "null") {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
 
         return config;
     },
     (error) => Promise.reject(error)
+);
+
+// ============================================================
+// RESPONSE INTERCEPTOR - ERROR LOGGING
+// ============================================================
+
+holidayApi.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.error(
+            "Holiday API Error:",
+            error.response?.status,
+            error.response?.data || error.message
+        );
+
+        return Promise.reject(error);
+    }
 );
 
 // ============================================================
@@ -98,5 +122,9 @@ export const getHolidaysBetween = async (startDate, endDate) => {
 
     return response.data;
 };
+
+// ============================================================
+// EXPORT AXIOS INSTANCE
+// ============================================================
 
 export default holidayApi;
