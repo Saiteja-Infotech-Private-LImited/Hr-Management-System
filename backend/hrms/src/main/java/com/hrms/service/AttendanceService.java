@@ -4,6 +4,7 @@ import com.hrms.dto.AttendanceDTOs;
 import com.hrms.entity.Attendance;
 import com.hrms.entity.AttendanceBreak;
 import com.hrms.entity.Employee;
+import com.hrms.entity.Holiday; // CHANGE 1: new import
 import com.hrms.enums.AttendanceStatus;
 import com.hrms.enums.BreakType;
 import com.hrms.repository.AttendanceBreakRepository;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
@@ -40,6 +40,7 @@ public class AttendanceService {
     private final AttendanceBreakRepository attendanceBreakRepo;
     private final EmployeeService employeeService;
     private final EmployeeRepository employeeRepo;
+    private final HolidayService holidayService; // CHANGE 2: new dependency
 
     private static final LocalTime LATE_THRESHOLD = LocalTime.of(9, 15);
     private static final int FLAG_BREAK_MINUTES = 60;
@@ -49,6 +50,14 @@ public class AttendanceService {
         Employee emp = employeeService.findById(employeeId);
         ZoneId istZone = ZoneId.of("Asia/Kolkata");
         LocalDate date = (req != null && req.getDate() != null) ? req.getDate() : LocalDate.now(istZone);
+
+        // CHANGE 3: block check-in on holidays (single day or date range)
+        List<Holiday> holidays = holidayService.getHolidaysBetween(date, date);
+        if (!holidays.isEmpty()) {
+            throw new IllegalStateException(
+                    "Today is a holiday (" + holidays.get(0).getHolidayName()
+                            + "). Check-in is not allowed on " + date + ".");
+        }
 
         if (attendanceRepo.findByEmployeeAndDate(emp, date).isPresent()) {
             throw new IllegalStateException("Already checked in for " + date);
@@ -192,31 +201,31 @@ public class AttendanceService {
     public Page<AttendanceDTOs.Response> getAttendanceByDate(LocalDate date, Pageable pageable) {
         return attendanceRepo.findByDate(date, pageable).map(this::toResponse);
     }
+
     @Transactional
-public void deleteMyAttendance(Long employeeId, Long attendanceId) {
-    Employee emp = employeeService.findById(employeeId);
+    public void deleteMyAttendance(Long employeeId, Long attendanceId) {
+        Employee emp = employeeService.findById(employeeId);
 
-    Attendance attendance = attendanceRepo.findById(attendanceId)
-            .orElseThrow(() -> new IllegalStateException("Attendance record not found"));
+        Attendance attendance = attendanceRepo.findById(attendanceId)
+                .orElseThrow(() -> new IllegalStateException("Attendance record not found"));
 
-    // Employee can delete only their own attendance record
-    if (!attendance.getEmployee().getId().equals(emp.getId())) {
-        throw new IllegalStateException(
-                "You are not allowed to delete this attendance record"
-        );
+        // Employee can delete only their own attendance record
+        if (!attendance.getEmployee().getId().equals(emp.getId())) {
+            throw new IllegalStateException(
+                    "You are not allowed to delete this attendance record");
+        }
+
+        attendanceRepo.delete(attendance);
     }
 
-    attendanceRepo.delete(attendance);
-}
-@Transactional
-public void clearMyAttendance(Long employeeId) {
-    Employee emp = employeeService.findById(employeeId);
+    @Transactional
+    public void clearMyAttendance(Long employeeId) {
+        Employee emp = employeeService.findById(employeeId);
 
-    List<Attendance> attendanceRecords =
-            attendanceRepo.findByEmployee(emp);
+        List<Attendance> attendanceRecords = attendanceRepo.findByEmployee(emp);
 
-    attendanceRepo.deleteAll(attendanceRecords);
-}
+        attendanceRepo.deleteAll(attendanceRecords);
+    }
 
     @Transactional(readOnly = true)
     public AttendanceDTOs.EmployeeDetailedReport getEmployeeDetailedReport(Long employeeId, LocalDate asOfDate) {
@@ -300,8 +309,6 @@ public void clearMyAttendance(Long employeeId) {
                     summary.setCheckOut(att.getCheckOut());
                     summary.setWorkHours(att.getWorkHours());
                     summary.setTotalBreakMinutes(att.getTotalBreakMinutes());
-                    summary.setOnBreak(attendanceBreakRepo.findFirstByAttendanceAndBreakEndIsNull(att).isPresent());
-                    summary.setTotalBreakMinutes(att.getTotalBreakMinutes());
                     summary.setBreaks(att.getBreaks().stream()
                             .map(this::toBreakResponse).collect(Collectors.toList()));
                     summary.setOnBreak(att.getBreaks().stream().anyMatch(b -> b.getBreakEnd() == null));
@@ -340,7 +347,6 @@ public void clearMyAttendance(Long employeeId) {
 
         return buildAttendanceWorkbook(exportData, from, to);
     }
-
 
     // ===== EXPORT: single employee, date range =====
     @Transactional(readOnly = true)
