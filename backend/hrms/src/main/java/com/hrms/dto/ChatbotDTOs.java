@@ -199,8 +199,7 @@ public class ChatbotDTOs {
 
         private int presentDays;
 
-        private int lopDays;
-
+        private java.math.BigDecimal lopDays;
         private boolean paid;
 
         private LocalDate payDate;

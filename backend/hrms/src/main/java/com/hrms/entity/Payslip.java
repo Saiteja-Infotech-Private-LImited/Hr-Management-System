@@ -63,8 +63,8 @@ public class Payslip {
     private BigDecimal netSalary;
 
     private int presentDays;
-    private int lopDays;
-
+    @Column(precision = 5, scale = 2)
+    private BigDecimal lopDays;
     private LocalDate payDate;
 
     private LocalDateTime generatedAt;

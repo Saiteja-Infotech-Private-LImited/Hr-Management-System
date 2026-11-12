@@ -32,10 +32,10 @@ public class PayslipPdfService {
     // ---- Company letterhead details - EDIT THESE for your company ----
     private static final String COMPANY_NAME = "SAITEJA INFOTECH PRIVATE LIMITED";
     private static final String[] COMPANY_ADDRESS_LINES = {
-            "#21-04-24,",
-            "GOVINDA NAGAR, TIRUPATI,",
-            "CHITTOR, AP 517501",
-            "PHONE NO: 9686617096"
+            "#20-3-124A/1,",
+            "2nd floor, CMS Building, Leela Mahal Circle",
+            "Tirupati",
+            "Andhra Pradesh 517501"
     };
     // Optional logo: place a file at src/main/resources/static/logo.png
     // If it isn't there, the logo is simply skipped (no error).
@@ -154,12 +154,20 @@ public class PayslipPdfService {
                 float infoBoxBottom = afterInfoY - attendanceRowH;
 
                 int standardDays = 31;
-                int presentDays = p.getPresentDays();
-                int lopDays = p.getLopDays();
+
+                java.math.BigDecimal payableDays = java.math.BigDecimal.valueOf(
+                        p.getPresentDays());
+
+                java.math.BigDecimal lopDays = p.getLopDays() != null
+                        ? p.getLopDays()
+                        : java.math.BigDecimal.ZERO;
+
                 float attTextY = afterInfoY - 15;
+
                 drawText(cs, FONT_REG, 9, BLACK, leftLabelX, attTextY,
-                        "Standard Days: " + standardDays + "    Payable Days: " + presentDays
-                                + "    Loss of Pay Days: " + lopDays
+                        "Standard Days: " + standardDays
+                                + "    Payable Days: " + payableDays.stripTrailingZeros().toPlainString()
+                                + "    Loss of Pay Days: " + lopDays.stripTrailingZeros().toPlainString()
                                 + "    LOP Reversal Days: 0    Arrear Days: 0");
 
                 // Box border: outer rect + vertical divider + horizontal line above attendance

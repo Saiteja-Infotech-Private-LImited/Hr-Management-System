@@ -1,3 +1,4 @@
+
 package com.hrms.entity;
 
 import jakarta.persistence.*;
@@ -24,19 +25,20 @@ public class Payroll {
     private Employee employee;
 
     @Column(name = "\"month\"")
-    private int month; // 1-12
+    private int month;
+
     @Column(name = "\"year\"")
     private int year;
 
-    // Earnings
+    // Salary components
     @Column(precision = 12, scale = 2)
     private BigDecimal basicSalary;
 
     @Column(precision = 12, scale = 2)
-    private BigDecimal hra; // House Rent Allowance
+    private BigDecimal hra;
 
     @Column(precision = 12, scale = 2)
-    private BigDecimal da; // Dearness Allowance
+    private BigDecimal da;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal specialAllowance;
@@ -46,10 +48,13 @@ public class Payroll {
 
     // Deductions
     @Column(precision = 12, scale = 2)
-    private BigDecimal esi; // ESI (0.75% of gross if <= 21000)
+    private BigDecimal esi;
 
     @Column(precision = 12, scale = 2)
-    private BigDecimal tds; // Tax Deducted at Source
+    private BigDecimal tds;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal lopDeduction;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal totalDeductions;
@@ -57,10 +62,27 @@ public class Payroll {
     @Column(precision = 12, scale = 2)
     private BigDecimal netSalary;
 
+    // Calendar details
+    private int totalDays;
+    private int weekOffDays;
+    private int holidayDays;
+    private int workingDays;
+
+    // Attendance and leave details
     private int presentDays;
-    private int lopDays; // Loss of Pay
+    private int halfDays;
+    private int absentDays;
+    private int paidLeaveDays;
+    private int unpaidLeaveDays;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal lopDays;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal payableDays;
 
     private boolean paid = false;
+
     private LocalDate payDate;
 
     private LocalDateTime generatedAt;
